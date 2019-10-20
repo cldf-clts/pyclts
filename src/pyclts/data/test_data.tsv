@@ -1,0 +1,732 @@
+source	type	grapheme	bipa	nfd-normalized	clts-normalized	aliased	generated	stressed	name	codepoints
+ms	cluster	ms	ms				+		from voiced bilabial nasal to voiceless alveolar sibilant fricative cluster	U+006d U+0073
+nh	cluster	nh	nh				+		from voiced alveolar nasal to voiceless glottal fricative cluster	U+006e U+0068
+ps	cluster	ps	ps				+		from voiceless bilabial stop to voiceless alveolar sibilant fricative cluster	U+0070 U+0073
+pʃ	cluster	pʃ	pʃ				+		from voiceless bilabial stop to voiceless post-alveolar sibilant fricative cluster	U+0070 U+0283
+tt	cluster	tt	tt				+		from voiceless alveolar stop to voiceless alveolar stop cluster	U+0074 U+0074
+b	consonant	b	b						voiced bilabial stop consonant	U+0062
+bː	consonant	bː	bː						long voiced bilabial stop consonant	U+0062 U+02d0
+b̥	consonant	b̥	b̥						devoiced voiced bilabial stop consonant	U+0062 U+0325
+c	consonant	c	c						voiceless palatal stop consonant	U+0063
+cʰ	consonant	cʰ	cʰ						aspirated voiceless palatal stop consonant	U+0063 U+02b0
+cʷ	consonant	cʷ	cʷ				+		labialized voiceless palatal stop consonant	U+0063 U+02b7
+cʼ	consonant	cʼ	cʼ						voiceless palatal ejective stop consonant	U+0063 U+02bc
+cː	consonant	cː	cː						long voiceless palatal stop consonant	U+0063 U+02d0
+ç	consonant	ç	ç	+					voiceless palatal sibilant fricative consonant	U+0063 U+0327
+d	consonant	d	d						voiced alveolar stop consonant	U+0064
+ḍ/d	consonant	d	d		+				voiced alveolar stop consonant	U+0064
+dz	consonant	dz	dz						voiced alveolar sibilant affricate consonant	U+0064 U+007a
+dʐ	consonant	dʐ	ɖʐ			+			voiced retroflex sibilant affricate consonant	U+0256 U+0290
+dʑ	consonant	dʑ	dʑ						voiced alveolo-palatal sibilant affricate consonant	U+0064 U+0291
+dʒ	consonant	dʒ	dʒ						voiced post-alveolar sibilant affricate consonant	U+0064 U+0292
+dʰ	consonant	dʰ	dʰ						aspirated voiced alveolar stop consonant	U+0064 U+02b0
+dʱ	consonant	dʱ	dʱ						breathy voiced alveolar stop consonant	U+0064 U+02b1
+dʲ	consonant	dʲ	dʲ						palatalized voiced alveolar stop consonant	U+0064 U+02b2
+dː	consonant	dː	dː						long voiced alveolar stop consonant	U+0064 U+02d0
+dːʒ	consonant	dːʒ	dːʒ						long voiced post-alveolar sibilant affricate consonant	U+0064 U+02d0 U+0292
+d̤	consonant	d̤	dʱ			+			breathy voiced alveolar stop consonant	U+0064 U+02b1
+d̥	consonant	d̥	d̥						devoiced voiced alveolar stop consonant	U+0064 U+0325
+d̪	consonant	d̪	d̪						voiced dental stop consonant	U+0064 U+032a
+f	consonant	f	f						voiceless labio-dental fricative consonant	U+0066
+fʰ	consonant	fʰ	fʰ						aspirated voiceless labio-dental fricative consonant	U+0066 U+02b0
+fː	consonant	fː	fː						long voiceless labio-dental fricative consonant	U+0066 U+02d0
+g	consonant	g	g						voiced velar stop consonant	U+0067
+ɡ	consonant	g	g		+				voiced velar stop consonant	U+0067
+gʷ	consonant	gʷ	gʷ						labialized voiced velar stop consonant	U+0067 U+02b7
+gː	consonant	gː	gː						long voiced velar stop consonant	U+0067 U+02d0
+ɡː	consonant	gː	gː		+				long voiced velar stop consonant	U+0067 U+02d0
+ɡ̥	consonant	g̥	g̊		+	+			devoiced voiced velar stop consonant	U+0067 U+030a
+h	consonant	h	h						voiceless glottal fricative consonant	U+0068
+j	consonant	j	j						voiced palatal approximant consonant	U+006a
+Y/j	consonant	j	j		+				voiced palatal approximant consonant	U+006a
+jʰ	consonant	jʰ	jʰ				+		aspirated voiced palatal approximant consonant	U+006a U+02b0
+jʱ	consonant	jʱ	jʱ				+		breathy voiced palatal approximant consonant	U+006a U+02b1
+jː	consonant	jː	jː						long voiced palatal approximant consonant	U+006a U+02d0
+j̊	consonant	j̊	j̊						devoiced voiced palatal approximant consonant	U+006a U+030a
+j̩	consonant	j̩	j̩				+		syllabic voiced palatal approximant consonant	U+006a U+0329
+k	consonant	k	k						voiceless velar stop consonant	U+006b
+kw	consonant	kw	kʷ			+			labialized voiceless velar stop consonant	U+006b U+02b7
+kʰ	consonant	kʰ	kʰ						aspirated voiceless velar stop consonant	U+006b U+02b0
+ŋ/kʰ	consonant	kʰ	kʰ		+				aspirated voiceless velar stop consonant	U+006b U+02b0
+kʲ	consonant	kʲ	kʲ						palatalized voiceless velar stop consonant	U+006b U+02b2
+kʲʰ	consonant	kʲʰ	kʲʰ				+		palatalized aspirated voiceless velar stop consonant	U+006b U+02b2 U+02b0
+kʷ	consonant	kʷ	kʷ						labialized voiceless velar stop consonant	U+006b U+02b7
+kʼ	consonant	kʼ	kʼ						voiceless velar ejective stop consonant	U+006b U+02bc
+kː	consonant	kː	kː						long voiceless velar stop consonant	U+006b U+02d0
+l	consonant	l	l						voiced alveolar lateral approximant consonant	U+006c
+|/l	consonant	l	l		+				voiced alveolar lateral approximant consonant	U+006c
+ĺ/l	consonant	l	l		+				voiced alveolar lateral approximant consonant	U+006c
+lʰ	consonant	lʰ	lʰ				+		aspirated voiced alveolar lateral approximant consonant	U+006c U+02b0
+lʱ	consonant	lʱ	lʱ						breathy voiced alveolar lateral approximant consonant	U+006c U+02b1
+lʷ	consonant	lʷ	lʷ				+		labialized voiced alveolar lateral approximant consonant	U+006c U+02b7
+lː	consonant	lː	lː						long voiced alveolar lateral approximant consonant	U+006c U+02d0
+lˠ	consonant	lˠ	lˠ				+		velarized voiced alveolar lateral approximant consonant	U+006c U+02e0
+l̥	consonant	l̥	l̥						devoiced voiced alveolar lateral approximant consonant	U+006c U+0325
+l̥ʰ	consonant	l̥ʰ	l̥ʰ				+		aspirated devoiced voiced alveolar lateral approximant consonant	U+006c U+0325 U+02b0
+l̩	consonant	l̩	l̩						syllabic voiced alveolar lateral approximant consonant	U+006c U+0329
+l̪	consonant	l̪	l̪						voiced dental lateral approximant consonant	U+006c U+032a
+m	consonant	m	m						voiced bilabial nasal consonant	U+006d
+mʰ	consonant	mʰ	mʰ						aspirated voiced bilabial nasal consonant	U+006d U+02b0
+mʱ	consonant	mʱ	mʱ						breathy voiced bilabial nasal consonant	U+006d U+02b1
+mː	consonant	mː	mː						long voiced bilabial nasal consonant	U+006d U+02d0
+ṃ	consonant	ṃ	m̩	+		+			syllabic voiced bilabial nasal consonant	U+006d U+0329
+m̥	consonant	m̥	m̥						devoiced voiced bilabial nasal consonant	U+006d U+0325
+m̥ʰ	consonant	m̥ʰ	m̥ʰ				+		aspirated devoiced voiced bilabial nasal consonant	U+006d U+0325 U+02b0
+m̩	consonant	m̩	m̩						syllabic voiced bilabial nasal consonant	U+006d U+0329
+n	consonant	n	n						voiced alveolar nasal consonant	U+006e
+nʰ	consonant	nʰ	nʰ				+		aspirated voiced alveolar nasal consonant	U+006e U+02b0
+nʱ	consonant	nʱ	nʱ				+		breathy voiced alveolar nasal consonant	U+006e U+02b1
+nʲ	consonant	nʲ	nʲ						palatalized voiced alveolar nasal consonant	U+006e U+02b2
+nː	consonant	nː	nː						long voiced alveolar nasal consonant	U+006e U+02d0
+n̥	consonant	n̥	n̥						devoiced voiced alveolar nasal consonant	U+006e U+0325
+n̥ʰ	consonant	n̥ʰ	n̥ʰ				+		aspirated devoiced voiced alveolar nasal consonant	U+006e U+0325 U+02b0
+n̩	consonant	n̩	n̩						syllabic voiced alveolar nasal consonant	U+006e U+0329
+n̪	consonant	n̪	n̪						voiced dental nasal consonant	U+006e U+032a
+n̪ː	consonant	n̪ː	n̪ː				+		long voiced dental nasal consonant	U+006e U+032a U+02d0
+p	consonant	p	p						voiceless bilabial stop consonant	U+0070
+pf	consonant	pf	pf						voiceless labio-dental affricate consonant	U+0070 U+0066
+pfʰ	consonant	pfʰ	pfʰ						aspirated voiceless labio-dental affricate consonant	U+0070 U+0066 U+02b0
+pʰ	consonant	pʰ	pʰ						aspirated voiceless bilabial stop consonant	U+0070 U+02b0
+pʼ	consonant	pʼ	pʼ						voiceless bilabial ejective stop consonant	U+0070 U+02bc
+pː	consonant	pː	pː						long voiceless bilabial stop consonant	U+0070 U+02d0
+q	consonant	q	q						voiceless uvular stop consonant	U+0071
+qʰ	consonant	qʰ	qʰ						aspirated voiceless uvular stop consonant	U+0071 U+02b0
+qʱ	consonant	qʱ	qʱ				+		breathy voiceless uvular stop consonant	U+0071 U+02b1
+qː	consonant	qː	qː				+		long voiceless uvular stop consonant	U+0071 U+02d0
+r	consonant	r	r						voiced alveolar trill consonant	U+0072
+rʰ	consonant	rʰ	rʰ				+		aspirated voiced alveolar trill consonant	U+0072 U+02b0
+rʲ	consonant	rʲ	rʲ						palatalized voiced alveolar trill consonant	U+0072 U+02b2
+rː	consonant	rː	rː						long voiced alveolar trill consonant	U+0072 U+02d0
+r̥	consonant	r̥	r̥						devoiced voiced alveolar trill consonant	U+0072 U+0325
+s	consonant	s	s						voiceless alveolar sibilant fricative consonant	U+0073
+sʰ	consonant	sʰ	sʰ				+		aspirated voiceless alveolar sibilant fricative consonant	U+0073 U+02b0
+sː	consonant	sː	sː						long voiceless alveolar sibilant fricative consonant	U+0073 U+02d0
+t	consonant	t	t						voiceless alveolar stop consonant	U+0074
+t̩/t	consonant	t	t		+				voiceless alveolar stop consonant	U+0074
+ts	consonant	ts	ts						voiceless alveolar sibilant affricate consonant	U+0074 U+0073
+tsʰ	consonant	tsʰ	tsʰ						aspirated voiceless alveolar sibilant affricate consonant	U+0074 U+0073 U+02b0
+ʒ/tsʰ	consonant	tsʰ	tsʰ		+				aspirated voiceless alveolar sibilant affricate consonant	U+0074 U+0073 U+02b0
+tsː	consonant	tsː	tsː						long voiceless alveolar sibilant affricate consonant	U+0074 U+0073 U+02d0
+tɕ	consonant	tɕ	tɕ						voiceless alveolo-palatal sibilant affricate consonant	U+0074 U+0255
+tɕʰ	consonant	tɕʰ	tɕʰ						aspirated voiceless alveolo-palatal sibilant affricate consonant	U+0074 U+0255 U+02b0
+tɬ	consonant	tɬ	tɬ						voiceless alveolar lateral affricate consonant	U+0074 U+026c
+tʂ	consonant	tʂ	ʈʂ			+			voiceless retroflex sibilant affricate consonant	U+0288 U+0282
+tʂʰ	consonant	tʂʰ	ʈʂʰ			+			aspirated voiceless retroflex sibilant affricate consonant	U+0288 U+0282 U+02b0
+tʃ	consonant	tʃ	tʃ						voiceless post-alveolar sibilant affricate consonant	U+0074 U+0283
+c/tʃ	consonant	tʃ	tʃ		+				voiceless post-alveolar sibilant affricate consonant	U+0074 U+0283
+tʃʰ	consonant	tʃʰ	tʃʰ						aspirated voiceless post-alveolar sibilant affricate consonant	U+0074 U+0283 U+02b0
+tʰ	consonant	tʰ	tʰ						aspirated voiceless alveolar stop consonant	U+0074 U+02b0
+l/tʰ	consonant	tʰ	tʰ		+				aspirated voiceless alveolar stop consonant	U+0074 U+02b0
+n/tʰ	consonant	tʰ	tʰ		+				aspirated voiceless alveolar stop consonant	U+0074 U+02b0
+tʲ	consonant	tʲ	tʲ						palatalized voiceless alveolar stop consonant	U+0074 U+02b2
+tʼ	consonant	tʼ	tʼ						voiceless alveolar ejective stop consonant	U+0074 U+02bc
+tː	consonant	tː	tː						long voiceless alveolar stop consonant	U+0074 U+02d0
+tːs	consonant	tːs	tsː			+			long voiceless alveolar sibilant affricate consonant	U+0074 U+0073 U+02d0
+tːʃ	consonant	tːʃ	tʃː			+			long voiceless post-alveolar sibilant affricate consonant	U+0074 U+0283 U+02d0
+t̪	consonant	t̪	t̪						voiceless dental stop consonant	U+0074 U+032a
+t̪ʷ	consonant	t̪ʷ	t̪ʷ						labialized voiceless dental stop consonant	U+0074 U+032a U+02b7
+t̪ː	consonant	t̪ː	t̪ː						long voiceless dental stop consonant	U+0074 U+032a U+02d0
+v	consonant	v	v						voiced labio-dental fricative consonant	U+0076
+vʱ	consonant	vʱ	vʱ				+		breathy voiced labio-dental fricative consonant	U+0076 U+02b1
+vʲ	consonant	vʲ	vʲ						palatalized voiced labio-dental fricative consonant	U+0076 U+02b2
+vː	consonant	vː	vː						long voiced labio-dental fricative consonant	U+0076 U+02d0
+ṽ	consonant	ṽ	ṽ	+			+		nasalized voiced labio-dental fricative consonant	U+0076 U+0303
+v̥	consonant	v̥	v̥						devoiced voiced labio-dental fricative consonant	U+0076 U+0325
+v̩	consonant	v̩	v̩						syllabic voiced labio-dental fricative consonant	U+0076 U+0329
+w	consonant	w	w						voiced labio-velar approximant consonant	U+0077
+w̥	consonant	w̥	w̥				+		devoiced voiced labio-velar approximant consonant	U+0077 U+0325
+x	consonant	x	x						voiceless velar fricative consonant	U+0078
+xʰ	consonant	xʰ	xʰ				+		aspirated voiceless velar fricative consonant	U+0078 U+02b0
+z	consonant	z	z						voiced alveolar sibilant fricative consonant	U+007a
+ð	consonant	ð	ð						voiced dental fricative consonant	U+00f0
+Ḏ/ð	consonant	ð	ð		+				voiced dental fricative consonant	U+00f0
+ħ	consonant	ħ	ħ						voiceless pharyngeal fricative consonant	U+0127
+ŋ	consonant	ŋ	ŋ						voiced velar nasal consonant	U+014b
+ŋʰ	consonant	ŋʰ	ŋʰ				+		aspirated voiced velar nasal consonant	U+014b U+02b0
+ŋː	consonant	ŋː	ŋː						long voiced velar nasal consonant	U+014b U+02d0
+ŋ̊	consonant	ŋ̊	ŋ̊						devoiced voiced velar nasal consonant	U+014b U+030a
+ŋ̍	consonant	ŋ̍	ŋ̍						syllabic voiced velar nasal consonant	U+014b U+030d
+ŋ̩	consonant	ŋ̩	ŋ̍			+			syllabic voiced velar nasal consonant	U+014b U+030d
+ɓ	consonant	ɓ	ɓ						voiced bilabial implosive consonant	U+0253
+ɕ	consonant	ɕ	ɕ						voiceless alveolo-palatal sibilant fricative consonant	U+0255
+ɕʰ	consonant	ɕʰ	ɕʰ				+		aspirated voiceless alveolo-palatal sibilant fricative consonant	U+0255 U+02b0
+ɖ	consonant	ɖ	ɖ						voiced retroflex stop consonant	U+0256
+ɖʐ	consonant	ɖʐ	ɖʐ						voiced retroflex sibilant affricate consonant	U+0256 U+0290
+ɖː	consonant	ɖː	ɖː				+		long voiced retroflex stop consonant	U+0256 U+02d0
+ɗ	consonant	ɗ	ɗ						voiced dental implosive consonant	U+0257
+ɗ̥	consonant	ɗ̥	ɗ̥						devoiced voiced dental implosive consonant	U+0257 U+0325
+ɟ	consonant	ɟ	ɟ						voiced palatal stop consonant	U+025f
+ɟʰ	consonant	ɟʰ	ɟʰ				+		aspirated voiced palatal stop consonant	U+025f U+02b0
+ɢ	consonant	ɢ	ɢ						voiced uvular stop consonant	U+0262
+ɣ	consonant	ɣ	ɣ						voiced velar fricative consonant	U+0263
+ɥ	consonant	ɥ	ɥ						voiced labio-palatal approximant consonant	U+0265
+ɦ	consonant	ɦ	ɦ						voiced glottal fricative consonant	U+0266
+ɬ	consonant	ɬ	ɬ						voiceless alveolar lateral fricative consonant	U+026c
+ɭ	consonant	ɭ	ɭ						voiced retroflex lateral approximant consonant	U+026d
+ɭ̥ʰ	consonant	ɭ̥ʰ	ɭ̥ʰ				+		aspirated devoiced voiced retroflex lateral approximant consonant	U+026d U+0325 U+02b0
+ɮ	consonant	ɮ	ɮ						voiced alveolar lateral fricative consonant	U+026e
+ɲ	consonant	ɲ	ɲ						voiced palatal nasal consonant	U+0272
+ɲʰ	consonant	ɲʰ	ɲʰ				+		aspirated voiced palatal nasal consonant	U+0272 U+02b0
+ɲʱ	consonant	ɲʱ	ɲʱ				+		breathy voiced palatal nasal consonant	U+0272 U+02b1
+ɲː	consonant	ɲː	ɲː						long voiced palatal nasal consonant	U+0272 U+02d0
+ɲ̊	consonant	ɲ̊	ɲ̊						devoiced voiced palatal nasal consonant	U+0272 U+030a
+ɲ̥	consonant	ɲ̥	ɲ̊			+			devoiced voiced palatal nasal consonant	U+0272 U+030a
+ɲ̥ʰ	consonant	ɲ̥ʰ	ɲ̥ʰ			+	+		aspirated devoiced voiced palatal nasal consonant	U+0272 U+0325 U+02b0
+ɳ	consonant	ɳ	ɳ						voiced retroflex nasal consonant	U+0273
+ɴ	consonant	ɴ	ɴ						voiced uvular nasal consonant	U+0274
+ɴ̥	consonant	ɴ̥	ɴ̥						devoiced voiced uvular nasal consonant	U+0274 U+0325
+ɸ	consonant	ɸ	ɸ						voiceless bilabial fricative consonant	U+0278
+ɹ	consonant	ɹ	ɹ						voiced alveolar approximant consonant	U+0279
+ɺ	consonant	ɺ	ɺ						voiced alveolar lateral tap consonant	U+027a
+ɽ	consonant	ɽ	ɽ						voiced retroflex tap consonant	U+027d
+ɾ	consonant	ɾ	ɾ						voiced alveolar tap consonant	U+027e
+ʀ	consonant	ʀ	ʀ						voiced uvular trill consonant	U+0280
+ʁ	consonant	ʁ	ʁ						voiced uvular fricative consonant	U+0281
+ʂ	consonant	ʂ	ʂ						voiceless retroflex sibilant fricative consonant	U+0282
+ʃ	consonant	ʃ	ʃ						voiceless post-alveolar sibilant fricative consonant	U+0283
+ʃː	consonant	ʃː	ʃː				+		long voiceless post-alveolar sibilant fricative consonant	U+0283 U+02d0
+ʈ	consonant	ʈ	ʈ						voiceless retroflex stop consonant	U+0288
+ʈʂʰ	consonant	ʈʂʰ	ʈʂʰ						aspirated voiceless retroflex sibilant affricate consonant	U+0288 U+0282 U+02b0
+ʈʰ	consonant	ʈʰ	ʈʰ						aspirated voiceless retroflex stop consonant	U+0288 U+02b0
+ʋ	consonant	ʋ	ʋ						voiced labio-dental approximant consonant	U+028b
+ʎ	consonant	ʎ	ʎ						voiced palatal lateral approximant consonant	U+028e
+ʎː	consonant	ʎː	ʎː				+		long voiced palatal lateral approximant consonant	U+028e U+02d0
+ʎ̥ʰ	consonant	ʎ̥ʰ	ʎ̥ʰ				+		aspirated devoiced voiced palatal lateral approximant consonant	U+028e U+0325 U+02b0
+ʐ	consonant	ʐ	ʐ						voiced retroflex sibilant fricative consonant	U+0290
+ʑ	consonant	ʑ	ʑ						voiced alveolo-palatal sibilant fricative consonant	U+0291
+ʒ	consonant	ʒ	ʒ						voiced post-alveolar sibilant fricative consonant	U+0292
+Z/ʒ	consonant	ʒ	ʒ		+				voiced post-alveolar sibilant fricative consonant	U+0292
+ʔ	consonant	ʔ	ʔ						voiceless glottal stop consonant	U+0294
+ʔʲ	consonant	ʔʲ	ʔʲ						palatalized voiceless glottal stop consonant	U+0294 U+02b2
+ʔʷ	consonant	ʔʷ	ʔʷ						labialized voiceless glottal stop consonant	U+0294 U+02b7
+ʣ	consonant	ʣ	dz			+			voiced alveolar sibilant affricate consonant	U+0064 U+007a
+ʤ	consonant	ʤ	dʒ			+			voiced post-alveolar sibilant affricate consonant	U+0064 U+0292
+ʥ	consonant	ʥ	dʑ			+			voiced alveolo-palatal sibilant affricate consonant	U+0064 U+0291
+ʦ	consonant	ʦ	ts			+			voiceless alveolar sibilant affricate consonant	U+0074 U+0073
+j/ʦʰ	consonant	ʦʰ	tsʰ		+	+	+		aspirated voiceless alveolar sibilant affricate consonant	U+0074 U+0073 U+02b0
+ʧ	consonant	ʧ	tʃ			+			voiceless post-alveolar sibilant affricate consonant	U+0074 U+0283
+ʧʰ	consonant	ʧʰ	tʃʰ			+	+		aspirated voiceless post-alveolar sibilant affricate consonant	U+0074 U+0283 U+02b0
+ʨ	consonant	ʨ	tɕ			+			voiceless alveolo-palatal sibilant affricate consonant	U+0074 U+0255
+ˀb	consonant	ˀb	ˀb				+		pre-glottalized voiced bilabial stop consonant	U+02c0 U+0062
+ˀd	consonant	ˀd	ˀd				+		pre-glottalized voiced alveolar stop consonant	U+02c0 U+0064
+ˀk	consonant	ˀk	ˀk				+		pre-glottalized voiceless velar stop consonant	U+02c0 U+006b
+ˀm	consonant	ˀm	ˀm				+		pre-glottalized voiced bilabial nasal consonant	U+02c0 U+006d
+ˀn	consonant	ˀn	ˀn				+		pre-glottalized voiced alveolar nasal consonant	U+02c0 U+006e
+ˀr	consonant	ˀr	ˀr				+		pre-glottalized voiced alveolar trill consonant	U+02c0 U+0072
+ˀs	consonant	ˀs	ˀs				+		pre-glottalized voiceless alveolar sibilant fricative consonant	U+02c0 U+0073
+ˀt	consonant	ˀt	ˀt				+		pre-glottalized voiceless alveolar stop consonant	U+02c0 U+0074
+ˀt̪	consonant	ˀt̪	ˀt̪				+		pre-glottalized voiceless dental stop consonant	U+02c0 U+0074 U+032a
+ˀw	consonant	ˀw	ˀw				+		pre-glottalized voiced labio-velar approximant consonant	U+02c0 U+0077
+ˀɭ	consonant	ˀɭ	ˀɭ				+		pre-glottalized voiced retroflex lateral approximant consonant	U+02c0 U+026d
+ˈf	consonant	ˈf	f			+	+	+	voiceless labio-dental fricative consonant	U+0066
+ˈj	consonant	ˈj	j			+	+	+	voiced palatal approximant consonant	U+006a
+ˈlˠ	consonant	ˈlˠ	lˠ			+	+	+	velarized voiced alveolar lateral approximant consonant	U+006c U+02e0
+ˈr	consonant	ˈr	r			+	+	+	voiced alveolar trill consonant	U+0072
+ˈw	consonant	ˈw	w			+	+	+	voiced labio-velar approximant consonant	U+0077
+ˈɥ	consonant	ˈɥ	ɥ			+	+	+	voiced labio-palatal approximant consonant	U+0265
+β	consonant	β	β						voiced bilabial fricative consonant	U+03b2
+θ	consonant	θ	θ						voiceless dental fricative consonant	U+03b8
+χ	consonant	χ	χ						voiceless uvular fricative consonant	U+03c7
+ᵐb	consonant	ᵐb	ⁿb			+	+		pre-nasalized voiced bilabial stop consonant	U+207f U+0062
+ᵐp	consonant	ᵐp	ⁿp			+	+		pre-nasalized voiceless bilabial stop consonant	U+207f U+0070
+ⁿt	consonant	ⁿt	ⁿt						pre-nasalized voiceless alveolar stop consonant	U+207f U+0074
+ai	diphthong	ai	ai				+		from unrounded open front to unrounded close front diphthong	U+0061 U+0069
+ao	diphthong	ao	ao				+		from unrounded open front to rounded close-mid back diphthong	U+0061 U+006f
+áá	diphthong	áá	áá	+			+		from unrounded open front with_high_tone to unrounded open front with_high_tone diphthong	U+0061 U+0301 U+0061 U+0301
+ã́ã́	diphthong	ã́ã́	ã́ã́	+			+		from nasalized unrounded open front with_high_tone to nasalized unrounded open front with_high_tone diphthong	U+0061 U+0303 U+0301 U+0061 U+0303 U+0301
+éé	diphthong	éé	éé	+			+		from unrounded close-mid front with_high_tone to unrounded close-mid front with_high_tone diphthong	U+0065 U+0301 U+0065 U+0301
+ẽ́ẽ́	diphthong	ẽ́ẽ́	ẽ́ẽ́	+			+		from nasalized unrounded close-mid front with_high_tone to nasalized unrounded close-mid front with_high_tone diphthong	U+0065 U+0303 U+0301 U+0065 U+0303 U+0301
+ie	diphthong	ie	ie				+		from unrounded close front to unrounded close-mid front diphthong	U+0069 U+0065
+iii	diphthong	iii	iːi				+		from long unrounded close front to unrounded close front diphthong	U+0069 U+02d0 U+0069
+íí	diphthong	íí	íí	+			+		from unrounded close front with_high_tone to unrounded close front with_high_tone diphthong	U+0069 U+0301 U+0069 U+0301
+ĩ́ĩ́	diphthong	ĩ́ĩ́	ĩ́ĩ́	+			+		from nasalized unrounded close front with_high_tone to nasalized unrounded close front with_high_tone diphthong	U+0069 U+0303 U+0301 U+0069 U+0303 U+0301
+óó	diphthong	óó	óó	+			+		from rounded close-mid back with_high_tone to rounded close-mid back with_high_tone diphthong	U+006f U+0301 U+006f U+0301
+ṍṍ	diphthong	ṍṍ	ṍṍ	+			+		from nasalized rounded close-mid back with_high_tone to nasalized rounded close-mid back with_high_tone diphthong	U+006f U+0303 U+0301 U+006f U+0303 U+0301
+ui	diphthong	ui	ui				+		from rounded close back to unrounded close front diphthong	U+0075 U+0069
+əu	diphthong	əu	əu				+		from unrounded mid central to rounded close back diphthong	U+0259 U+0075
+ˈai	diphthong	ˈai	ai				+	+	from unrounded open front to unrounded close front diphthong	U+0061 U+0069
+ˈau	diphthong	ˈau	au				+	+	from unrounded open front to rounded close back diphthong	U+0061 U+0075
+ˈeə	diphthong	ˈeə	eə				+	+	from unrounded close-mid front to unrounded mid central diphthong	U+0065 U+0259
+ˈe̯a	diphthong	ˈe̯a	e̯a				+	+	from non-syllabic unrounded close-mid front to unrounded open front diphthong	U+0065 U+032f U+0061
+ˈia	diphthong	ˈia	ia				+	+	from unrounded close front to unrounded open front diphthong	U+0069 U+0061
+ˈie	diphthong	ˈie	ie				+	+	from unrounded close front to unrounded close-mid front diphthong	U+0069 U+0065
+ˈiə	diphthong	ˈiə	iə				+	+	from unrounded close front to unrounded mid central diphthong	U+0069 U+0259
+ˈoi	diphthong	ˈoi	oi				+	+	from rounded close-mid back to unrounded close front diphthong	U+006f U+0069
+ˈo̯a	diphthong	ˈo̯a	o̯a				+	+	from non-syllabic rounded close-mid back to unrounded open front diphthong	U+006f U+032f U+0061
+ˈui	diphthong	ˈui	ui				+	+	from rounded close back to unrounded close front diphthong	U+0075 U+0069
+_	marker										
+∼	marker										
++	marker										
+#	marker										
+→	marker										
+←	marker										
+²	tone	²	²						short from-mid-low tone	U+00b2
+⁵⁴/²	tone	²	²		+				short from-mid-low tone	U+00b2
+⁵/²	tone	²	²		+				short from-mid-low tone	U+00b2
+⁴⁵/²	tone	²	²		+				short from-mid-low tone	U+00b2
+³⁵/²	tone	²	²		+				short from-mid-low tone	U+00b2
+²²	tone	²²	²²						flat from-mid-low to-mid-low tone	U+00b2 U+00b2
+²¹/²²	tone	²²	²²		+				flat from-mid-low to-mid-low tone	U+00b2 U+00b2
+²²/²²	tone	²²	²²		+				flat from-mid-low to-mid-low tone	U+00b2 U+00b2
+⁴²/²²	tone	²²	²²		+				flat from-mid-low to-mid-low tone	U+00b2 U+00b2
+¹¹/²²	tone	²²	²²		+				flat from-mid-low to-mid-low tone	U+00b2 U+00b2
+³⁵/²²	tone	²²	²²		+				flat from-mid-low to-mid-low tone	U+00b2 U+00b2
+⁵⁵/²²	tone	²²	²²		+				flat from-mid-low to-mid-low tone	U+00b2 U+00b2
+²³	tone	²³	²³						rising from-mid-low to-mid tone	U+00b2 U+00b3
+²¹/²³	tone	²³	²³		+				rising from-mid-low to-mid tone	U+00b2 U+00b3
+²²/²³	tone	²³	²³		+				rising from-mid-low to-mid tone	U+00b2 U+00b3
+⁴⁴/²³	tone	²³	²³		+				rising from-mid-low to-mid tone	U+00b2 U+00b3
+³⁵/²³	tone	²³	²³		+				rising from-mid-low to-mid tone	U+00b2 U+00b3
+²³⁵/²³	tone	²³	²³		+				rising from-mid-low to-mid tone	U+00b2 U+00b3
+²¹	tone	²¹	²¹						falling from-mid-low to-low tone	U+00b2 U+00b9
+³⁵/²¹	tone	²¹	²¹		+				falling from-mid-low to-low tone	U+00b2 U+00b9
+⁵³/²¹	tone	²¹	²¹		+				falling from-mid-low to-low tone	U+00b2 U+00b9
+⁵⁴⁴/²¹	tone	²¹	²¹		+				falling from-mid-low to-low tone	U+00b2 U+00b9
+²⁴/²¹	tone	²¹	²¹		+				falling from-mid-low to-low tone	U+00b2 U+00b9
+²³/²¹	tone	²¹	²¹		+				falling from-mid-low to-low tone	U+00b2 U+00b9
+¹³/²¹	tone	²¹	²¹		+				falling from-mid-low to-low tone	U+00b2 U+00b9
+⁵⁵/²¹	tone	²¹	²¹		+				falling from-mid-low to-low tone	U+00b2 U+00b9
+²¹²	tone	²¹²	²¹²						contour from-mid-low via-low to-mid-low tone	U+00b2 U+00b9 U+00b2
+¹¹/²¹²	tone	²¹²	²¹²		+				contour from-mid-low via-low to-mid-low tone	U+00b2 U+00b9 U+00b2
+¹²/²¹²	tone	²¹²	²¹²		+				contour from-mid-low via-low to-mid-low tone	U+00b2 U+00b9 U+00b2
+⁴⁴/²¹²	tone	²¹²	²¹²		+				contour from-mid-low via-low to-mid-low tone	U+00b2 U+00b9 U+00b2
+²¹/²¹²	tone	²¹²	²¹²		+				contour from-mid-low via-low to-mid-low tone	U+00b2 U+00b9 U+00b2
+⁵³/²¹²	tone	²¹²	²¹²		+				contour from-mid-low via-low to-mid-low tone	U+00b2 U+00b9 U+00b2
+²¹³	tone	²¹³	²¹³						contour from-mid-low via-low to-mid tone	U+00b2 U+00b9 U+00b3
+³¹/²¹³	tone	²¹³	²¹³		+				contour from-mid-low via-low to-mid tone	U+00b2 U+00b9 U+00b3
+²²/²¹³	tone	²¹³	²¹³		+				contour from-mid-low via-low to-mid tone	U+00b2 U+00b9 U+00b3
+²¹/²¹³	tone	²¹³	²¹³		+				contour from-mid-low via-low to-mid tone	U+00b2 U+00b9 U+00b3
+¹³/²¹³	tone	²¹³	²¹³		+				contour from-mid-low via-low to-mid tone	U+00b2 U+00b9 U+00b3
+⁵⁵/²¹³	tone	²¹³	²¹³		+				contour from-mid-low via-low to-mid tone	U+00b2 U+00b9 U+00b3
+²⁴/²¹³	tone	²¹³	²¹³		+				contour from-mid-low via-low to-mid tone	U+00b2 U+00b9 U+00b3
+³³/²¹³	tone	²¹³	²¹³		+				contour from-mid-low via-low to-mid tone	U+00b2 U+00b9 U+00b3
+⁵³/²¹³	tone	²¹³	²¹³		+				contour from-mid-low via-low to-mid tone	U+00b2 U+00b9 U+00b3
+²³/²¹³	tone	²¹³	²¹³		+				contour from-mid-low via-low to-mid tone	U+00b2 U+00b9 U+00b3
+³⁵/²¹³	tone	²¹³	²¹³		+				contour from-mid-low via-low to-mid tone	U+00b2 U+00b9 U+00b3
+⁴²/²¹³	tone	²¹³	²¹³		+				contour from-mid-low via-low to-mid tone	U+00b2 U+00b9 U+00b3
+⁴⁴/²¹³	tone	²¹³	²¹³		+				contour from-mid-low via-low to-mid tone	U+00b2 U+00b9 U+00b3
+²¹⁵/²¹³	tone	²¹³	²¹³		+				contour from-mid-low via-low to-mid tone	U+00b2 U+00b9 U+00b3
+²/²¹³	tone	²¹³	²¹³		+				contour from-mid-low via-low to-mid tone	U+00b2 U+00b9 U+00b3
+²¹⁴	tone	²¹⁴	²¹⁴						contour from-mid-low via-low to-mid-high tone	U+00b2 U+00b9 U+2074
+²¹/²¹⁴	tone	²¹⁴	²¹⁴		+				contour from-mid-low via-low to-mid-high tone	U+00b2 U+00b9 U+2074
+³⁵/²¹⁴	tone	²¹⁴	²¹⁴		+				contour from-mid-low via-low to-mid-high tone	U+00b2 U+00b9 U+2074
+²⁴	tone	²⁴	²⁴						rising from-mid-low to-mid-high tone	U+00b2 U+2074
+²¹/²⁴	tone	²⁴	²⁴		+				rising from-mid-low to-mid-high tone	U+00b2 U+2074
+⁵³/²⁴	tone	²⁴	²⁴		+				rising from-mid-low to-mid-high tone	U+00b2 U+2074
+³³/²⁴	tone	²⁴	²⁴		+				rising from-mid-low to-mid-high tone	U+00b2 U+2074
+¹¹/²⁴	tone	²⁴	²⁴		+				rising from-mid-low to-mid-high tone	U+00b2 U+2074
+²²/²⁴	tone	²⁴	²⁴		+				rising from-mid-low to-mid-high tone	U+00b2 U+2074
+⁴⁴/²⁴	tone	²⁴	²⁴		+				rising from-mid-low to-mid-high tone	U+00b2 U+2074
+⁴²/²⁴	tone	²⁴	²⁴		+				rising from-mid-low to-mid-high tone	U+00b2 U+2074
+⁵/²⁴	tone	²⁴	²⁴		+				rising from-mid-low to-mid-high tone	U+00b2 U+2074
+³⁵/²⁴	tone	²⁴	²⁴		+				rising from-mid-low to-mid-high tone	U+00b2 U+2074
+⁵⁵/²⁴	tone	²⁴	²⁴		+				rising from-mid-low to-mid-high tone	U+00b2 U+2074
+²⁴²	tone	²⁴²	²⁴²						contour from-mid-low via-mid-high to-mid-low tone	U+00b2 U+2074 U+00b2
+⁵³/²⁴²	tone	²⁴²	²⁴²		+				contour from-mid-low via-mid-high to-mid-low tone	U+00b2 U+2074 U+00b2
+²¹/²⁴²	tone	²⁴²	²⁴²		+				contour from-mid-low via-mid-high to-mid-low tone	U+00b2 U+2074 U+00b2
+⁴⁴/²⁴²	tone	²⁴²	²⁴²		+				contour from-mid-low via-mid-high to-mid-low tone	U+00b2 U+2074 U+00b2
+³²/²⁴²	tone	²⁴²	²⁴²		+				contour from-mid-low via-mid-high to-mid-low tone	U+00b2 U+2074 U+00b2
+²⁵	tone	²⁵	²⁵						rising from-mid-low to-high tone	U+00b2 U+2075
+³	tone	³	³						short from-mid tone	U+00b3
+²¹/³	tone	³	³		+				short from-mid tone	U+00b3
+²/³	tone	³	³		+				short from-mid tone	U+00b3
+³³/³	tone	³	³		+				short from-mid tone	U+00b3
+⁴⁴/³	tone	³	³		+				short from-mid tone	U+00b3
+³²	tone	³²	³²						falling from-mid to-mid-low tone	U+00b3 U+00b2
+⁵/³²	tone	³²	³²		+				falling from-mid to-mid-low tone	U+00b3 U+00b2
+⁴⁴/³²	tone	³²	³²		+				falling from-mid to-mid-low tone	U+00b3 U+00b2
+²¹/³²	tone	³²	³²		+				falling from-mid to-mid-low tone	U+00b3 U+00b2
+⁵³/³²	tone	³²	³²		+				falling from-mid to-mid-low tone	U+00b3 U+00b2
+³⁵/³²	tone	³²	³²		+				falling from-mid to-mid-low tone	U+00b3 U+00b2
+³²⁴	tone	³²⁴	³²⁴						contour from-mid via-mid-low to-mid-high tone	U+00b3 U+00b2 U+2074
+³²/³²⁴	tone	³²⁴	³²⁴		+				contour from-mid via-mid-low to-mid-high tone	U+00b3 U+00b2 U+2074
+³⁵/³²⁴	tone	³²⁴	³²⁴		+				contour from-mid via-mid-low to-mid-high tone	U+00b3 U+00b2 U+2074
+³³	tone	³³	³³						flat from-mid to-mid tone	U+00b3 U+00b3
+³⁵/³³	tone	³³	³³		+				flat from-mid to-mid tone	U+00b3 U+00b3
+¹¹/³³	tone	³³	³³		+				flat from-mid to-mid tone	U+00b3 U+00b3
+²¹/³³	tone	³³	³³		+				flat from-mid to-mid tone	U+00b3 U+00b3
+³¹/³³	tone	³³	³³		+				flat from-mid to-mid tone	U+00b3 U+00b3
+²²/³³	tone	³³	³³		+				flat from-mid to-mid tone	U+00b3 U+00b3
+⁴²/³³	tone	³³	³³		+				flat from-mid to-mid tone	U+00b3 U+00b3
+⁵³/³³	tone	³³	³³		+				flat from-mid to-mid tone	U+00b3 U+00b3
+¹²/³³	tone	³³	³³		+				flat from-mid to-mid tone	U+00b3 U+00b3
+³³⁵/³³	tone	³³	³³		+				flat from-mid to-mid tone	U+00b3 U+00b3
+³¹	tone	³¹	³¹						falling from-mid to-low tone	U+00b3 U+00b9
+³⁵/³¹	tone	³¹	³¹		+				falling from-mid to-low tone	U+00b3 U+00b9
+⁴⁴/³¹	tone	³¹	³¹		+				falling from-mid to-low tone	U+00b3 U+00b9
+²¹/³¹	tone	³¹	³¹		+				falling from-mid to-low tone	U+00b3 U+00b9
+⁵⁵/³¹	tone	³¹	³¹		+				falling from-mid to-low tone	U+00b3 U+00b9
+⁵/³¹	tone	³¹	³¹		+				falling from-mid to-low tone	U+00b3 U+00b9
+¹²/³¹	tone	³¹	³¹		+				falling from-mid to-low tone	U+00b3 U+00b9
+⁵³/³¹	tone	³¹	³¹		+				falling from-mid to-low tone	U+00b3 U+00b9
+³³/³¹	tone	³¹	³¹		+				falling from-mid to-low tone	U+00b3 U+00b9
+⁴²/³¹	tone	³¹	³¹		+				falling from-mid to-low tone	U+00b3 U+00b9
+¹³/³¹	tone	³¹	³¹		+				falling from-mid to-low tone	U+00b3 U+00b9
+²²/³¹	tone	³¹	³¹		+				falling from-mid to-low tone	U+00b3 U+00b9
+²/³¹	tone	³¹	³¹		+				falling from-mid to-low tone	U+00b3 U+00b9
+¹¹/³¹	tone	³¹	³¹		+				falling from-mid to-low tone	U+00b3 U+00b9
+⁴⁵/³¹	tone	³¹	³¹		+				falling from-mid to-low tone	U+00b3 U+00b9
+³¹⁵/³¹	tone	³¹	³¹		+				falling from-mid to-low tone	U+00b3 U+00b9
+³¹²	tone	³¹²	³¹²						contour from-mid via-low to-mid-low tone	U+00b3 U+00b9 U+00b2
+³¹/³¹²	tone	³¹²	³¹²		+				contour from-mid via-low to-mid-low tone	U+00b3 U+00b9 U+00b2
+²⁴/³¹²	tone	³¹²	³¹²		+				contour from-mid via-low to-mid-low tone	U+00b3 U+00b9 U+00b2
+³¹³	tone	³¹³	³¹³						contour from-mid via-low to-mid tone	U+00b3 U+00b9 U+00b3
+³⁴	tone	³⁴	³⁴						rising from-mid to-mid-high tone	U+00b3 U+2074
+³³/³⁴	tone	³⁴	³⁴		+				rising from-mid to-mid-high tone	U+00b3 U+2074
+⁴⁴/³⁴	tone	³⁴	³⁴		+				rising from-mid to-mid-high tone	U+00b3 U+2074
+³⁵	tone	³⁵	³⁵						rising from-mid to-high tone	U+00b3 U+2075
+¹³/³⁵	tone	³⁵	³⁵		+				rising from-mid to-high tone	U+00b3 U+2075
+⁴⁴/³⁵	tone	³⁵	³⁵		+				rising from-mid to-high tone	U+00b3 U+2075
+²¹/³⁵	tone	³⁵	³⁵		+				rising from-mid to-high tone	U+00b3 U+2075
+²²/³⁵	tone	³⁵	³⁵		+				rising from-mid to-high tone	U+00b3 U+2075
+³³/³⁵	tone	³⁵	³⁵		+				rising from-mid to-high tone	U+00b3 U+2075
+³¹/³⁵	tone	³⁵	³⁵		+				rising from-mid to-high tone	U+00b3 U+2075
+⁴²/³⁵	tone	³⁵	³⁵		+				rising from-mid to-high tone	U+00b3 U+2075
+²³/³⁵	tone	³⁵	³⁵		+				rising from-mid to-high tone	U+00b3 U+2075
+⁵³/³⁵	tone	³⁵	³⁵		+				rising from-mid to-high tone	U+00b3 U+2075
+⁵⁵/³⁵	tone	³⁵	³⁵		+				rising from-mid to-high tone	U+00b3 U+2075
+²/³⁵	tone	³⁵	³⁵		+				rising from-mid to-high tone	U+00b3 U+2075
+⁴⁵/³⁵	tone	³⁵	³⁵		+				rising from-mid to-high tone	U+00b3 U+2075
+¹	tone	¹	¹						short from-low tone	U+00b9
+¹¹/¹	tone	¹	¹		+				short from-low tone	U+00b9
+¹/¹	tone	¹	¹		+				short from-low tone	U+00b9
+²³/¹	tone	¹	¹		+				short from-low tone	U+00b9
+²¹/¹	tone	¹	¹		+				short from-low tone	U+00b9
+⁴/¹	tone	¹	¹		+				short from-low tone	U+00b9
+¹²	tone	¹²	¹²						rising from-low to-mid-low tone	U+00b9 U+00b2
+⁵⁵/¹²	tone	¹²	¹²		+				rising from-low to-mid-low tone	U+00b9 U+00b2
+¹³	tone	¹³	¹³						rising from-low to-mid tone	U+00b9 U+00b3
+⁴⁴/¹³	tone	¹³	¹³		+				rising from-low to-mid tone	U+00b9 U+00b3
+²³/¹³	tone	¹³	¹³		+				rising from-low to-mid tone	U+00b9 U+00b3
+²¹/¹³	tone	¹³	¹³		+				rising from-low to-mid tone	U+00b9 U+00b3
+⁵³/¹³	tone	¹³	¹³		+				rising from-low to-mid tone	U+00b9 U+00b3
+³¹/¹³	tone	¹³	¹³		+				rising from-low to-mid tone	U+00b9 U+00b3
+¹¹/¹³	tone	¹³	¹³		+				rising from-low to-mid tone	U+00b9 U+00b3
+²²/¹³	tone	¹³	¹³		+				rising from-low to-mid tone	U+00b9 U+00b3
+⁴⁵/¹³	tone	¹³	¹³		+				rising from-low to-mid tone	U+00b9 U+00b3
+³⁵/¹³	tone	¹³	¹³		+				rising from-low to-mid tone	U+00b9 U+00b3
+³³/¹³	tone	¹³	¹³		+				rising from-low to-mid tone	U+00b9 U+00b3
+⁵⁵/¹³	tone	¹³	¹³		+				rising from-low to-mid tone	U+00b9 U+00b3
+¹³/¹³	tone	¹³	¹³		+				rising from-low to-mid tone	U+00b9 U+00b3
+⁵/¹³	tone	¹³	¹³		+				rising from-low to-mid tone	U+00b9 U+00b3
+¹⁴/¹³	tone	¹³	¹³		+				rising from-low to-mid tone	U+00b9 U+00b3
+¹¹	tone	¹¹	¹¹						flat from-low to-low tone	U+00b9 U+00b9
+⁵³/¹¹	tone	¹¹	¹¹		+				flat from-low to-low tone	U+00b9 U+00b9
+²¹/¹¹	tone	¹¹	¹¹		+				flat from-low to-low tone	U+00b9 U+00b9
+⁴⁵/¹¹	tone	¹¹	¹¹		+				flat from-low to-low tone	U+00b9 U+00b9
+²²/¹¹	tone	¹¹	¹¹		+				flat from-low to-low tone	U+00b9 U+00b9
+⁵/¹¹	tone	¹¹	¹¹		+				flat from-low to-low tone	U+00b9 U+00b9
+¹⁵	tone	¹⁵	¹⁵						rising from-low to-high tone	U+00b9 U+2075
+⁰	tone	⁰	⁰						short neutral tone	U+2070
+⁴	tone	⁴	⁴						short from-mid-high tone	U+2074
+⁴²	tone	⁴²	⁴²						falling from-mid-high to-mid-low tone	U+2074 U+00b2
+²²/⁴²	tone	⁴²	⁴²		+				falling from-mid-high to-mid-low tone	U+2074 U+00b2
+¹¹/⁴²	tone	⁴²	⁴²		+				falling from-mid-high to-mid-low tone	U+2074 U+00b2
+³¹/⁴²	tone	⁴²	⁴²		+				falling from-mid-high to-mid-low tone	U+2074 U+00b2
+⁵⁵/⁴²	tone	⁴²	⁴²		+				falling from-mid-high to-mid-low tone	U+2074 U+00b2
+³⁵/⁴²	tone	⁴²	⁴²		+				falling from-mid-high to-mid-low tone	U+2074 U+00b2
+⁵³/⁴²	tone	⁴²	⁴²		+				falling from-mid-high to-mid-low tone	U+2074 U+00b2
+²¹/⁴²	tone	⁴²	⁴²		+				falling from-mid-high to-mid-low tone	U+2074 U+00b2
+⁵⁴⁴/⁴²	tone	⁴²	⁴²		+				falling from-mid-high to-mid-low tone	U+2074 U+00b2
+¹²/⁴²	tone	⁴²	⁴²		+				falling from-mid-high to-mid-low tone	U+2074 U+00b2
+⁴⁵/⁴²	tone	⁴²	⁴²		+				falling from-mid-high to-mid-low tone	U+2074 U+00b2
+⁴³	tone	⁴³	⁴³						falling from-mid-high to-mid tone	U+2074 U+00b3
+²¹/⁴³	tone	⁴³	⁴³		+				falling from-mid-high to-mid tone	U+2074 U+00b3
+⁴¹	tone	⁴¹	⁴¹						falling from-mid-high to-low tone	U+2074 U+00b9
+⁴⁴	tone	⁴⁴	⁴⁴						flat from-mid-high to-mid-high tone	U+2074 U+2074
+³²/⁴⁴	tone	⁴⁴	⁴⁴		+				flat from-mid-high to-mid-high tone	U+2074 U+2074
+²¹/⁴⁴	tone	⁴⁴	⁴⁴		+				flat from-mid-high to-mid-high tone	U+2074 U+2074
+³³/⁴⁴	tone	⁴⁴	⁴⁴		+				flat from-mid-high to-mid-high tone	U+2074 U+2074
+³⁵/⁴⁴	tone	⁴⁴	⁴⁴		+				flat from-mid-high to-mid-high tone	U+2074 U+2074
+⁴²/⁴⁴	tone	⁴⁴	⁴⁴		+				flat from-mid-high to-mid-high tone	U+2074 U+2074
+²⁴/⁴⁴	tone	⁴⁴	⁴⁴		+				flat from-mid-high to-mid-high tone	U+2074 U+2074
+⁵³/⁴⁴	tone	⁴⁴	⁴⁴		+				flat from-mid-high to-mid-high tone	U+2074 U+2074
+⁴⁴²	tone	⁴⁴²	⁴⁴²						falling from-mid-high via-mid-high to-mid-low tone	U+2074 U+2074 U+00b2
+⁵³/⁴⁴²	tone	⁴⁴²	⁴⁴²		+				falling from-mid-high via-mid-high to-mid-low tone	U+2074 U+2074 U+00b2
+⁴⁴³	tone	⁴⁴³	⁴⁴³						falling from-mid-high via-mid-high to-mid tone	U+2074 U+2074 U+00b3
+⁴⁴⁵	tone	⁴⁴⁵	⁴⁴⁵						rising from-mid-high via-mid-high to-high tone	U+2074 U+2074 U+2075
+³³/⁴⁴⁵	tone	⁴⁴⁵	⁴⁴⁵		+				rising from-mid-high via-mid-high to-high tone	U+2074 U+2074 U+2075
+³¹/⁴⁴⁵	tone	⁴⁴⁵	⁴⁴⁵		+				rising from-mid-high via-mid-high to-high tone	U+2074 U+2074 U+2075
+⁴⁵	tone	⁴⁵	⁴⁵						rising from-mid-high to-high tone	U+2074 U+2075
+⁵³/⁴⁵	tone	⁴⁵	⁴⁵		+				rising from-mid-high to-high tone	U+2074 U+2075
+⁴⁵⁴	tone	⁴⁵⁴	⁴⁵⁴						contour from-mid-high via-high to-mid-high tone	U+2074 U+2075 U+2074
+⁵	tone	⁵	⁵						short from-high tone	U+2075
+²¹/⁵	tone	⁵	⁵		+				short from-high tone	U+2075
+⁴⁴/⁵	tone	⁵	⁵		+				short from-high tone	U+2075
+²/⁵	tone	⁵	⁵		+				short from-high tone	U+2075
+³/⁵	tone	⁵	⁵		+				short from-high tone	U+2075
+²³/⁵	tone	⁵	⁵		+				short from-high tone	U+2075
+⁵³/⁵	tone	⁵	⁵		+				short from-high tone	U+2075
+⁴/⁵	tone	⁵	⁵		+				short from-high tone	U+2075
+³²/⁵	tone	⁵	⁵		+				short from-high tone	U+2075
+⁵/⁵	tone	⁵	⁵		+				short from-high tone	U+2075
+¹¹/⁵	tone	⁵	⁵		+				short from-high tone	U+2075
+⁵²	tone	⁵²	⁵²						falling from-high to-mid-low tone	U+2075 U+00b2
+⁵³	tone	⁵³	⁵³						falling from-high to-mid tone	U+2075 U+00b3
+²³/⁵³	tone	⁵³	⁵³		+				falling from-high to-mid tone	U+2075 U+00b3
+²⁴/⁵³	tone	⁵³	⁵³		+				falling from-high to-mid tone	U+2075 U+00b3
+⁵⁵/⁵³	tone	⁵³	⁵³		+				falling from-high to-mid tone	U+2075 U+00b3
+¹¹/⁵³	tone	⁵³	⁵³		+				falling from-high to-mid tone	U+2075 U+00b3
+³⁵/⁵³	tone	⁵³	⁵³		+				falling from-high to-mid tone	U+2075 U+00b3
+⁴²³/⁵³	tone	⁵³	⁵³		+				falling from-high to-mid tone	U+2075 U+00b3
+³¹/⁵³	tone	⁵³	⁵³		+				falling from-high to-mid tone	U+2075 U+00b3
+⁴²/⁵³	tone	⁵³	⁵³		+				falling from-high to-mid tone	U+2075 U+00b3
+⁴⁵/⁵³	tone	⁵³	⁵³		+				falling from-high to-mid tone	U+2075 U+00b3
+²¹/⁵³	tone	⁵³	⁵³		+				falling from-high to-mid tone	U+2075 U+00b3
+⁴⁴/⁵³	tone	⁵³	⁵³		+				falling from-high to-mid tone	U+2075 U+00b3
+³³/⁵³	tone	⁵³	⁵³		+				falling from-high to-mid tone	U+2075 U+00b3
+³²/⁵³	tone	⁵³	⁵³		+				falling from-high to-mid tone	U+2075 U+00b3
+⁵/⁵³	tone	⁵³	⁵³		+				falling from-high to-mid tone	U+2075 U+00b3
+¹³/⁵³	tone	⁵³	⁵³		+				falling from-high to-mid tone	U+2075 U+00b3
+²¹³/⁵³	tone	⁵³	⁵³		+				falling from-high to-mid tone	U+2075 U+00b3
+⁵³³	tone	⁵³³	⁵³³						falling from-high via-mid to-mid tone	U+2075 U+00b3 U+00b3
+⁵¹	tone	⁵¹	⁵¹						falling from-high to-low tone	U+2075 U+00b9
+³³/⁵¹	tone	⁵¹	⁵¹		+				falling from-high to-low tone	U+2075 U+00b9
+²¹/⁵¹	tone	⁵¹	⁵¹		+				falling from-high to-low tone	U+2075 U+00b9
+¹³/⁵¹	tone	⁵¹	⁵¹		+				falling from-high to-low tone	U+2075 U+00b9
+⁴⁴/⁵¹	tone	⁵¹	⁵¹		+				falling from-high to-low tone	U+2075 U+00b9
+⁵³/⁵¹	tone	⁵¹	⁵¹		+				falling from-high to-low tone	U+2075 U+00b9
+²¹³/⁵¹	tone	⁵¹	⁵¹		+				falling from-high to-low tone	U+2075 U+00b9
+⁵⁵/⁵¹	tone	⁵¹	⁵¹		+				falling from-high to-low tone	U+2075 U+00b9
+⁵¹³	tone	⁵¹³	⁵¹³						contour from-high via-low to-mid tone	U+2075 U+00b9 U+00b3
+⁵⁵/⁵¹³	tone	⁵¹³	⁵¹³		+				contour from-high via-low to-mid tone	U+2075 U+00b9 U+00b3
+²¹/⁵¹³	tone	⁵¹³	⁵¹³		+				contour from-high via-low to-mid tone	U+2075 U+00b9 U+00b3
+³³/⁵¹³	tone	⁵¹³	⁵¹³		+				contour from-high via-low to-mid tone	U+2075 U+00b9 U+00b3
+⁵¹/⁵¹³	tone	⁵¹³	⁵¹³		+				contour from-high via-low to-mid tone	U+2075 U+00b9 U+00b3
+⁵⁴	tone	⁵⁴	⁵⁴						falling from-high to-mid-high tone	U+2075 U+2074
+²/⁵⁴	tone	⁵⁴	⁵⁴		+				falling from-high to-mid-high tone	U+2075 U+2074
+⁵⁵	tone	⁵⁵	⁵⁵						flat from-high to-high tone	U+2075 U+2075
+⁴²/⁵⁵	tone	⁵⁵	⁵⁵		+				flat from-high to-high tone	U+2075 U+2075
+³¹/⁵⁵	tone	⁵⁵	⁵⁵		+				flat from-high to-high tone	U+2075 U+2075
+²¹³/⁵⁵	tone	⁵⁵	⁵⁵		+				flat from-high to-high tone	U+2075 U+2075
+²²/⁵⁵	tone	⁵⁵	⁵⁵		+				flat from-high to-high tone	U+2075 U+2075
+⁴⁵/⁵⁵	tone	⁵⁵	⁵⁵		+				flat from-high to-high tone	U+2075 U+2075
+³⁵/⁵⁵	tone	⁵⁵	⁵⁵		+				flat from-high to-high tone	U+2075 U+2075
+³³/⁵⁵	tone	⁵⁵	⁵⁵		+				flat from-high to-high tone	U+2075 U+2075
+²¹/⁵⁵	tone	⁵⁵	⁵⁵		+				flat from-high to-high tone	U+2075 U+2075
+⁴⁴/⁵⁵	tone	⁵⁵	⁵⁵		+				flat from-high to-high tone	U+2075 U+2075
+⁵³/⁵⁵	tone	⁵⁵	⁵⁵		+				flat from-high to-high tone	U+2075 U+2075
+¹³/⁵⁵	tone	⁵⁵	⁵⁵		+				flat from-high to-high tone	U+2075 U+2075
+⁵¹/⁵⁵	tone	⁵⁵	⁵⁵		+				flat from-high to-high tone	U+2075 U+2075
+š	unknownsound									
+?	unknownsound									
+ɴ̣	unknownsound									
+ʰɯ	unknownsound									
+‹	unknownsound									
+›	unknownsound									
+ß	unknownsound									
+M	unknownsound									
+ɡw	unknownsound									
+ʔw	unknownsound									
+éh	unknownsound									
+nn	unknownsound									
+tw	unknownsound									
+ós	unknownsound									
+ŋw	unknownsound									
+ws	unknownsound									
+P	unknownsound									
+A	unknownsound									
+S	unknownsound									
+K	unknownsound									
+V	unknownsound									
+W	unknownsound									
+T	unknownsound									
+pw	unknownsound									
+⁵/	unknownsound									
+⁴/	unknownsound									
+¹/	unknownsound									
+³/	unknownsound									
+⁶/	unknownsound									
+²/	unknownsound									
+⁸/	unknownsound									
+⁷/	unknownsound									
+ɲ̌	unknownsound									
+ŋ̮	unknownsound									
+�	unknownsound									
+⁰⁴	unknownsound									
+⁰²	unknownsound									
+³²¹	unknownsound									
+a	vowel	a	a						unrounded open front vowel	U+0061
+aa	vowel	aa	aː			+			long unrounded open front vowel	U+0061 U+02d0
+aː	vowel	aː	aː						long unrounded open front vowel	U+0061 U+02d0
+a:	vowel	aː	aː		+				long unrounded open front vowel	U+0061 U+02d0
+à	vowel	à	à	+			+		unrounded open front with_low_tone vowel	U+0061 U+0300
+á	vowel	á	á	+			+		unrounded open front with_high_tone vowel	U+0061 U+0301
+â	vowel	â	â	+			+		unrounded open front with_falling_tone vowel	U+0061 U+0302
+ã	vowel	ã	ã						nasalized unrounded open front vowel	U+0061 U+0303
+ã	vowel	ã	ã	+					nasalized unrounded open front vowel	U+0061 U+0303
+ãã	vowel	ãã	ãː	+		+			long nasalized unrounded open front vowel	U+0061 U+0303 U+02d0
+ãː	vowel	ãː	ãː	+					long nasalized unrounded open front vowel	U+0061 U+0303 U+02d0
+ã̀	vowel	ã̀	ã̀	+			+		nasalized unrounded open front with_low_tone vowel	U+0061 U+0303 U+0300
+ã́	vowel	ã́	ã́	+			+		nasalized unrounded open front with_high_tone vowel	U+0061 U+0303 U+0301
+ă	vowel	ă	ă	+					ultra-short unrounded open front vowel	U+0061 U+0306
+ᴀ/a̱	vowel	a̠	a̠		+		+		retracted unrounded open front vowel	U+0061 U+0320
+ᴀ̃/ã̱	vowel	ã̠	ã̠		+		+		retracted nasalized unrounded open front vowel	U+0061 U+0320 U+0303
+a̤	vowel	a̤	a̤				+		breathy unrounded open front vowel	U+0061 U+0324
+a̤ː	vowel	a̤ː	a̤ː				+		long breathy unrounded open front vowel	U+0061 U+0324 U+02d0
+a̰	vowel	a̰	a̰						creaky unrounded open front vowel	U+0061 U+0330
+e	vowel	e	e						unrounded close-mid front vowel	U+0065
+&/e	vowel	e	e		+				unrounded close-mid front vowel	U+0065
+ee	vowel	ee	eː			+			long unrounded close-mid front vowel	U+0065 U+02d0
+eː	vowel	eː	eː						long unrounded close-mid front vowel	U+0065 U+02d0
+e:	vowel	eː	eː		+				long unrounded close-mid front vowel	U+0065 U+02d0
+è	vowel	è	è	+			+		unrounded close-mid front with_low_tone vowel	U+0065 U+0300
+é	vowel	é	é	+			+		unrounded close-mid front with_high_tone vowel	U+0065 U+0301
+ê	vowel	ê	ê	+			+		unrounded close-mid front with_falling_tone vowel	U+0065 U+0302
+ẽ	vowel	ẽ	ẽ						nasalized unrounded close-mid front vowel	U+0065 U+0303
+ẽ	vowel	ẽ	ẽ	+					nasalized unrounded close-mid front vowel	U+0065 U+0303
+ẽẽ	vowel	ẽẽ	ẽː	+		+			long nasalized unrounded close-mid front vowel	U+0065 U+0303 U+02d0
+ẽ̀	vowel	ẽ̀	ẽ̀	+			+		nasalized unrounded close-mid front with_low_tone vowel	U+0065 U+0303 U+0300
+ẽ́	vowel	ẽ́	ẽ́	+			+		nasalized unrounded close-mid front with_high_tone vowel	U+0065 U+0303 U+0301
+ᴇ/e̞	vowel	e̞	e̞		+				unrounded mid front vowel	U+0065 U+031e
+ᴇ̃/ẽ̞	vowel	ẽ̞	ẽ̞		+				nasalized unrounded mid front vowel	U+0065 U+031e U+0303
+e̤	vowel	e̤	e̤						breathy unrounded close-mid front vowel	U+0065 U+0324
+e̤ː	vowel	e̤ː	e̤ː				+		long breathy unrounded close-mid front vowel	U+0065 U+0324 U+02d0
+ẽ̤ː	vowel	ẽ̤ː	ẽ̤ː	+			+		long nasalized breathy unrounded close-mid front vowel	U+0065 U+0324 U+0303 U+02d0
+ḛ	vowel	ḛ	ḛ	+					creaky unrounded close-mid front vowel	U+0065 U+0330
+i	vowel	i	i						unrounded close front vowel	U+0069
+i̱/i	vowel	i	i		+				unrounded close front vowel	U+0069
+ii	vowel	ii	iː			+			long unrounded close front vowel	U+0069 U+02d0
+iː	vowel	iː	iː						long unrounded close front vowel	U+0069 U+02d0
+i:	vowel	iː	iː		+				long unrounded close front vowel	U+0069 U+02d0
+ì	vowel	ì	ì	+			+		unrounded close front with_low_tone vowel	U+0069 U+0300
+í	vowel	í	í	+			+		unrounded close front with_high_tone vowel	U+0069 U+0301
+î	vowel	î	î	+			+		unrounded close front with_falling_tone vowel	U+0069 U+0302
+ĩ	vowel	ĩ	ĩ						nasalized unrounded close front vowel	U+0069 U+0303
+ĩ	vowel	ĩ	ĩ	+					nasalized unrounded close front vowel	U+0069 U+0303
+ĩĩ	vowel	ĩĩ	ĩː	+		+			long nasalized unrounded close front vowel	U+0069 U+0303 U+02d0
+ĩ́	vowel	ĩ́	ĩ́	+			+		nasalized unrounded close front with_high_tone vowel	U+0069 U+0303 U+0301
+ï	vowel	ï	i			+	+		unrounded close centralized vowel	U+0069
+i̤	vowel	i̤	i̤						breathy unrounded close front vowel	U+0069 U+0324
+i̤ː	vowel	i̤ː	i̤ː				+		long breathy unrounded close front vowel	U+0069 U+0324 U+02d0
+ĩ̤	vowel	ĩ̤	ĩ̤	+			+		nasalized breathy unrounded close front vowel	U+0069 U+0324 U+0303
+ḭ	vowel	ḭ	ḭ	+					creaky unrounded close front vowel	U+0069 U+0330
+o	vowel	o	o						rounded close-mid back vowel	U+006f
+o̱/o	vowel	o	o		+				rounded close-mid back vowel	U+006f
+Õ/o	vowel	o	o		+				rounded close-mid back vowel	U+006f
+oo	vowel	oo	oː			+			long rounded close-mid back vowel	U+006f U+02d0
+oː	vowel	oː	oː						long rounded close-mid back vowel	U+006f U+02d0
+ò	vowel	ò	ò	+			+		rounded close-mid back with_low_tone vowel	U+006f U+0300
+ó	vowel	ó	ó	+			+		rounded close-mid back with_high_tone vowel	U+006f U+0301
+ô	vowel	ô	ô	+			+		rounded close-mid back with_falling_tone vowel	U+006f U+0302
+õ	vowel	õ	õ						nasalized rounded close-mid back vowel	U+006f U+0303
+õ	vowel	õ	õ	+					nasalized rounded close-mid back vowel	U+006f U+0303
+õõ	vowel	õõ	õ	+		+			nasalized rounded close-mid back vowel	U+006f U+0303
+õ̀	vowel	õ̀	õ̀	+			+		nasalized rounded close-mid back with_low_tone vowel	U+006f U+0303 U+0300
+ṍ	vowel	ṍ	ṍ	+			+		nasalized rounded close-mid back with_high_tone vowel	U+006f U+0303 U+0301
+õ̂	vowel	õ̂	õ̂	+			+		nasalized rounded close-mid back with_falling_tone vowel	U+006f U+0303 U+0302
+o̤	vowel	o̤	o̤						breathy rounded close-mid back vowel	U+006f U+0324
+o̤ː	vowel	o̤ː	o̤ː				+		long breathy rounded close-mid back vowel	U+006f U+0324 U+02d0
+o̰	vowel	o̰	o̰						creaky rounded close-mid back vowel	U+006f U+0330
+õ̰	vowel	õ̰	õ̰	+			+		nasalized creaky rounded close-mid back vowel	U+006f U+0330 U+0303
+u	vowel	u	u						rounded close back vowel	U+0075
+u̱/u	vowel	u	u		+				rounded close back vowel	U+0075
+ù/u	vowel	u	u		+				rounded close back vowel	U+0075
+uu	vowel	uu	uː			+			long rounded close back vowel	U+0075 U+02d0
+uː	vowel	uː	uː						long rounded close back vowel	U+0075 U+02d0
+u:	vowel	uː	uː		+				long rounded close back vowel	U+0075 U+02d0
+ú	vowel	ú	ú	+			+		rounded close back with_high_tone vowel	U+0075 U+0301
+ũ	vowel	ũ	ũ						nasalized rounded close back vowel	U+0075 U+0303
+ũ	vowel	ũ	ũ	+					nasalized rounded close back vowel	U+0075 U+0303
+ṹ	vowel	ṹ	ṹ	+			+		nasalized rounded close back with_high_tone vowel	U+0075 U+0303 U+0301
+ṳ	vowel	ṳ	ṳ	+					breathy rounded close back vowel	U+0075 U+0324
+ṳː	vowel	ṳː	ṳː	+			+		long breathy rounded close back vowel	U+0075 U+0324 U+02d0
+ṵ	vowel	ṵ	ṵ	+					creaky rounded close back vowel	U+0075 U+0330
+y	vowel	y	y						rounded close front vowel	U+0079
+yː	vowel	yː	yː						long rounded close front vowel	U+0079 U+02d0
+ỹ	vowel	ỹ	ỹ	+					nasalized rounded close front vowel	U+0079 U+0303
+æ	vowel	æ	æ						unrounded near-open front vowel	U+00e6
+æː	vowel	æː	æː						long unrounded near-open front vowel	U+00e6 U+02d0
+æ̃	vowel	æ̃	æ̃						nasalized unrounded near-open front vowel	U+00e6 U+0303
+ø	vowel	ø	ø						rounded close-mid front vowel	U+00f8
+øː	vowel	øː	øː						long rounded close-mid front vowel	U+00f8 U+02d0
+œ	vowel	œ	œ						rounded open-mid front vowel	U+0153
+ɐ	vowel	ɐ	ɐ						unrounded near-open central vowel	U+0250
+ɐː	vowel	ɐː	ɐː						long unrounded near-open central vowel	U+0250 U+02d0
+ɑ	vowel	ɑ	ɑ						unrounded open back vowel	U+0251
+ɑː	vowel	ɑː	ɑː						long unrounded open back vowel	U+0251 U+02d0
+ɑ̃	vowel	ɑ̃	ɑ̃						nasalized unrounded open back vowel	U+0251 U+0303
+ɑ̤ː	vowel	ɑ̤ː	ɑ̤ː				+		long breathy unrounded open back vowel	U+0251 U+0324 U+02d0
+ɒ	vowel	ɒ	ɒ						rounded open back vowel	U+0252
+ɒ̃	vowel	ɒ̃	ɒ̃						nasalized rounded open back vowel	U+0252 U+0303
+ɔ	vowel	ɔ	ɔ						rounded open-mid back vowel	U+0254
+ɔː	vowel	ɔː	ɔː						long rounded open-mid back vowel	U+0254 U+02d0
+ɔ̃	vowel	ɔ̃	ɔ̃						nasalized rounded open-mid back vowel	U+0254 U+0303
+ɔ̤	vowel	ɔ̤	ɔ̤				+		breathy rounded open-mid back vowel	U+0254 U+0324
+ɔ̤ː	vowel	ɔ̤ː	ɔ̤ː				+		long breathy rounded open-mid back vowel	U+0254 U+0324 U+02d0
+ɔ̰	vowel	ɔ̰	ɔ̰						creaky rounded open-mid back vowel	U+0254 U+0330
+ə	vowel	ə	ə						unrounded mid central vowel	U+0259
+ǝ	vowel	ə	ə		+				unrounded mid central vowel	U+0259
+əː	vowel	əː	əː						long unrounded mid central vowel	U+0259 U+02d0
+ə˞	vowel	ə˞	ə˞						rhotacized unrounded mid central vowel	U+0259 U+02de
+ɚ	vowel	ə˞	ə˞		+				rhotacized unrounded mid central vowel	U+0259 U+02de
+ə́	vowel	ə́	ə́				+		unrounded mid central with_high_tone vowel	U+0259 U+0301
+ə̃	vowel	ə̃	ə̃						nasalized unrounded mid central vowel	U+0259 U+0303
+ə̃́	vowel	ə̃́	ə̃́				+		nasalized unrounded mid central with_high_tone vowel	U+0259 U+0303 U+0301
+ə̆	vowel	ə̆	ə̆						ultra-short unrounded mid central vowel	U+0259 U+0306
+ə̠	vowel	ə̠	ə̠				+		retracted unrounded mid central vowel	U+0259 U+0320
+ə̤	vowel	ə̤	ə̤				+		breathy unrounded mid central vowel	U+0259 U+0324
+ə̤ː	vowel	ə̤ː	ə̤ː				+		long breathy unrounded mid central vowel	U+0259 U+0324 U+02d0
+ɛ	vowel	ɛ	ɛ						unrounded open-mid front vowel	U+025b
+ɛː	vowel	ɛː	ɛː						long unrounded open-mid front vowel	U+025b U+02d0
+ɛ̃	vowel	ɛ̃	ɛ̃						nasalized unrounded open-mid front vowel	U+025b U+0303
+ɛ̤	vowel	ɛ̤	ɛ̤				+		breathy unrounded open-mid front vowel	U+025b U+0324
+ɛ̰	vowel	ɛ̰	ɛ̰						creaky unrounded open-mid front vowel	U+025b U+0330
+ɜ	vowel	ɜ	ɜ						unrounded open-mid central vowel	U+025c
+ɞ	vowel	ɞ	ɞ						rounded open-mid central vowel	U+025e
+ɤ	vowel	ɤ	ɤ						unrounded close-mid back vowel	U+0264
+ɤː	vowel	ɤː	ɤː						long unrounded close-mid back vowel	U+0264 U+02d0
+ɤ̃	vowel	ɤ̃	ɤ̃						nasalized unrounded close-mid back vowel	U+0264 U+0303
+ɨ	vowel	ɨ	ɨ						unrounded close central vowel	U+0268
+ɨɨ	vowel	ɨɨ	ɨː			+			long unrounded close central vowel	U+0268 U+02d0
+ɨː	vowel	ɨː	ɨː						long unrounded close central vowel	U+0268 U+02d0
+ïï/ɨː	vowel	ɨː	ɨː		+				long unrounded close central vowel	U+0268 U+02d0
+ɨ̤	vowel	ɨ̤	ɨ̤				+		breathy unrounded close central vowel	U+0268 U+0324
+ɨ̤ː	vowel	ɨ̤ː	ɨ̤ː				+		long breathy unrounded close central vowel	U+0268 U+0324 U+02d0
+ɪ	vowel	ɪ	ɪ						unrounded near-close near-front vowel	U+026a
+ɪː	vowel	ɪː	ɪː						long unrounded near-close near-front vowel	U+026a U+02d0
+ɪ̃	vowel	ɪ̃	ɪ̃						nasalized unrounded near-close near-front vowel	U+026a U+0303
+ɯ	vowel	ɯ	ɯ						unrounded close back vowel	U+026f
+ɯː	vowel	ɯː	ɯː						long unrounded close back vowel	U+026f U+02d0
+ɯ̃	vowel	ɯ̃	ɯ̃						nasalized unrounded close back vowel	U+026f U+0303
+ɵ	vowel	ɵ	ɵ						rounded close-mid central vowel	U+0275
+ɿ	vowel	ɿ	ɿ						unrounded close with-frication back vowel	U+027f
+ɿ̃	vowel	ɿ̃	ɿ̃				+		nasalized unrounded close with-frication back vowel	U+027f U+0303
+ʅ	vowel	ʅ	ʅ						unrounded close with-frication central vowel	U+0285
+ʅ̃	vowel	ʅ̃	ʅ̃				+		nasalized unrounded close with-frication central vowel	U+0285 U+0303
+ʉ	vowel	ʉ	ʉ						rounded close central vowel	U+0289
+ʊ	vowel	ʊ	ʊ						rounded near-close near-back vowel	U+028a
+υ/ʊ	vowel	ʊ	ʊ		+				rounded near-close near-back vowel	U+028a
+ʊː	vowel	ʊː	ʊː						long rounded near-close near-back vowel	U+028a U+02d0
+υː/ʊː	vowel	ʊː	ʊː		+				long rounded near-close near-back vowel	U+028a U+02d0
+ʊ̃	vowel	ʊ̃	ʊ̃						nasalized rounded near-close near-back vowel	U+028a U+0303
+ʌ	vowel	ʌ	ʌ						unrounded open-mid back vowel	U+028c
+ʌː	vowel	ʌː	ʌː						long unrounded open-mid back vowel	U+028c U+02d0
+ʌ̃	vowel	ʌ̃	ʌ̃						nasalized unrounded open-mid back vowel	U+028c U+0303
+ʏ	vowel	ʏ	ʏ						rounded near-close near-front vowel	U+028f
+ʮ	vowel	ʮ	ʮ						rounded close with-frication back vowel	U+02ae
+ˈa	vowel	ˈa	a			+	+	+	unrounded open front vowel	U+0061
+ˈaː	vowel	ˈaː	aː			+	+	+	long unrounded open front vowel	U+0061 U+02d0
+ˈã	vowel	ˈã	ã	+		+	+	+	nasalized unrounded open front vowel	U+0061 U+0303
+ˈe	vowel	ˈe	e			+	+	+	unrounded close-mid front vowel	U+0065
+ˈeː	vowel	ˈeː	eː			+	+	+	long unrounded close-mid front vowel	U+0065 U+02d0
+ˈẽ	vowel	ˈẽ	ẽ	+		+	+	+	nasalized unrounded close-mid front vowel	U+0065 U+0303
+ˈi	vowel	ˈi	i			+	+	+	unrounded close front vowel	U+0069
+ˈiː	vowel	ˈiː	iː			+	+	+	long unrounded close front vowel	U+0069 U+02d0
+ˈo	vowel	ˈo	o			+	+	+	rounded close-mid back vowel	U+006f
+ˈoː	vowel	ˈoː	oː			+	+	+	long rounded close-mid back vowel	U+006f U+02d0
+ˈu	vowel	ˈu	u			+	+	+	rounded close back vowel	U+0075
+ˈuː	vowel	ˈuː	uː			+	+	+	long rounded close back vowel	U+0075 U+02d0
+ˈy	vowel	ˈy	y			+	+	+	rounded close front vowel	U+0079
+ˈyː	vowel	ˈyː	yː			+	+	+	long rounded close front vowel	U+0079 U+02d0
+ˈæ	vowel	ˈæ	æ			+	+	+	unrounded near-open front vowel	U+00e6
+ˈæː	vowel	ˈæː	æː			+	+	+	long unrounded near-open front vowel	U+00e6 U+02d0
+ˈœ	vowel	ˈœ	œ			+	+	+	rounded open-mid front vowel	U+0153
+ˈœː	vowel	ˈœː	œː			+	+	+	long rounded open-mid front vowel	U+0153 U+02d0
+ˈɒ	vowel	ˈɒ	ɒ			+	+	+	rounded open back vowel	U+0252
+ˈɔ	vowel	ˈɔ	ɔ			+	+	+	rounded open-mid back vowel	U+0254
+ˈɔː	vowel	ˈɔː	ɔː			+	+	+	long rounded open-mid back vowel	U+0254 U+02d0
+ˈə	vowel	ˈə	ə			+	+	+	unrounded mid central vowel	U+0259
+ˈɛ	vowel	ˈɛ	ɛ			+	+	+	unrounded open-mid front vowel	U+025b
+ˈɛː	vowel	ˈɛː	ɛː			+	+	+	long unrounded open-mid front vowel	U+025b U+02d0
+ˈɨ	vowel	ˈɨ	ɨ			+	+	+	unrounded close central vowel	U+0268

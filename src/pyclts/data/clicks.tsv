@@ -1,0 +1,141 @@
+GRAPHEME	PHONATION	PLACE	SECONDARY	MANNER	EXTRA	ALIAS	NOTE
+gʘ	voiced	labial		stop-segment			
+gʘχ	voiced	labial	uvular-fricative	stop-cluster			
+gʘqχ	voiced	labial	uvular-affricate	stop-cluster			
+gʘqχʼ	voiced	labial	uvular-ejective-affricate	stop-cluster			
+gʘq	voiced	labial	uvular-plosive	stop-cluster			
+gʘɢ	voiced	labial	uvular-voiced-plosive	stop-cluster			
+gʘqʰ	voiced	labial	uvular-aspirated-plosive	stop-cluster			
+gʘɢʰ	voiced	labial	uvular-voiced-aspirated-plosive	stop-cluster			
+gʘqʼ	voiced	labial	uvular-ejective-plosive	stop-cluster			
+gʘɢʼ	voiced	labial	uvular-voiced-ejective-plosive	stop-cluster			
+gʘh	voiced	labial	voiced-glottal	stop-cluster			
+gʘʔ	voiced	labial	glottal	stop-cluster			
+gǀ	voiced	dental		stop-segment			
+gǀχ	voiced	dental	uvular-fricative	stop-cluster			
+gǀqχ	voiced	dental	uvular-affricate	stop-cluster			
+gǀqχʼ	voiced	dental	uvular-ejective-affricate	stop-cluster			
+gǀq	voiced	dental	uvular-plosive	stop-cluster			
+gǀɢ	voiced	dental	uvular-voiced-plosive	stop-cluster			
+gǀqʰ	voiced	dental	uvular-aspirated-plosive	stop-cluster			
+gǀɢʰ	voiced	dental	uvular-voiced-aspirated-plosive	stop-cluster			
+gǀqʼ	voiced	dental	uvular-ejective-plosive	stop-cluster			
+gǀɢʼ	voiced	dental	uvular-voiced-ejective-plosive	stop-cluster			
+gǀh	voiced	dental	voiced-glottal	stop-cluster			
+gǀʔ	voiced	dental	glottal	stop-cluster			
+gǃ	voiced	alveolar		stop-segment			
+gǃχ	voiced	alveolar	uvular-fricative	stop-cluster			
+gǃqχ	voiced	alveolar	uvular-affricate	stop-cluster			
+gǃqχʼ	voiced	alveolar	uvular-ejective-affricate	stop-cluster			
+gǃq	voiced	alveolar	uvular-plosive	stop-cluster			
+gǃɢ	voiced	alveolar	uvular-voiced-plosive	stop-cluster			
+gǃqʰ	voiced	alveolar	uvular-aspirated-plosive	stop-cluster			
+gǃɢʰ	voiced	alveolar	uvular-voiced-aspirated-plosive	stop-cluster			
+gǃqʼ	voiced	alveolar	uvular-ejective-plosive	stop-cluster			
+gǃɢʼ	voiced	alveolar	uvular-voiced-ejective-plosive	stop-cluster			
+gǃh	voiced	alveolar	voiced-glottal	stop-cluster			
+gǃʔ	voiced	alveolar	glottal	stop-cluster			
+gǂ	voiced	palatal		stop-segment			
+gǂχ	voiced	palatal	uvular-fricative	stop-cluster			
+gǂqχ	voiced	palatal	uvular-affricate	stop-cluster			
+gǂqχʼ	voiced	palatal	uvular-ejective-affricate	stop-cluster			
+gǂq	voiced	palatal	uvular-plosive	stop-cluster			
+gǂɢ	voiced	palatal	uvular-voiced-plosive	stop-cluster			
+gǂqʰ	voiced	palatal	uvular-aspirated-plosive	stop-cluster			
+gǂɢʰ	voiced	palatal	uvular-voiced-aspirated-plosive	stop-cluster			
+gǂqʼ	voiced	palatal	uvular-ejective-plosive	stop-cluster			
+gǂɢʼ	voiced	palatal	uvular-voiced-ejective-plosive	stop-cluster			
+gǂh	voiced	palatal	voiced-glottal	stop-cluster			
+gǂʔ	voiced	palatal	glottal	stop-cluster			
+gǁ	voiced	lateral		stop-segment			
+gǁχ	voiced	lateral	uvular-fricative	stop-cluster			
+gǁqχ	voiced	lateral	uvular-affricate	stop-cluster			
+gǁqχʼ	voiced	lateral	uvular-ejective-affricate	stop-cluster			
+gǁq	voiced	lateral	uvular-plosive	stop-cluster			
+gǁɢ	voiced	lateral	uvular-voiced-plosive	stop-cluster			
+gǁqʰ	voiced	lateral	uvular-aspirated-plosive	stop-cluster			
+gǁɢʰ	voiced	lateral	uvular-voiced-aspirated-plosive	stop-cluster			
+gǁqʼ	voiced	lateral	uvular-ejective-plosive	stop-cluster			
+gǁɢʼ	voiced	lateral	uvular-voiced-ejective-plosive	stop-cluster			
+gǁh	voiced	lateral	voiced-glottal	stop-cluster			
+gǁʔ	voiced	lateral	glottal	stop-cluster			
+ʘ	voiceless	labial		stop-segment			
+ʘχ	voiceless	labial	uvular-fricative	stop-cluster			
+ʘqχ	voiceless	labial	uvular-affricate	stop-cluster			
+ʘqχʼ	voiceless	labial	uvular-ejective-affricate	stop-cluster			
+ʘq	voiceless	labial	uvular-plosive	stop-cluster			
+ʘɢ	voiceless	labial	uvular-voiced-plosive	stop-cluster			
+ʘqʰ	voiceless	labial	uvular-aspirated-plosive	stop-cluster			
+ʘɢʰ	voiceless	labial	uvular-voiced-aspirated-plosive	stop-cluster			
+ʘqʼ	voiceless	labial	uvular-ejective-plosive	stop-cluster			
+ʘɢʼ	voiceless	labial	uvular-voiced-ejective-plosive	stop-cluster			
+ʘh	voiceless	labial	voiced-glottal	stop-cluster			
+ʘʔ	voiceless	labial	glottal	stop-cluster			
+ǀ	voiceless	dental		stop-segment			
+ǀχ	voiceless	dental	uvular-fricative	stop-cluster			
+ǀqχ	voiceless	dental	uvular-affricate	stop-cluster			
+ǀqχʼ	voiceless	dental	uvular-ejective-affricate	stop-cluster			
+ǀq	voiceless	dental	uvular-plosive	stop-cluster			
+ǀɢ	voiceless	dental	uvular-voiced-plosive	stop-cluster			
+ǀqʰ	voiceless	dental	uvular-aspirated-plosive	stop-cluster			
+ǀɢʰ	voiceless	dental	uvular-voiced-aspirated-plosive	stop-cluster			
+ǀqʼ	voiceless	dental	uvular-ejective-plosive	stop-cluster			
+ǀɢʼ	voiceless	dental	uvular-voiced-ejective-plosive	stop-cluster			
+ǀh	voiceless	dental	voiced-glottal	stop-cluster			
+ǀʔ	voiceless	dental	glottal	stop-cluster			
+ǃ	voiceless	alveolar		stop-segment			
+ǃχ	voiceless	alveolar	uvular-fricative	stop-cluster			
+ǃqχ	voiceless	alveolar	uvular-affricate	stop-cluster			
+ǃqχʼ	voiceless	alveolar	uvular-ejective-affricate	stop-cluster			
+ǃq	voiceless	alveolar	uvular-plosive	stop-cluster			
+ǃɢ	voiceless	alveolar	uvular-voiced-plosive	stop-cluster			
+ǃqʰ	voiceless	alveolar	uvular-aspirated-plosive	stop-cluster			
+ǃɢʰ	voiceless	alveolar	uvular-voiced-aspirated-plosive	stop-cluster			
+ǃqʼ	voiceless	alveolar	uvular-ejective-plosive	stop-cluster			
+ǃɢʼ	voiceless	alveolar	uvular-voiced-ejective-plosive	stop-cluster			
+ǃh	voiceless	alveolar	voiced-glottal	stop-cluster			
+ǃʔ	voiceless	alveolar	glottal	stop-cluster			
+ǂ	voiceless	palatal		stop-segment			
+ǂχ	voiceless	palatal	uvular-fricative	stop-cluster			
+ǂqχ	voiceless	palatal	uvular-affricate	stop-cluster			
+ǂqχʼ	voiceless	palatal	uvular-ejective-affricate	stop-cluster			
+ǂq	voiceless	palatal	uvular-plosive	stop-cluster			
+ǂɢ	voiceless	palatal	uvular-voiced-plosive	stop-cluster			
+ǂqʰ	voiceless	palatal	uvular-aspirated-plosive	stop-cluster			
+ǂɢʰ	voiceless	palatal	uvular-voiced-aspirated-plosive	stop-cluster			
+ǂqʼ	voiceless	palatal	uvular-ejective-plosive	stop-cluster			
+ǂɢʼ	voiceless	palatal	uvular-voiced-ejective-plosive	stop-cluster			
+ǂh	voiceless	palatal	voiced-glottal	stop-cluster			
+ǂʔ	voiceless	palatal	glottal	stop-cluster			
+ǁ	voiceless	lateral		stop-segment			
+ǁχ	voiceless	lateral	uvular-fricative	stop-cluster			
+ǁqχ	voiceless	lateral	uvular-affricate	stop-cluster			
+ǁqχʼ	voiceless	lateral	uvular-ejective-affricate	stop-cluster			
+ǁq	voiceless	lateral	uvular-plosive	stop-cluster			
+ǁɢ	voiceless	lateral	uvular-voiced-plosive	stop-cluster			
+ǁqʰ	voiceless	lateral	uvular-aspirated-plosive	stop-cluster			
+ǁɢʰ	voiceless	lateral	uvular-voiced-aspirated-plosive	stop-cluster			
+ǁqʼ	voiceless	lateral	uvular-ejective-plosive	stop-cluster			
+ǁɢʼ	voiceless	lateral	uvular-voiced-ejective-plosive	stop-cluster			
+ǁh	voiceless	lateral	voiced-glottal	stop-cluster			
+ǁʔ	voiceless	lateral	glottal	stop-cluster			
+ŋʘ	voiced	labial 		nasal			
+ŋǀ	voiced	dental 		nasal			
+ŋǃ	voiced	alveolar 		nasal			
+ŋǂ	voiced	palatal 		nasal			
+ŋǁ	voiced	lateral 		nasal			
+ŋ̊ʘ	voiced	labial 		nasal	voicing:devoiced		
+ŋ̊ǀ	voiced	dental 		nasal	voicing:devoiced		
+ŋ̊ǃ	voiced	alveolar 		nasal	voicing:devoiced		
+ŋ̊ǂ	voiced	palatal 		nasal	voicing:devoiced		
+ŋ̊ǁ	voiced	lateral 		nasal	voicing:devoiced		
+ˀŋʘ	voiced	labial 		nasal	preceding:pre-glottalized		
+ˀŋǀ	voiced	dental 		nasal	preceding:pre-glottalized		
+ˀŋǃ	voiced	alveolar 		nasal	preceding:pre-glottalized		
+ˀŋǂ	voiced	palatal 		nasal	preceding:pre-glottalized		
+ˀŋǁ	voiced	lateral 		nasal	preceding:pre-glottalized		
+ŋgʘ	voiced	labial 		nasal	preceding:postoralized		
+ŋgǀ	voiced	dental 		nasal	preceding:postoralized		
+ŋgǃ	voiced	alveolar 		nasal	preceding:postoralized		
+ŋgǂ	voiced	palatal 		nasal	preceding:postoralized		
+ŋgǁ	voiced	lateral 		nasal	preceding:postoralized		
