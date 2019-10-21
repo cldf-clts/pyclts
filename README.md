@@ -31,7 +31,7 @@ or
 clts --repos PATH/TO/clts stats
 ```
 
-The data location can be looked up in a [`cldfcatalog` config file](https://github.com/cldf/cldfcatalog/#configuration), under the key `clts`.
+To save this effort, the data location can also be looked up in a [`cldfcatalog` config file](https://github.com/cldf/cldfcatalog/#configuration), under the key `clts`.
 
 Such a config file (and the repository clone) can be created automatically,
 by installing [`cldfbench`](https://pypi.org/cldfbench) and running
