@@ -10,6 +10,34 @@ Tooling to access and curate [CLTS data](https://github.com/cldf-clts/clts).
 This is an attempt to create a system that allows to translate and compare different phonetic transcription systems.
 
 
+## Install
+
+`pyclts` provides a Python API for [CLTS data](https://github.com/cldf-clts/clts).
+Using `pyclts` requires this data to be available locally, either as repository
+clone, or as unzipped download of a [released version](https://github.com/cldf-clts/clts/releases).
+
+To install `pyclts` run
+```
+pip install pyclts
+```
+This will install the python API as well as a commad line tool `clts`.
+Both, require the location of the data as argument:
+```python
+>>> from pyclts import CLTS
+>>> clts = CLTS('PATH/TO/clts')
+```
+or
+```bash
+clts --repos PATH/TO/clts stats
+```
+
+The data location can be looked up in a [`cldfcatalog` config file](https://github.com/cldf/cldfcatalog/#configuration), under the key `clts`.
+
+Such a config file (and the repository clone) can be created automatically,
+by installing [`cldfbench`](https://pypi.org/cldfbench) and running
+`cldfbench config`.
+
+
 ## Overview
 
 Using `pyclts` is exemplified in this short code snippet:

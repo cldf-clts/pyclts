@@ -3,6 +3,7 @@ Main command line interface to the pyclts package.
 """
 import sys
 from pathlib import Path
+import contextlib
 
 from cldfcatalog import Config, Catalog
 from clldutils.clilib import register_subcommands, get_parser_and_subparsers, ParserError
@@ -26,7 +27,7 @@ def main(args=None, catch_all=False, parsed_args=None):
         type=Path)
     parser.add_argument(
         '--repos-version',
-        help="version of repository data",
+        help="version of repository data. Requires a git clone!",
         default=None)
     parser.add_argument(
         '--system',
@@ -39,22 +40,26 @@ def main(args=None, catch_all=False, parsed_args=None):
         parser.print_help()
         return 1
 
-    with Logging(args.log, level=args.log_level):
-        with Catalog(args.repos, tag=args.repos_version) as cat:
-            args.repos = CLTS(cat.dir)
-            args.log.info('cldf-clts/clts at {0}'.format(args.repos.repos))
-            try:
-                return args.main(args) or 0
-            except KeyboardInterrupt:  # pragma: no cover
-                return 0
-            except ParserError as e:
+    with contextlib.ExitStack() as stack:
+        stack.enter_context(Logging(args.log, level=args.log_level))
+        if args.repos_version:
+            # If a specific version of the data is to be used, we make
+            # use of a Catalog as context manager:
+            stack.enter_contet(Catalog(args.repos, tag=args.repos_version))
+        args.repos = CLTS(args.repos)
+        args.log.info('cldf-clts/clts at {0}'.format(args.repos.repos))
+        try:
+            return args.main(args) or 0
+        except KeyboardInterrupt:  # pragma: no cover
+            return 0
+        except ParserError as e:
+            print(e)
+            return main([args._command, '-h'])
+        except Exception as e:
+            if catch_all:  # pragma: no cover
                 print(e)
-                return main([args._command, '-h'])
-            except Exception as e:
-                if catch_all:  # pragma: no cover
-                    print(e)
-                    return 1
-                raise
+                return 1
+            raise
 
 
 if __name__ == '__main__':  # pragma: no cover
