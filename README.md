@@ -20,7 +20,7 @@ To install `pyclts` run
 ```
 pip install pyclts
 ```
-This will install the python API as well as a commad line tool `clts`.
+This will install the python API as well as a command line tool `clts`.
 Both, require the location of the data as argument:
 ```python
 >>> from pyclts import CLTS
