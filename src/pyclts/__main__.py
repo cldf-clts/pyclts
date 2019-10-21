@@ -4,6 +4,7 @@ Main command line interface to the pyclts package.
 import sys
 from pathlib import Path
 
+from cldfcatalog import Config, Catalog
 from clldutils.clilib import register_subcommands, get_parser_and_subparsers, ParserError
 from clldutils.loglib import Logging
 
@@ -13,9 +14,20 @@ from pyclts import CLTS
 def main(args=None, catch_all=False, parsed_args=None):
     import pyclts.commands
 
+    try:
+        repos = Config.from_file().get_clone('clts')
+    except KeyError:
+        repos = Path('.')
     parser, subparsers = get_parser_and_subparsers('clts')
     parser.add_argument(
-        '--repos', help="clone of cldf-clts/clts", default=Path('.'), type=Path)
+        '--repos',
+        help="clone of cldf-clts/clts",
+        default=repos,
+        type=Path)
+    parser.add_argument(
+        '--repos-version',
+        help="version of repository data",
+        default=None)
     parser.add_argument(
         '--system',
         help="specify the transcription system you want to load",
@@ -27,20 +39,22 @@ def main(args=None, catch_all=False, parsed_args=None):
         parser.print_help()
         return 1
 
-    args.repos = CLTS(args.repos)
     with Logging(args.log, level=args.log_level):
-        try:
-            return args.main(args) or 0
-        except KeyboardInterrupt:  # pragma: no cover
-            return 0
-        except ParserError as e:
-            print(e)
-            return main([args._command, '-h'])
-        except Exception as e:
-            if catch_all:  # pragma: no cover
+        with Catalog(args.repos, tag=args.repos_version) as cat:
+            args.repos = CLTS(cat.dir)
+            args.log.info('cldf-clts/clts at {0}'.format(args.repos.repos))
+            try:
+                return args.main(args) or 0
+            except KeyboardInterrupt:  # pragma: no cover
+                return 0
+            except ParserError as e:
                 print(e)
-                return 1
-            raise
+                return main([args._command, '-h'])
+            except Exception as e:
+                if catch_all:  # pragma: no cover
+                    print(e)
+                    return 1
+                raise
 
 
 if __name__ == '__main__':  # pragma: no cover

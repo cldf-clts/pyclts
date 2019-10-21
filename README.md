@@ -1,190 +1,113 @@
-# cldfbench
-Tooling to create CLDF datasets from existing data
+# pyclts
 
-[![Build Status](https://travis-ci.org/cldf/cldfbench.svg?branch=master)](https://travis-ci.org/cldf/cldfbench)
-[![codecov](https://codecov.io/gh/cldf/cldfbench/branch/master/graph/badge.svg)](https://codecov.io/gh/cldf/cldfbench)
-[![PyPI](https://img.shields.io/pypi/v/cldfbench.svg)](https://pypi.org/project/cldfbench)
+Tooling to access and curate [CLTS data](https://github.com/cldf-clts/clts).
+
+[![Build Status](https://travis-ci.org/cldf-clts/pyclts.svg?branch=master)](https://travis-ci.org/cldf-clts/pyclts)
+[![codecov](https://codecov.io/gh/cldf-clts/pyclts/branch/master/graph/badge.svg)](https://codecov.io/gh/cldf-clts/pyclts)
+[![PyPI](https://img.shields.io/pypi/v/pyclts.svg)](https://pypi.org/project/pyclts)
+
+
+This is an attempt to create a system that allows to translate and compare different phonetic transcription systems.
 
 
 ## Overview
 
-This package provides tools to curate cross-linguistic data, with the goal of
-packaging it as [CLDF](https://cldf.clld.org) dataset.
+Using `pyclts` is exemplified in this short code snippet:
 
-In particular, it supports a workflow where 
-- "raw" source data is downloaded to a `raw` subdirectory,
-- and subsequently converted to a CLDF dataset in a `cldf` subdirectory, with the help of
-  - configuration data in a `etc` directory
-  - custom Python code (a subclass of [`cldfbench.Dataset`](src/cldfbench/dataset.py) which implements the workflow actions)
+```python
+>>> from pyclts import CLTS
+>>> clts = CLTS('clts/')
+>>> asjp = clts.transcriptionsystem('asjpcode')
+>>> snd1 = clts.bipa['ts']
+>>> snd2 = asjp['c']
+>>> snd1.name
+'voiceless alveolar sibilant affricate consonant'
+>>> snd2.name
+'voiceless alveolar sibilant affricate consonant'
+>>> clts.bipa.translate('ts a ŋ ə', asjp)
+'c E N 3'
+>>> asjp.translate('C a y', clts.bipa)
+'tʃ ɐ j'
+```
 
-This workflow is supported via
-- a commandline interface `cldfbench` which calls the workflow actions via [subcommands](src/cldfbench/commands),
-- a `cldfbench.Dataset` base class, which must be overwritten in a custom module
-  to hook custom code into the workflow.
+Notes:
+- Since "bipa" is the standard transcriptionsystem in CLTS, it's available - as shortcut -
+  directly as `bipa` attribute of `CLTS`.
+- We represent the sounds `ts` and `c`, depending on the alphabet from which they are taken.
 
 
-## Install
+## Sounds
 
-`cldfbench` can be installed via `pip` - preferably in a 
-[virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/) - running
-```bash
-pip install cldfbench
+`pyclts` can not only deal with sound that are already in our database. Intead, We it tries to create "unknown" sounds automatically and infer its features from the set of diacritics and the base sound:
+
+```python
+>>> sound = clts.bipa['dʱʷ']
+>>> sound.name
+'labialized breathy voiced alveolar stop consonant'
+>>> sound.generated
+True
+>>> sound.alias
+True
+>>> print(sound)
+dʷʱ
+>>> print(sound.uname)
+LATIN SMALL LETTER D / MODIFIER LETTER SMALL W / MODIFIER LETTER SMALL H WITH HOOK
+>>> print(sound.codepoints)
+U+0064 U+02b7 U+02b1
+```
+
+You can see, since we represent breathy-voice phonation differently, we flag this sound as an alias. Also since it is not yet in our database explicitly coded, we flag it as a "generated" sound. In a similar way, you can generate sounds from their names:
+
+```python
+>>> sound = clts.bipa['pre-aspirated voiced aspirated bilabial stop consonant']
+>>> print(sound)
+ʰbʰ
+>>> sound.generated
+True
+>>> sound.name
+'pre-aspirated aspirated voiced bilabial stop consonant'
+```
+
+Note that this sound probably does not exist in any language, but we generate it from the feature components. Note also that the ```name``` that is automatically given for the sound automatically orders how the features are put together to form the sound identifier. In principle, our features bundles are unordered, but we try to decide for some explicit order of features to enhance comparison.
+
+
+## Transcription systems and sound classes
+
+You can also use our transcription data to convert from one transcription system to a given dataset (note that backwards-conversion may not be possible, as transcription data is often limited):
+
+```python
+>>> sca = clts.soundclass('sca')
+>>> clts.bipa.translate('f a: t ə r', sca)
+'B A T E R'
+```
+
+The translation can also be done by loading the transcription data directly:
+```python
+>>> sca('v a t ə r')
+['B', 'A', 'T', 'E', 'R']
 ```
 
 
-## The command line interface `cldfbench`
+## Basic Structure of the Package
 
-Installing the python package will also install a command `cldfbench` available on
-the command line:
-```bash
-$ cldfbench -h
-usage: cldfbench [-h] [--log-level LOG_LEVEL] COMMAND ...
+`pyclts` provides access to three basic types of data:
 
-optional arguments:
-  -h, --help            show this help message and exit
-  --log-level LOG_LEVEL
-                        log level [ERROR|WARN|INFO|DEBUG] (default: 20)
+* transcription systems (```pyclts.transcriptionsystems.TranscriptionSystem```), a system that can *generate* sounds
+* transcription data (```pyclts.transcriptiondata.TranscriptionData```): a dataset with a *fixed number of sounds*
+* sound classes (```pyclts.soundclasses.SoundClasses```): a dataset with a direct mapping from sounds to a concrete character (the sound class)
 
-available commands:
-  Run "COMAMND -h" to get help for a specific command.
-
-  COMMAND
-    check               Run generic CLDF checks
-    ...
-```
-
-As shown above, run `cldfbench -h` to get help, and `cldfbench COMMAND -h` to get
-help on individual subcommands, e.g. `cldfbench new -h` to read about the usage
-of the `new` subcommand.
+Transcription data is linked to our transcription system by the grapheme for the B(road) IPA transcription system, which serves as our default, and the name, which follows the IPA conventions with some modifications which were needed to make sure that we can represent sounds that we regularly find in cross-linguistic datasets.
 
 
-### Dataset discovery
+## Parsing Procedure 
 
-Most `cldfbench` commands operate on an existing dataset (unlike `new`, which
-creates a new one). Datasets can be discovered in two ways:
-
-1. Via the python module (i.e. the `*.py` file, containing the `Dataset` subclass).
-   To use this mode of discovery, pass the path to the python module whenever
-   as `DATASET` argument, when required by a command.
-
-2. Via [entry point](https://packaging.python.org/specifications/entry-points/) and
-   dataset ID. To use this mode, specify the name of the entry point as value of
-   the `--entry-point` option (or use the default name `cldfbench.dataset`) and
-   the `Dataset.id` as `DATASET` argument.
-
-Discovery via entry point is particularly useful for commands that can operate
-on multiple datasets. To select **all** datasets advertising a given entry point,
-pass `"_"` (i.e. an underscore) as `DATASET` argument.
-
-
-## Workflow
-
-For a full example of the `cldfbench` curation workflow, see [the tutorial](doc/tutorial.md).
-
-
-### Creating a skeleton for a new dataset directory
-
-A directory containing stub entries for a dataset can be created running
-
-```bash
-cldfbench new cldfbench OUTDIR
-```
-
-This will create the following layout (where `<ID>` stands for the chosen dataset ID):
-```
-<ID>/
-├── cldf               # A stub directory for the CLDF data
-│   └── README.md
-├── cldfbench_<ID>.py  # The python module, providing the Dataset subclass
-├── etc                # A stub directory for the configuration data
-│   └── README.md
-├── metadata.json      # The metadata provided to the subcommand serialized as JSON
-├── raw                # A stub directory for the raw data
-│   └── README.md
-├── setup.cfg          # Python setup config, providing defaults for test integration
-├── setup.py           # Python setup file, making the dataset "installable" 
-├── test.py            # The python code to run for dataset validation
-└── .travis.yml        # Integrate the validation with Travis-CI
-```
-
-
-### Implementing CLDF creation
-
-`cldfbench` provides tools to make CLDF creation simple. Still, each dataset is
-different, and so each dataset will have to provide its own custom code to do so.
-This custom code goes into the `cmd_makecldf` method of the `Dataset` subclass in
-the dataset's python module.
-
-Typically, this code will make use of one or more
-- `cldfbench.CLDFWriter` instances, which can be obtained by calling `Dataset.cldf_writer`, passing in a
-- `cldfbench.CLDFSpec` instance, which describes what kind of CLDF to create.
-
-`cldfbench` supports several scenarios of CLDF creation:
-- The typical use case is turning raw data into a single CLDF dataset. This would
-  require instantiating one `CLDFWriter` writer in the `cmd_makecldf` method, and
-  the defaults of `CLDFSpec` will probably be ok.
-- But it is also possible to create multiple CLDF datasets:
-  - For a dataset containing both, lexical and typological data, it may be appropriate
-    to create a `Ẁordlist` and a `StructureDataset`. To do so, one would have to
-    call `cldf_writer` twice, passing in an approriate `CLDFSpec`. Note that if
-    both CLDF datasets are created in the same directory, they can share the
-    `LanguageTable` - but would have to specify distinct file names for the
-    `ParameterTable`, passing distinct values to `CLDFSpec.data_fnames`
-  - When creating multiple datasets of the same CLDF module, e.g. to split a large  dataset into smaller chunks, care must be taken to also disambiguate the name
-    of the metadata file, passing distinct values to `CLDFSpec.metadata_fname`.
-
-When creating CLDF, it is also often useful to have standard reference catalogs
-accessible, in particular Glottolog. See the section on [Catalogs](#catalogs) for
-a description of how this is supported by `cldfbench`.
-
-
-### Catalogs
-
-TODO: Catalog objects, Catalogs in cli,
-
-
-### Curating a dataset on GitHub
-
-One of the design goals of CLDF was to specify a data format that plays well with
-version control. Thus, it's natural - and actually recommended - to curate a CLDF
-dataset in a version controled repository. The most popular way to do this in a
-collaborative fashion is by using a [git](https://git-scm.com/) repository hosted on 
-[GitHub](https://github.com).
-
-The directory layout supported by `cldfbench` caters to this use case in several ways:
-- Each directory contains a file `README.md`, which will be rendered as human readable
-  description when browsing the repository at GitHub.
-- The file `.travis.yml` contains the configuration for hooking up a repository with
-  [Travis CI](https://www.travis-ci.org/), to provide continuous consistency checking
-  of the data.
-
-
-### Archiving a dataset with Zenodo
-
-Curating a dataset on GitHub also provides a simple way to archiving and publishing
-released versions of the data. You can hook up your repository with [Zenodo](https://zenodo.org) (following [this guide](https://guides.github.com/activities/citable-code/)). Then, Zenodo will pick up any released package, assign a DOI to it, archive it and
-make it accessible in the long-term.
-
-Some notes:
-- Hook-up with Zenodo requires the repository to be public (not private).
-- You should consider using an institutional account on GitHub and Zenodo to associate the repository with. Currently, only the user account registering a repository on Zenodo can change any metadata of releases lateron.
-- Once released and archived with Zenodo, it's a good idea to add the DOI assigned by Zenodo to the release description on GitHub.
-- To make sure a release is picked up by Zenodo, the version number must start with a letter, e.g. "v1.0" - **not** "1.0".
-
-Thus, with a setup as described here, you can make sure you create [FAIR data](https://en.wikipedia.org/wiki/FAIR_data).
-
-
-## Extending `cldfbench`
-
-### Custom dataset templates
-
-A python package can provide alternative dataset templates to be run with `cldfbench new`.
-
-TODO
-
-
-### Commands
-
-A python package can provide additional subcommands to be run from `cldfbench`.
-
-TODO
+feature | handled by | note | example
+--- | --- | --- | ---
+normalized | ```ts._norm()```, ```ts[sound].normalized``` | this refers to one-to-one character replacement with obviously wrong unicode lookalikes | ```λ``` (wrong) vs. ```ʎ``` (correct)
+alias | transcription system data (```+``` indicates alias), ```ts['sound'].alias``` | this refers to "free" IPA variants that are widely used and are therefore officially accepted for "broad ipa" or any other TS, but one variant is usually chosen as the preferred one | ```ts``` (normal) vs. ```ʦ``` (alias)
+source | ```ts['sound'].source``` | the unnormalized form as it is given to the TS | ```bipa['λ'].source == 'λ'```
+grapheme | ```ts[lingpy/'sound'].grapheme``` | the normalized form which has not been resolved by an alias | ```bipa['ʦ'].grapheme == 'ʦ'
+string/unicode | ```ts['sound'].__unicode__()``` | the normalized form in which a potential alias is replaced by its "accepted" counterpart | ```str(bipa['ʦ']) == 'ts'```
+name | ```bipa['sound'].name``` | the canonical representation of the feature system that defines a sound, with the sound class (consonant, cluster, vowel, diphthong) in the end, and the feature bundle following the order given in the ```pyclts.models``` description of the corresponding sound class. This representation serves as the basis for translation among different TS. | ```bipa['ts'].name == 'voiceless alveolar sibilant-affricate consonant'```
+generated | ```ts['sound'].generated``` | If a sound is not yet know to a given TS, the algorithm tries to generate it by de-composing it into its *base part* and adding features to the left and to the right, based on the *diacritics*. If a sound has been generated, this is traced with help of the attribute. Normally, generated sounds need to be double-checked by the experts, as their grapheme representation may be erroneous. Thus, while the sound ```kʷʰ``` can be regularly defined in a TS (like BIPA), a user might query ```kʰʷ```, in which case the sound would be generated internally, the grapheme would be stored in its normalized form (which is identical with the base), but the ```str()```-representation would contain the correct order, and the character would be automatically qualified as an alias of an existing one.  | ```str(TS['kʰʷ']) == 'kʷʰ' and TS['kʰʷ'].grapheme == 'kʰʷ' and TS[''kʰʷ'].alias and TS['kʰʷ'].generated``` 
+base | ```ts['sound'].base``` | if a sound is being generated, the parsing algorithm first tries to identify the potential "base" of the sound, i.e., a sound that is already known and explicitly defined in a given transcription system. Based on this base sound, the grapheme is then constructed by following the diacritics to the left and to the right. If the so-constructed feature bundle already exists in the transcription system, the constructed sound is treated as an alias, if it does not exist, the sound is only marked as being generated. | ```str(TS['d̤ʷ']) == 'dʷʱ'```

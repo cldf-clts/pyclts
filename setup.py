@@ -26,6 +26,7 @@ setup(
         install_requires=[
         'attrs>=18.2',
         'clldutils>=3.1.2',
+        'cldfcatalog>=1.3',
         'csvw>=1.6',
         'uritemplate',
     ],

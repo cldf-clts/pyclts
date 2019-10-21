@@ -1,13 +1,16 @@
 from clldutils.apilib import API
 from clldutils.misc import lazyproperty
 from csvw.dsv import iterrows as reader
+from cldfcatalog import Config
 
 from pyclts import TranscriptionData, TranscriptionSystem, SoundClasses
 from pyclts.soundclasses import SOUNDCLASS_SYSTEMS
 
 
 class CLTS(API):
-    def __init__(self, repos):
+    def __init__(self, repos=None):
+        if repos is None:
+            repos = Config.from_file().get_clone('clts') 
         super().__init__(repos)
         self.pkg_dir = self.repos / 'pkg'
         self.transcriptionsystems_dir = self.pkg_dir / 'transcriptionsystems'
