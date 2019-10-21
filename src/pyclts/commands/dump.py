@@ -141,7 +141,6 @@ def run(args, test=False):
         if test:
             break
 
-
     with writer('sounds.tsv') as w:
         w.writerow(['NAME', 'TYPE', 'GRAPHEME', 'UNICODE', 'GENERATED', 'NOTE'])
         for k, v in sorted(sounds.items(), reverse=True):

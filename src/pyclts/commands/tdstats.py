@@ -21,5 +21,5 @@ def run(args):
         len(table) - 1,
         '',
         '',
-        0 if not len(table) -1 else sum([line[-1] for line in table[1:]]) / (len(table) - 1)])
+        0 if not len(table) - 1 else sum([line[-1] for line in table[1:]]) / (len(table) - 1)])
     print(table.render(tablefmt=args.format))

@@ -51,12 +51,6 @@ def test_transcriptiondata(sca, dolgo, asjpd, phoible, bipa):  # pragma: no cove
     assert sca(seq4)[3] == '!'
     assert asjpd(seq4)[3] == '!'
 
-    #with pytest.raises(KeyError):
-    #    _ = dolgo['A']
-
-    #with pytest.raises(KeyError):
-    #    _ = sca['B']
-
     # test data from sound name
     assert sca.resolve_sound(bipa['ʰb']) == 'P'
     assert sca.resolve_sound(bipa['ae']) == 'A'
@@ -106,19 +100,19 @@ def read_tests(name):
 
 
 def test_sounds(bipa, log):
-        for test in read_tests('test_data.tsv'):
-            del test['bipa']
-            if None in test:
-                del test[None]
-            try:
-                _test_sounds(bipa, **{k.replace('-', '_'): v for k, v in test.items()})
-            except AssertionError as e:
-                log.warning('{0}\t{1}'.format(test['source'], e))
+    for test in read_tests('test_data.tsv'):
+        del test['bipa']
+        if None in test:
+            del test[None]
+        try:
+            _test_sounds(bipa, **{k.replace('-', '_'): v for k, v in test.items()})
+        except AssertionError as e:
+            log.warning('{0}\t{1}'.format(test['source'], e))
 
 
 def test_clicks(bipa):
-        for test in read_tests('clicks.tsv'):
-            _test_clicks(bipa, test['GRAPHEME'], test['MANNER'])
+    for test in read_tests('clicks.tsv'):
+        _test_clicks(bipa, test['GRAPHEME'], test['MANNER'])
 
 
 def _test_clicks(bipa, grapheme, gtype):

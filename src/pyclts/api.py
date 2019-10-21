@@ -10,7 +10,7 @@ from pyclts.soundclasses import SOUNDCLASS_SYSTEMS
 class CLTS(API):
     def __init__(self, repos=None):
         if repos is None:
-            repos = Config.from_file().get_clone('clts') 
+            repos = Config.from_file().get_clone('clts')
         super().__init__(repos)
         self.pkg_dir = self.repos / 'pkg'
         self.transcriptionsystems_dir = self.pkg_dir / 'transcriptionsystems'

@@ -1,4 +1,4 @@
-from pyclts.transcriptionsystem import Symbol, TranscriptionSystem
+from pyclts.transcriptionsystem import Symbol
 from pyclts.util import read_data, TranscriptionBase
 
 SOUNDCLASS_SYSTEMS = ['sca', 'cv', 'art', 'dolgo', 'asjp', 'color']

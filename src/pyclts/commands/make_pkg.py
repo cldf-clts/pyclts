@@ -66,7 +66,7 @@ def run(args):
         for grapheme, sound in sorted(bipa.sounds.items()):
             if not sound.alias:
                 w.writerow(
-                    [sound.name, grapheme] +
-                    [token2class(grapheme, Model(cls)) for cls in SOUNDCLASS_SYSTEMS])
+                    [sound.name, grapheme]
+                    + [token2class(grapheme, Model(cls)) for cls in SOUNDCLASS_SYSTEMS])
                 count += 1
     args.log.info('SoundClasses: {0} written to file.'.format(count))
