@@ -14,6 +14,7 @@ __all__ = [
     'Tone',
     'Marker',
     'Diphthong',
+    'Triphthong',
     'Cluster',
     'UnknownSound']
 EXCLUDE_FEATURES = [
@@ -284,33 +285,34 @@ class Consonant(Sound):
 @attr.s(cmp=False, repr=False)
 class ComplexSound(Sound):
     from_sound = attr.ib(default=None)
-    to_sound = attr.ib(default=None)
+    to_sounds = attr.ib(default=None)
 
     def __str__(self):
-        return str(self.from_sound) + str(self.to_sound)
+        return str(self.from_sound) + "".join([str(snd) for snd in self.to_sounds])
 
     @property
     def name(self):
         n1 = ' '.join(self.from_sound.name.split(' ')[:-1])
-        n2 = ' '.join(self.to_sound.name.split(' ')[:-1])
+        n2 = ' to '.join([" ".join(snd.name.split(' ')[:-1]) for snd in self.to_sounds])
         return 'from ' + n1 + ' to ' + n2 + ' ' + self.type
 
     @classmethod
-    def from_sounds(cls, source, sound1, sound2, ts):
+    def from_sounds(cls, source, sounds, ts):
         return cls(
             source=source,
-            grapheme=sound1.grapheme + sound2.grapheme,
-            from_sound=sound1,
-            to_sound=sound2,
+            grapheme="".join([str(snd) for snd in sounds]),
+            from_sound=sounds[0],
+            to_sounds=sounds[1:],
             ts=ts,
             generated=True,
-            stress=sound1.stress or sound2.stress
+            stress=any([snd.stress for snd in sounds])
         )
 
     @property
     def table(self):
         """Overwrite the table attribute for complex sounds"""
-        return [self.grapheme, self.from_sound.name, self.to_sound.name]
+        to_sounds = [snd.name for snd in self.to_sounds]
+        return [self.grapheme, self.from_sound.name] + to_sounds
 
 
 @attr.s(cmp=False, repr=False)
@@ -368,11 +370,16 @@ class Vowel(Sound):
         'breathiness', 'roundedness', 'height', 'frication', 'centrality',
         'tone']
 
-
 @attr.s(cmp=False, repr=False)
 class Diphthong(ComplexSound):
     """
     A dipthong consists of two vowels.
+    """
+
+@attr.s(cmp=False, repr=False)
+class Triphthong(ComplexSound):
+    """
+    A tripthong consists of three vowels.
     """
 
 

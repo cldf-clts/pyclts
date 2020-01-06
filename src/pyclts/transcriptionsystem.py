@@ -38,7 +38,7 @@ class TranscriptionSystem(TranscriptionBase):
         features = jsonlib.load(features)
 
         self.diacritics = dict(
-            consonant={}, vowel={}, click={}, diphthong={}, tone={}, cluster={})
+            consonant={}, vowel={}, click={}, diphthong={}, triphthong={}, tone={}, cluster={})
         for dia in itertable(self.system.tabledict['diacritics.tsv']):
             if not dia['alias'] and not dia['typography']:
                 self.features[dia['type']][dia['value']] = dia['grapheme']
@@ -128,9 +128,12 @@ class TranscriptionSystem(TranscriptionBase):
         if frozenset(components) in self.features:
             return self.features[frozenset(components)]
         rest, sound_class = components[:-1], components[-1]
-        if sound_class in ['diphthong', 'cluster']:
+        if sound_class in ['diphthong', 'triphthong', 'cluster']:
             if string.startswith('from ') and 'to ' in string:
-                extension = {'diphthong': 'vowel', 'cluster': 'consonant'}[sound_class]
+                extension = {
+                    'diphthong': 'vowel',
+                    'triphthong' : 'vowel',
+                    'cluster': 'consonant'}[sound_class]
                 string_ = ' '.join(string.split(' ')[1:-1])
                 from_, to_ = string_.split(' to ')
                 v1, v2 = frozenset(from_.split(' ') + [extension]), frozenset(
@@ -138,9 +141,9 @@ class TranscriptionSystem(TranscriptionBase):
                 if v1 in self.features and v2 in self.features:
                     s1, s2 = (self.features[v1], self.features[v2])
                     if sound_class == 'diphthong':
-                        return Diphthong.from_sounds(s1 + s2, s1, s2, self)  # noqa: F405
+                        return Diphthong.from_sounds(s1 + s2, [s1, s2], self)  # noqa: F405
                     else:
-                        return Cluster.from_sounds(s1 + s2, s1, s2, self)  # noqa: F405
+                        return Cluster.from_sounds(s1 + s2, [s1, s2], self)  # noqa: F405
                 else:
                     # try to generate the sounds if they are not there
                     s1, s2 = self._from_name(from_ + ' ' + extension), self._from_name(
@@ -149,8 +152,8 @@ class TranscriptionSystem(TranscriptionBase):
                         s1, UnknownSound) or isinstance(s2, UnknownSound)):  # noqa: F405
                         if sound_class == 'diphthong':
                             return Diphthong.from_sounds(  # noqa: F405
-                                s1 + s2, s1, s2, self)
-                        return Cluster.from_sounds(s1 + s2, s1, s2, self)  # noqa: F405
+                                s1 + s2, [s1, s2], self)
+                        return Cluster.from_sounds(s1 + s2, [s1, s2], self)  # noqa: F405
                     raise ValueError('components could not be found in system')
             else:
                 raise ValueError('name string is erroneously encoded')
@@ -190,12 +193,15 @@ class TranscriptionSystem(TranscriptionBase):
             sound.source = string
             return sound
 
-        match = list(self._regex.finditer(nstring))
         # if the match has length 2, we assume that we have two sounds, so we split
-        # the sound and pass it on for separate evaluation (recursive function)
+        # the sound and pass it on for separate evaluation (recursive function);
+        # same thing for 3 or more; the logic is kept separated so the constraints
+        # are clearer
+        match = list(self._regex.finditer(nstring))
         if len(match) == 2:
             sound1 = self._parse(nstring[:match[1].start()])
             sound2 = self._parse(nstring[match[1].start():])
+
             # if we have ANY unknown sound, we mark the whole sound as unknown, if
             # we have two known sounds of the same type (vowel or consonant), we
             # either construct a diphthong or a cluster
@@ -204,12 +210,40 @@ class TranscriptionSystem(TranscriptionBase):
                 # diphthong creation
                 if sound1.type == 'vowel':
                     return Diphthong.from_sounds(  # noqa: F405
-                        string, sound1, sound2, self)
+                        string, [sound1, sound2], self)
                 elif sound1.type == 'consonant' and \
                         sound1.manner in ('stop', 'implosive', 'click', 'nasal') and \
                         sound2.manner in ('stop', 'implosive', 'affricate', 'fricative'):
                     return Cluster.from_sounds(  # noqa: F405
-                        string, sound1, sound2, self)
+                        string, [sound1, sound2], self)
+
+            # failure to parse 2-sound grapheme
+            return UnknownSound(grapheme=nstring, source=string, ts=self)  # noqa: F405
+
+        elif len(match) == 3:
+            sound1 = self._parse(nstring[:match[1].start()])
+            sound2 = self._parse(nstring[match[1].start():match[2].start()])
+            sound3 = self._parse(nstring[match[2].start():])
+
+            # if we have ANY unknown sound, we mark the whole sound as unknown, if
+            # we have two known sounds of the same type (vowel or consonant), we
+            # either construct a diphthong or a cluster
+            if 'unknownsound' not in (sound1.type, sound2.type, sound3.type) and \
+                    sound1.type == sound2.type and sound2.type == sound3.type:
+                # diphthong creation
+                if sound1.type == 'vowel':
+                    return Triphthong.from_sounds(  # noqa: F405
+                        string, [sound1, sound2, sound3], self)
+                # only allowing one pattern for the time being
+                elif sound1.type == 'consonant' and \
+                        sound1.manner in ('nasal') and \
+                        sound2.manner in ('stop', 'implosive', 'click', 'nasal') and \
+                        sound3.manner in ('flap', 'trill', 'lateral'):
+                    return Cluster.from_sounds(  # noqa: F405
+                        string, [sound1, sound2, sound3], self)
+
+
+            # failure to parse 3-sound grapheme
             return UnknownSound(grapheme=nstring, source=string, ts=self)  # noqa: F405
 
         if len(match) != 1:

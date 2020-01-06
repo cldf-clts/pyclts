@@ -79,8 +79,22 @@ def test_parse(bipa):
         assert res.name.endswith('diphthong')
         assert s == str(s)
 
-    # clusters
+    # triphthongs
+    for s in ['uai', 'aia']:
+        res = bipa[s]
+        assert res.type == 'triphthong'
+        assert res.name.endswith('triphthong')
+        assert s == str(s)
+
+    # 2-consonant clusters
     for s in ['tk', 'pk', 'dg', 'bdʰ']:
+        res = bipa[s]
+        assert res.type == 'cluster'
+        assert 'cluster' in res.name
+        assert s == str(s)
+
+    # 3-consonant clusters
+    for s in ['mbr']:
         res = bipa[s]
         assert res.type == 'cluster'
         assert 'cluster' in res.name
