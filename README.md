@@ -35,7 +35,7 @@ To save this effort, the data location can also be looked up in a [`cldfcatalog`
 
 Such a config file (and the repository clone) can be created automatically,
 by installing [`cldfbench`](https://pypi.org/cldfbench) and running
-`cldfbench config`.
+`cldfbench catconfig` (please note that command depends on the `pyglottolog` and `pyconcepticon` libraries).
 
 
 ## Overview
