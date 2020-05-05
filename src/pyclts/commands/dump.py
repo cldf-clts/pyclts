@@ -1,5 +1,5 @@
 """
-
+Dump the data in the CLTS collection for convenient reuse.
 """
 import collections
 
@@ -7,6 +7,8 @@ import attr
 from csvw.dsv import UnicodeWriter
 
 from pyclts.models import is_valid_sound
+import json
+import codecs
 
 
 @attr.s
@@ -30,8 +32,10 @@ def run(args, test=False):
 
     sounds = collections.defaultdict(dict)
     data = []
+    clts_dump = {}
     bipa = args.repos.bipa
     # start from assembling bipa-sounds
+    args.log.info('adding bipa data')
     for grapheme, sound in sorted(
             bipa.sounds.items(), key=lambda p: p[1].alias if p[1].alias else False):
         if sound.type not in ['marker']:
@@ -61,8 +65,10 @@ def run(args, test=False):
                 '',
                 '',
                 sound.note or ''))
+            clts_dump[grapheme] = [str(sound), sound.name]
 
     # add sounds systematically by their alias
+    args.log.info('adding transcription data')
     for td in args.repos.iter_transcriptiondata():
         for name in td.names:
             bipa_sound = bipa[name]
@@ -98,11 +104,13 @@ def run(args, test=False):
                     item.get('image', ''),
                     item.get('sound', ''),
                 ))
+                clts_dump[item['grapheme']] = [sound['grapheme'], name]
         if test:
             break
 
     # sound classes have a generative component, so we need to treat them
     # separately
+    args.log.info('adding sound classes')
     for sc in args.repos.iter_soundclass():
         for name in sounds:
             try:
@@ -121,6 +129,7 @@ def run(args, test=False):
 
     # last run, check again for each of the remaining transcription systems,
     # whether we can translate the sound
+    args.log.info('adding remaining transcriptin systems')
     for ts in args.repos.iter_transcriptionsystem(exclude=['bipa']):
         for name in sounds:
             try:
@@ -134,13 +143,15 @@ def run(args, test=False):
                         '',  # sounds[name]['alias'],
                         ts.id,
                     ))
+                    clts_dump[ts_sound.s] = [sounds[name]['grapheme'], name]
             except ValueError:
                 pass
             except TypeError:
                 args.log.debug('{0}: {1}'.format(ts.id, name))
         if test:
             break
-
+    
+    args.log.info('writing data to file')
     with writer('sounds.tsv') as w:
         w.writerow(['NAME', 'TYPE', 'GRAPHEME', 'UNICODE', 'GENERATED', 'NOTE'])
         for k, v in sorted(sounds.items(), reverse=True):
@@ -150,3 +161,6 @@ def run(args, test=False):
         w.writerow([f.name for f in attr.fields(Grapheme)])
         for row in data:
             w.writerow(attr.astuple(row))
+    
+    with codecs.open(args.repos.path('data', 'clts.json'), 'w', 'utf-8') as w:
+        w.write(json.dumps(clts_dump, indent=2))
