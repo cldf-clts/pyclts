@@ -32,7 +32,7 @@ def run(args, test=False):
 
     sounds = collections.defaultdict(dict)
     data = []
-    clts_dump = {}
+    clts_dump = collections.OrderedDict()
     bipa = args.repos.bipa
     # start from assembling bipa-sounds
     args.log.info('adding bipa data')
