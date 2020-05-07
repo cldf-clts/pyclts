@@ -1,7 +1,6 @@
-from pathlib import Path
+import pathlib
 
 from pyclts.__main__ import main
-from pyclts.api import CLTS
 
 
 def test_features(capsys, repos):
@@ -49,6 +48,8 @@ def test_make_pkg_and_app(capsys, tmp_repos, mocker):
     main(['--repos', str(tmp_repos), 'test', '--test'])
 
 
-def test_dump(tmp_repos):
-    main(['--repos', str(tmp_repos), 'dump'])
+def test_dump(tmp_repos, tmpdir):
+    p = pathlib.Path(str(tmpdir)) / 'test.zip'
+    main(['--repos', str(tmp_repos), 'dump', '--destination', str(p)])
     assert tmp_repos.joinpath('data', 'graphemes.tsv').exists()
+    assert p.exists()

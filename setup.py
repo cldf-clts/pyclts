@@ -25,7 +25,7 @@ setup(
     python_requires='>=3.5',
         install_requires=[
         'attrs>=18.2',
-        'clldutils>=3.1.2',
+        'clldutils>=3.5',
         'cldfcatalog>=1.3',
         'csvw>=1.6',
         'uritemplate',

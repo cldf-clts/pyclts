@@ -1,23 +1,24 @@
 """
 Dump the data in the CLTS collection for convenient reuse.
 """
+import json
+import zipfile
 import collections
 
 import attr
 from csvw.dsv import UnicodeWriter
+from clldutils.clilib import PathType
 
 from pyclts.models import is_valid_sound
-import json
-import codecs
-import zipfile
 
 
 def register(parser):
     parser.add_argument(
         "--destination",
         default=None,
+        type=PathType(type='file', must_exist=False),
         help="Name of the file to store data in compressed form."
-        )
+    )
 
 
 @attr.s
@@ -35,9 +36,9 @@ class Grapheme(object):
     NOTE = attr.ib(default='')
 
 
-def run(args, test=False):
-    args.destination = args.destination or args.repos.path('data',
-            'clts.zip').as_posix()
+def run(args):
+    args.destination = args.destination or args.repos.path('data', 'clts.zip')
+
     def writer(*comps):
         return UnicodeWriter(args.repos.path('data', *comps), delimiter='\t')
 
@@ -116,10 +117,8 @@ def run(args, test=False):
                     item.get('image', ''),
                     item.get('sound', ''),
                 ))
-                if item['graphem'] not in clts_dump:
+                if item['grapheme'] not in clts_dump:
                     clts_dump[item['grapheme']] = [sound['grapheme'], name]
-        if test:
-            break
 
     # sound classes have a generative component, so we need to treat them
     # separately
@@ -137,8 +136,6 @@ def run(args, test=False):
                 ))
             except KeyError:  # pragma: no cover
                 args.log.debug(name, sounds[name]['grapheme'])
-        if test:
-            break
 
     # last run, check again for each of the remaining transcription systems,
     # whether we can translate the sound
@@ -160,11 +157,9 @@ def run(args, test=False):
                         clts_dump[ts_sound.s] = [sounds[name]['grapheme'], name]
             except ValueError:
                 pass
-            except TypeError:
+            except TypeError:  # pragma: no cover
                 args.log.debug('{0}: {1}'.format(ts.id, name))
-        if test:
-            break
-    
+
     args.log.info('writing data to file')
     with writer('sounds.tsv') as w:
         w.writerow(['NAME', 'TYPE', 'GRAPHEME', 'UNICODE', 'GENERATED', 'NOTE'])
@@ -175,10 +170,10 @@ def run(args, test=False):
         w.writerow([f.name for f in attr.fields(Grapheme)])
         for row in data:
             w.writerow(attr.astuple(row))
-    
+
     with zipfile.ZipFile(
-            args.destination, 
-            mode='w',
-            compression=zipfile.ZIP_DEFLATED
-            ) as myzip:
+        str(args.destination),
+        mode='w',
+        compression=zipfile.ZIP_DEFLATED
+    ) as myzip:
         myzip.writestr('clts.json', json.dumps(clts_dump))
