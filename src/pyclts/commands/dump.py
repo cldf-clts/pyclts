@@ -116,7 +116,7 @@ def run(args, test=False):
                     item.get('image', ''),
                     item.get('sound', ''),
                 ))
-                if item['graphem'] not in clts_dump:
+                if item['grapheme'] not in clts_dump:
                     clts_dump[item['grapheme']] = [sound['grapheme'], name]
         if test:
             break
