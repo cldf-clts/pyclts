@@ -9,6 +9,15 @@ from csvw.dsv import UnicodeWriter
 from pyclts.models import is_valid_sound
 import json
 import codecs
+import zipfile
+
+
+def register(parser):
+    parser.add_argument(
+        "--destination",
+        default=None,
+        help="Name of the file to store data in compressed form."
+        )
 
 
 @attr.s
@@ -27,6 +36,8 @@ class Grapheme(object):
 
 
 def run(args, test=False):
+    args.destination = args.destination or args.repos.path('data',
+            'clts.zip').as_posix
     def writer(*comps):
         return UnicodeWriter(args.repos.path('data', *comps), delimiter='\t')
 
@@ -162,5 +173,9 @@ def run(args, test=False):
         for row in data:
             w.writerow(attr.astuple(row))
     
-    with codecs.open(args.repos.path('data', 'clts.json'), 'w', 'utf-8') as w:
-        w.write(json.dumps(clts_dump, indent=2))
+    with zipfile.ZipFile(
+            args.destination, 
+            mode='w',
+            compression=zipfile.ZIP_DEFLATED
+            ) as myzip:
+        myzip.writestr('clts.json', json.dumps(clts_dump))
