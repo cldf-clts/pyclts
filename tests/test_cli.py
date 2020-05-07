@@ -9,9 +9,9 @@ def test_features(capsys, repos):
     assert 'labialized' in out
 
 
-def test_stats(capsys, repos):
-    main(['--repos', str(repos), 'dump'])
-    main(['--repos', str(repos), 'stats'])
+def test_stats(capsys, tmp_repos):
+    main(['--repos', str(tmp_repos), 'dump'])
+    main(['--repos', str(tmp_repos), 'stats'])
     out, err = capsys.readouterr()
     assert 'STATS' in out
 
