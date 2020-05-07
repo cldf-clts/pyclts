@@ -37,7 +37,7 @@ class Grapheme(object):
 
 def run(args, test=False):
     args.destination = args.destination or args.repos.path('data',
-            'clts.zip').as_posix
+            'clts.zip').as_posix()
     def writer(*comps):
         return UnicodeWriter(args.repos.path('data', *comps), delimiter='\t')
 
