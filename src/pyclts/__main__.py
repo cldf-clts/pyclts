@@ -17,7 +17,7 @@ def main(args=None, catch_all=False, parsed_args=None):
 
     try:
         repos = Config.from_file().get_clone('clts')
-    except KeyError:
+    except KeyError:  # pragma: no cover
         repos = Path('.')
     parser, subparsers = get_parser_and_subparsers('clts')
     parser.add_argument(
@@ -36,13 +36,13 @@ def main(args=None, catch_all=False, parsed_args=None):
     register_subcommands(subparsers, pyclts.commands)
 
     args = parsed_args or parser.parse_args(args=args)
-    if not hasattr(args, "main"):
+    if not hasattr(args, "main"):  # pragma: no cover
         parser.print_help()
         return 1
 
     with contextlib.ExitStack() as stack:
         stack.enter_context(Logging(args.log, level=args.log_level))
-        if args.repos_version:
+        if args.repos_version:  # pragma: no cover
             # If a specific version of the data is to be used, we make
             # use of a Catalog as context manager:
             stack.enter_contet(Catalog(args.repos, tag=args.repos_version))
@@ -52,11 +52,11 @@ def main(args=None, catch_all=False, parsed_args=None):
             return args.main(args) or 0
         except KeyboardInterrupt:  # pragma: no cover
             return 0
-        except ParserError as e:
+        except ParserError as e:  # pragma: no cover
             print(e)
             return main([args._command, '-h'])
-        except Exception as e:
-            if catch_all:  # pragma: no cover
+        except Exception as e:  # pragma: no cover
+            if catch_all:
                 print(e)
                 return 1
             raise
