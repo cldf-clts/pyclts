@@ -76,7 +76,8 @@ def run(args, test=False):
                 '',
                 '',
                 sound.note or ''))
-            clts_dump[grapheme] = [str(sound), sound.name]
+            if grapheme not in clts_dump:
+                clts_dump[grapheme] = [str(sound), sound.name]
 
     # add sounds systematically by their alias
     args.log.info('adding transcription data')
@@ -115,7 +116,8 @@ def run(args, test=False):
                     item.get('image', ''),
                     item.get('sound', ''),
                 ))
-                clts_dump[item['grapheme']] = [sound['grapheme'], name]
+                if item['graphem'] not in clts_dump:
+                    clts_dump[item['grapheme']] = [sound['grapheme'], name]
         if test:
             break
 
@@ -154,7 +156,8 @@ def run(args, test=False):
                         '',  # sounds[name]['alias'],
                         ts.id,
                     ))
-                    clts_dump[ts_sound.s] = [sounds[name]['grapheme'], name]
+                    if ts_sound.s not in clts_dump:
+                        clts_dump[ts_sound.s] = [sounds[name]['grapheme'], name]
             except ValueError:
                 pass
             except TypeError:
