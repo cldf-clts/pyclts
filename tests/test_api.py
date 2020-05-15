@@ -19,6 +19,10 @@ def test_iter_sources(sources, tmpdir):
     assert srcs[0][0]['NAME'] == 'test'
 
 
+def test_transcriptionsystem_custom(repos, api):
+    assert api.transcriptionsystem(repos / 'pkg' / 'transcriptionsystems' / 'asjpcode')
+
+
 def test_soundclass(api):
     sc = api.soundclass('sca')
 
@@ -26,10 +30,13 @@ def test_soundclass(api):
         sc.resolve_sound('xy')
 
 
-def test_transcriptiondata(api):
+def test_transcriptiondata(api, repos):
     td = api.transcriptiondata('phoible')
     assert td.resolve_sound('a')
     with pytest.raises(KeyError):
         td.resolve_sound('xy')
 
+    assert str(td.resolve_grapheme('kǂʼ')) == 'ǂ’'
+
     assert api.get_meta(td)
+    assert api.transcriptiondata(repos / 'pkg' / 'transcriptiondata' / 'phoible.tsv')

@@ -10,7 +10,7 @@ class TranscriptionData(TranscriptionBase):
 
     def __init__(self, path, system):
         super().__init__(path, system)
-        self.data, self.sounds, self.names = read_data(
+        self.grapheme_map, self.data, self.sounds, self.names = read_data(
             self.path,
             'GRAPHEME',
             'URL',
@@ -35,7 +35,11 @@ class TranscriptionData(TranscriptionBase):
         features in order to yield the next approximate sound class, if the
         transcription data are sound classes.
         """
-        sound = sound if isinstance(sound, Sound) else self.system[sound]
+        if not isinstance(sound, Sound):
+            sound = self.system[sound]
         if sound.name in self.data:
             return '//'.join([x['grapheme'] for x in self.data[sound.name]])
         raise KeyError(":td:resolve_sound: No sound could be found.")
+
+    def resolve_grapheme(self, grapheme):
+        return self.system[self.grapheme_map[grapheme]]

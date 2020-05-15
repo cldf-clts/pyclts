@@ -14,7 +14,7 @@ class SoundClasses(TranscriptionBase):
         assert id_ in SOUNDCLASS_SYSTEMS
         super().__init__(path, system)
         self._id = id_
-        data, self.sounds, self.names = read_data(self.path, self._id)
+        _, data, self.sounds, self.names = read_data(self.path, self._id)
         self.data = {}
         self.classes = set()
         for k, v in data.items():

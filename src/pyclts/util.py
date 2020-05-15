@@ -67,9 +67,10 @@ def itertable(table):
 
 
 def read_data(fname, grapheme_col, *cols):
-    data, sounds, names = defaultdict(list), [], []
+    grapheme_map, data, sounds, names = {}, defaultdict(list), [], []
 
     for row in reader(fname, delimiter='\t', dicts=True):
+        grapheme_map[row[grapheme_col]] = row['BIPA_GRAPHEME']
         grapheme = {"grapheme": row[grapheme_col]}
         for col in cols:
             grapheme[col.lower()] = row[col]
@@ -78,4 +79,4 @@ def read_data(fname, grapheme_col, *cols):
         sounds.append(row['BIPA_GRAPHEME'])
         names.append(row['CLTS_NAME'])
 
-    return data, sounds, names
+    return grapheme_map, data, sounds, names
