@@ -3,6 +3,12 @@ import pathlib
 from pyclts.__main__ import main
 
 
+def test_ls(capsys, repos):
+    main(['--repos', str(repos), 'ls'])
+    out, _ = capsys.readouterr()
+    assert 'Setala' in out
+
+
 def test_features(capsys, repos):
     main(['--repos', str(repos), 'features'])
     out, err = capsys.readouterr()
