@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg id="vowel-trapezoid" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+     width="800px" height="450px" viewBox="130 130 800 450" enable-background="new 130 130 800 450"
+     preserveAspectRatio="xMinYMin meet"
+     xml:space="preserve">
+
+    <text x="295" y="170" text-anchor="middle" class="label">Front</text>
+    <text x="440" y="170" text-anchor="middle" class="label">Near-front</text>
+    <text x="585" y="170" text-anchor="middle" class="label">Central</text>
+    <text x="730" y="170" text-anchor="middle" class="label">Near-back</text>
+    <text x="875" y="170" text-anchor="middle" class="label">Back</text>
+
+    <text x="150" y="205" alignment-baseline="baseline" class="label">Close</text>
+    <text x="150" y="265" alignment-baseline="baseline" class="label">Near-close</text>
+    <text x="150" y="325" alignment-baseline="baseline" class="label">Close-mid</text>
+    <text x="150" y="385" alignment-baseline="baseline" class="label">Mid</text>
+    <text x="150" y="445" alignment-baseline="baseline" class="label">Open-mid</text>
+    <text x="150" y="505" alignment-baseline="baseline" class="label">Near-open</text>
+    <text x="150" y="565" alignment-baseline="baseline" class="label">Open</text>
+
+    <g id="Layer_3">
+        <line fill="none" stroke="#666666" stroke-width="3.2" x2="295" y2="200" x1="585" y1="560"/>
+        <line fill="none" stroke="#666666" stroke-width="3.2" x1="585" y1="200" x2="730" y2="560"/>
+        <line fill="none" stroke="#666666" stroke-width="3.2" x1="875" y1="200" x2="875" y2="560"/>
+
+        <line fill="none" stroke="#666666" stroke-width="3.2" x1="295" y1="200" x2="875" y2="200"/>
+        <line fill="none" stroke="#666666" stroke-width="3.2" x1="390" y1="320" x2="876" y2="320"/>
+        <line fill="none" stroke="#666666" stroke-width="3.2" x1="485" y1="440" x2="876" y2="440"/>
+        <line fill="none" stroke="#666666" stroke-width="3.2" x1="585" y1="560" x2="876" y2="560"/>
+    </g>
+    <circle fill="#666666" cx="295" cy="200" r="10"/>
+    <text x="295" y="205" text-anchor="middle" class="glyph" id="close-front"> </text>
+    <circle fill="#666666" cx="585" cy="200" r="10"/>
+    <text x="585" y="205" text-anchor="middle" class="glyph" id="close-central"> </text>
+    <circle fill="#666666" cx="875" cy="200" r="10"/>
+    <text x="875" y="205" text-anchor="middle" class="glyph" id="close-back"> </text>
+
+    <circle fill="#666666" cx="481" cy="260" r="10"/>
+    <text x="481" y="265" text-anchor="middle" class="glyph" id="nearclose-nearfront"> </text>
+    <circle fill="#666666" cx="761" cy="260" r="10"/>
+    <text x="761" y="265" text-anchor="middle" class="glyph" id="nearclose-nearback"> </text>
+
+    <circle fill="#666666" cx="390" cy="320" r="10"/>
+    <text x="390" y="325" text-anchor="middle" class="glyph" id="closemid-front"> </text>
+    <circle fill="#666666" cx="633" cy="320" r="10"/>
+    <text x="633" y="325" text-anchor="middle" class="glyph" id="closemid-central"> </text>
+    <circle fill="#666666" cx="875" cy="320" r="10"/>
+    <text x="876" y="325" text-anchor="middle" class="glyph" id="closemid-back"> </text>
+
+    <circle fill="#666666" cx="658" cy="380" r="10"/>
+    <text x="658" y="385" text-anchor="middle" class="glyph" id="mid-central"> </text>
+
+    <circle fill="#666666" cx="486" cy="440" r="10"/>
+    <text x="486" y="445" text-anchor="middle" class="glyph" id="openmid-front"> </text>
+    <circle fill="#666666" cx="682" cy="440" r="10"/>
+    <text x="682" y="445" text-anchor="middle" class="glyph" id="openmid-central"> </text>
+    <circle fill="#666666" cx="875" cy="440" r="10"/>
+    <text x="875" y="445" text-anchor="middle" class="glyph" id="openmid-back"> </text>
+
+    <circle fill="#666666" cx="536" cy="500" r="10"/>
+    <text x="536" y="505" text-anchor="middle" class="glyph" id="nearopen-front"> </text>
+    <circle fill="#666666" cx="706" cy="500" r="10"/>
+    <text x="706" y="505" text-anchor="middle" class="glyph" id="nearopen-central"> </text>
+
+    <circle fill="#666666" cx="585" cy="560" r="10"/>
+    <text x="585" y="565" text-anchor="middle" class="glyph" id="open-front"> </text>
+    <circle fill="#666666" cx="730" cy="560" r="10"/>
+    <text x="730" y="565" text-anchor="middle" class="glyph" id="open-central"> </text>
+    <circle fill="#666666" cx="875" cy="560" r="10"/>
+    <text x="875" y="565" text-anchor="middle" class="glyph" id="open-back"> </text>
+</svg>
