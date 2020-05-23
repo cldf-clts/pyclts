@@ -4,12 +4,14 @@ IPA charts are the most common device to visualize sound inventories.
 See also https://en.wikipedia.org/wiki/International_Phonetic_Alphabet_chart
 """
 import io
+import copy
 import pathlib
 from xml.etree import ElementTree as et
 
 import attr
+from clldutils.misc import lazyproperty
 
-from pyclts.models import *
+__all__ = ['Segment', 'VowelTrapezoid', 'PulmonicConsonants', 'ipa_charts']
 
 
 @attr.s
@@ -17,7 +19,8 @@ class Segment:
     """
     Bag of attributes controlling display of a segment in an IPA chart.
     """
-    sound = attr.ib()
+    sound_bipa = attr.ib(validator=attr.validators.instance_of(str))
+    sound_name = attr.ib(validator=attr.validators.instance_of(str))
     label = attr.ib(default=None)
     href = attr.ib(default=None)
     css_class = attr.ib(default=None)
@@ -25,9 +28,17 @@ class Segment:
 
     def __attrs_post_init__(self):
         if not self.label:
-            self.label = str(self.sound)
+            self.label = self.sound_bipa
         if not self.title:
-            self.title = self.sound.name
+            self.title = self.sound_name
+
+    @classmethod
+    def from_sound(cls, sound, **kw):
+        return cls(sound_bipa=str(sound), sound_name=sound.name, **kw)
+
+    @lazyproperty
+    def features(self):
+        return set(s.replace('-', '') for s in self.sound_name.split())
 
     @property
     def link_attrib(self):
@@ -101,7 +112,7 @@ class Diagram:
     """
     __id__ = None  # HTML element id
     __fname__ = None  # Template filename
-    __soundclass__ = Sound  # CLTS `Sound` subclass to consider in the diagram
+    __extend_features__ = None
 
     def __init__(self, id_=None):
         """
@@ -124,7 +135,7 @@ class Diagram:
         feature) and `element` is the ElementTree element where matching segments should be
         appended.
         """
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def fill_slots(self, inventory):
         """
@@ -133,27 +144,30 @@ class Diagram:
         :param inventory: `list` of `Segment` instances.
         :return: `set` of inventory indices which have been assigned to slots.
         """
-        self.slots = {frozenset(features): (element, []) for features, element in self.iter_slots()}
+        self.slots = {}
+        for features, element in self.iter_slots():
+            features = set(features)
+            if self.__extend_features__:
+                features = features.union(self.__extend_features__)
+            self.slots[frozenset(features)] = (element, [])
         covered = set()
         for i, segment in enumerate(inventory):
-            sound = segment.sound
-            if isinstance(sound, self.__soundclass__):
-                features = set(s.replace('-', '') for s in sound.name.split())
-                for ex in self.exclusive:
-                    if ex not in features:
-                        features.add('NON' + ex)
-                for f in self.slots:
-                    if f.issubset(features):
-                        covered.add(i)
-                        self.slots[f][1].append(segment)
-                        break
+            features = copy.copy(segment.features)
+            for ex in self.exclusive:
+                if ex not in segment.features:
+                    features.add('NON' + ex)
+            for f in self.slots:
+                if f.issubset(features):
+                    covered.add(i)
+                    self.slots[f][1].append(segment)
+                    break
         return covered
 
     def format_segment(self, element, segment, is_last, is_first):
         """
         Diagrams must provide a method to format segments as ElementTree elements.
         """
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def css(self, colorspec):
         return ''
@@ -172,16 +186,16 @@ class Diagram:
 class PulmonicConsonants(Diagram):
     __id__ = 'pulmonic-consonants'
     __fname__ = 'consonants.html'
-    __soundclass__ = Consonant
+    __extend_features__ = frozenset({'consonant'})
 
     def iter_slots(self):
         for e in self.tree.findall('.//td'):
             if 'class' in e.attrib:
                 for attrs in e.attrib['class'].split():
                     attrs = attrs.split('-')
-                    for attr in attrs:
-                        if attr.startswith('NON'):
-                            self.exclusive.add(attr[3:])
+                    for att in attrs:
+                        if att.startswith('NON'):
+                            self.exclusive.add(att[3:])
                     yield attrs, e
 
     def format_segment(self, e, segment, is_last, is_first):
@@ -197,7 +211,7 @@ class PulmonicConsonants(Diagram):
 class VowelTrapezoid(Diagram):
     __id__ = 'vowel-trapezoid'
     __fname__ = 'vowels.svg'
-    __soundclass__ = Vowel
+    __extend_features__ = frozenset({'vowel'})
 
     def iter_slots(self):
         ns = {'svg': "http://www.w3.org/2000/svg"}
