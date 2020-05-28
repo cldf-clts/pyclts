@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pyclts',
-    version='2.1.2',
+    version='2.1.3.dev0',
     description='A python library to check phonetic transcriptions',
     author='Johann-Mattis List, Cormac Anderson, Tiago Tresoldi, Christoph Rzymski, Simon Greenhill, and Robert Forkel',
     author_email='mattis.list@lingpy.org',
