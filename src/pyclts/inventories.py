@@ -8,7 +8,7 @@ import statistics
 
 
 def reduce_features(sound, clts=None, features=None):
-    clts = CLTS().bipa or clts
+    clts = clts or CLTS().bipa
     features = features or {
             'consonant': ['phonation', 'place', 'manner'],
             'vowel': ['roundedness', 'height', 'centrality'],
