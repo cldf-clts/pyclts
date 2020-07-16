@@ -78,9 +78,6 @@ class Inventory:
             return statistics.mean(score)
 
         if metric == 'similarity':
-            print(self.sounds)
-            print(other)
-
             score = []
             for aspect in aspects:
                 # Obtain all pairs and compute all similarities; note that we cannot
