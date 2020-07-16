@@ -41,13 +41,13 @@ class Inventory:
                 if val:
                     sounds[val][sound.s] = sound
         return cls(sounds=sounds, clts=clts)
-    
+
     def similar(self, other, metric='strict', aspects=None):
         aspects = aspects or ['consonant', 'vowel', 'tone']
 
         def jac(a, b):
             return len(set(a).intersection(set(b))) / len(set(a).union(set(b)))
-        
+
         if metric == 'strict':
             score = []
             for aspect in aspects:
@@ -77,5 +77,46 @@ class Inventory:
                     score += [sum(matches) / len(matches)]
             return statistics.mean(score)
 
-            
+        if metric == 'similarity':
+            print(self.sounds)
+            print(other)
 
+            score = []
+            for aspect in aspects:
+                # Obtain all pairs and compute all similarities; note that we cannot
+                # use `itertools` because the sounds end up cast as strings
+                simils = {}
+                for sound_a in self.sounds[aspect].values():
+                    for sound_b in other.sounds[aspect].values():
+                        simils[sound_a, sound_b] = sound_a.similarity(sound_b)
+
+                # Look for the highest score and remove the pair; if there is more
+                # than one instance with the highest score, just grab the first one
+                matched_b = []
+                while True:
+                    # Leave if there are no simils, including when inventories are empty
+                    if not simils:
+                        break
+
+                    max_score = max(simils.values())
+                    filter = [
+                        pair for pair, pair_score in simils.items()
+                        if pair_score == max_score][0]
+
+                    score.append(max_score)
+                    simils = {
+                        pair:pair_score for pair, pair_score in simils.items()
+                        if pair[0] != filter[0] and pair[1] != filter[1]
+                        }
+                    matched_b.append(filter[1])
+
+                # If there are sounds in the `other` inventory that were not matched,
+                # add a similarity of 0.0 to each
+                num_unmatched = len(other.sounds[aspect]) - len(matched_b)
+                score += [0.0] * num_unmatched
+
+            # If there is no `score` (two empty inventories), return zero
+            if not score:
+                score = [0.0]
+
+            return statistics.mean(score)
