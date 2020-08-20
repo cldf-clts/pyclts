@@ -10,18 +10,19 @@ import statistics
 def reduce_features(sound, clts=None, features=None):
     clts = clts or CLTS().bipa
     features = features or {
-            'consonant': ['phonation', 'place', 'manner'],
-            'vowel': ['roundedness', 'height', 'centrality'],
-            'tone': ['start']
-            }
+        'consonant': ['phonation', 'place', 'manner'],
+        'vowel': ['roundedness', 'height', 'centrality'],
+        'tone': ['start']
+    }
     sound_ = clts[sound] if isinstance(sound, str) else sound
     if sound_.type in ['cluster', 'diphthong']:
         return reduce_features(sound_.from_sound, clts=clts, features=features)
-    name = ' '.join([s for s in [sound_.featuredict.get(x) for x in
-        features[sound_.type]] if s])+' '+sound_.type
+    name = '{} {}'.format(
+        ' '.join([s for s in [sound_.featuredict.get(x) for x in features[sound_.type]] if s]),
+        sound_.type)
     if sound_.type != 'tone':
         return clts[name]
-    return clts['short '+' '.join(name.split(' '))]
+    return clts['short ' + ' '.join(name.split(' '))]
 
 
 @attr.s
@@ -102,9 +103,9 @@ class Inventory:
 
                     score.append(max_score)
                     simils = {
-                        pair:pair_score for pair, pair_score in simils.items()
+                        pair: pair_score for pair, pair_score in simils.items()
                         if pair[0] != filter[0] and pair[1] != filter[1]
-                        }
+                    }
                     matched_b.append(filter[1])
 
                 # If there are sounds in the `other` inventory that were not matched,
