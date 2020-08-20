@@ -60,7 +60,7 @@ def itertable(table):
     for item in table:
         res = {
             k.lower(): nfd(v) if isinstance(v, str) else v for k, v in item.items()}
-        for extra in res.pop('extra', []):
+        for extra in res.pop('extra', None) or []:
             k, _, v = extra.partition(':')
             res[k.strip()] = v.strip()
         yield res
