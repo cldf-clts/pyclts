@@ -279,6 +279,10 @@ class TranscriptionSystem(TranscriptionBase):
         string = nfd(string)
         return self._parse(string)
 
+    @property
+    def feature_system(self):
+        return self._feature_values
+
     def __contains__(self, item):
         if isinstance(item, Sound):  # noqa: F405
             return item.featureset in self.features
