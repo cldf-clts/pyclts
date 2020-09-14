@@ -33,11 +33,10 @@ setup(
     extras_require={
         'dev': ['flake8', 'wheel', 'twine'],
         'test': [
-            'pytest==6.0.2',
-            'pytest-mock==3.3.1',
-            'mock==3.0.5',
-            'pytest-cov==2.10.1',
-            'coverage==5.3',
+            'pytest',
+            'pytest-mock',
+            'pytest-cov',
+            'coverage',
         ],
     },
     classifiers=[
