@@ -34,9 +34,9 @@ setup(
         'dev': ['flake8', 'wheel', 'twine'],
         'test': [
             'pytest',
-            'pytest-mock',
+            'pytest-mock=3.3.1',
             'mock==3.0.5',
-            'pytest-cov',
+            'pytest-cov=2.10.1',
             'coverage>=4.2',
         ],
     },
