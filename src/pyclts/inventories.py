@@ -59,8 +59,8 @@ class Inventory:
         if metric == 'approximate':
             score = []
             for aspect in aspects:
-                soundsA = list(self.sounds[aspect].values())
-                soundsB = list(other.sounds[aspect].values())
+                soundsA = sorted(self.sounds[aspect].values())
+                soundsB = sorted(other.sounds[aspect].values())
                 matches = []
                 for sA in soundsA:
                     best, sim = None, 0
