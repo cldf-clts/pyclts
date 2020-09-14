@@ -31,7 +31,8 @@ def test_Inventory():
     inv2 = Inventory.from_list('a', 'e', 'i', 'œ', 'p', clts=bipa)
     inv3 = Inventory.from_list('a', 'e', 'i', 'æ', 'p', clts=bipa)
     assert inv1.similar(inv2, metric='strict') == inv1.similar(inv3, metric='strict')
-    assert inv1.similar(inv2, metric='approximate') > inv1.similar(
-            inv3, metric='approximate')
+    print(inv1.similar(inv2, metric='approximate'))
+    print(inv1.similar(inv3, metric='approximate'))
+    assert inv1.similar(inv2, metric='approximate') > inv1.similar(inv3, metric='approximate')
     assert inv1.similar(inv2, metric="similarity") == inv2.similar(inv3, metric="similarity")
     assert inv1.similar(inv2, metric="similarity") > inv1.similar(inv3, metric="similarity")
