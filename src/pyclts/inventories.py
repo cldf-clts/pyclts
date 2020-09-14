@@ -59,23 +59,26 @@ class Inventory:
         if metric == 'approximate':
             score = []
             for aspect in aspects:
-                soundsA = list(self.sounds[aspect].values())
-                soundsB = list(other.sounds[aspect].values())
-                matches = []
-                for sA in soundsA:
-                    best, sim = None, 0
-                    for sB in soundsB:
-                        if sA.similarity(sB) > sim:
-                            sim = sA.similarity(sB)
-                            best = sB
-                    if best:
-                        soundsB = [s for s in soundsB if s != best]
-                        matches += [sim]
-                    else:
-                        matches += [0]
-                matches += [0 for s in soundsB]
-                if matches:
-                    score += [sum(matches) / len(matches)]
+                soundsA = sorted(self.sounds[aspect].values(), key=str)
+                soundsB = sorted(other.sounds[aspect].values(), key=str)
+
+                if soundsA or soundsB:
+                    matches = []
+                    for sA in soundsA:
+                        best, sim = None, 0
+                        for sB in soundsB:
+                            if sA.similarity(sB) > sim:
+                                sim = sA.similarity(sB)
+                                best = sB
+                        if best:
+                            soundsB = [s for s in soundsB if s != best]
+                            matches += [sim]
+                        else:
+                            matches += [0]
+                    matches += [0 for s in soundsB]
+                    if matches:
+                        score += [sum(matches) / len(matches)]
+
             return statistics.mean(score)
 
         if metric == 'similarity':
