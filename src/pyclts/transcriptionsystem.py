@@ -207,7 +207,9 @@ class TranscriptionSystem(TranscriptionBase):
                         string, sound1, sound2, self)
                 elif sound1.type == 'consonant' and \
                         sound1.manner in ('stop', 'implosive', 'click', 'nasal') and \
-                        sound2.manner in ('stop', 'implosive', 'affricate', 'fricative'):
+                        sound2.manner in (
+                                'stop', 'implosive', 'affricate',
+                                'fricative', 'nasal'):
                     return Cluster.from_sounds(  # noqa: F405
                         string, sound1, sound2, self)
             return UnknownSound(grapheme=nstring, source=string, ts=self)  # noqa: F405
