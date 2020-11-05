@@ -98,6 +98,15 @@ svg|a:hover, svg|a:active {{outline: dotted 1px blue;}}
                 res.append("svg|a.{0} text, text svg|a.{0} {{fill: {1};}}".format(cls, fill))
             if outline:
                 res.append("svg|a.{0} {{outline: {1};}}".format(cls, outline))
+                # Unfortunately, there is no outline property in the SVG spec, see
+                # https://stackoverflow.com/q/13387851
+                # So as a fallback, we add a text-decoration:
+                res.append("svg|a.{0} {{text-decoration: underline;}}".format(cls))
+                res.append(
+                    "svg|a.{0} {{text-decoration-style: {1};}}".format(cls, outline.split()[0]))
+                res.append(
+                    "svg|a.{0} {{text-decoration-color: {1};}}".format(cls, outline.split()[-1]))
+
     return '\n'.join(res)
 
 

@@ -29,6 +29,9 @@ def test_soundclass(api):
     with pytest.raises(KeyError):
         sc.resolve_sound('xy')
 
+    assert tuple(str(snd) for snd in sc("m")) == ("M",)
+    assert tuple(str(snd) for snd in sc("m a")) == ("M", "A")
+    assert tuple(str(snd) for snd in sc(["m", "a"])) == ("M", "A")
 
 def test_transcriptiondata(api, repos):
     td = api.transcriptiondata('phoible')

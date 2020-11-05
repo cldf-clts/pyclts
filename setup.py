@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pyclts',
-    version='2.1.1.dev0',
+    version='2.1.4.dev0',
     description='A python library to check phonetic transcriptions',
     author='Johann-Mattis List, Cormac Anderson, Tiago Tresoldi, Christoph Rzymski, Simon Greenhill, and Robert Forkel',
     author_email='mattis.list@lingpy.org',
@@ -33,11 +33,10 @@ setup(
     extras_require={
         'dev': ['flake8', 'wheel', 'twine'],
         'test': [
-            'pytest>=3.6',
+            'pytest>=6',
             'pytest-mock',
-            'mock',
             'pytest-cov',
-            'coverage>=4.2',
+            'coverage',
         ],
     },
     classifiers=[
@@ -49,6 +48,8 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy'
     ],

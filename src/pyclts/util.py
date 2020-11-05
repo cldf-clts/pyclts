@@ -40,7 +40,10 @@ class TranscriptionBase(object):
             return default
 
     def __call__(self, sounds, default="0"):
-        return [self.get(x, default=default) for x in sounds.split()]
+        if isinstance(sounds, str):
+            sounds = sounds.split()
+
+        return [self.get(x, default=default) for x in sounds]
 
     def translate(self, string, target_system):
         return ' '.join('{0}'.format(
@@ -60,7 +63,7 @@ def itertable(table):
     for item in table:
         res = {
             k.lower(): nfd(v) if isinstance(v, str) else v for k, v in item.items()}
-        for extra in res.pop('extra', []):
+        for extra in res.pop('extra', None) or []:
             k, _, v = extra.partition(':')
             res[k.strip()] = v.strip()
         yield res
