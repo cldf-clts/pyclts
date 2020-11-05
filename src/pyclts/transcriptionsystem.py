@@ -1,6 +1,6 @@
 """
 Transcription System module for consistent IPA handling.
-========================================
+========================================================
 
 """
 import re
@@ -107,7 +107,8 @@ class TranscriptionSystem(TranscriptionBase):
 
     def _update_regex(self):
         self._regex = re.compile('|'.join(
-            map(re.escape, sorted(self.sounds, key=lambda x: len(x), reverse=True))))
+            map(re.escape, sorted(self.sounds, key=lambda x: (len(x),
+                -ord(x[0])), reverse=True))))
 
     def _norm(self, string):
         """Extended normalization: normalize by list of norm-characers, split
@@ -191,8 +192,16 @@ class TranscriptionSystem(TranscriptionBase):
             return sound
 
         match = list(self._regex.finditer(nstring))
+
+        if len(match) != 1 and len(match) != 2:
+            # Either no match or more than one; both is considered an error.
+            return UnknownSound(grapheme=nstring, source=string, ts=self)  # noqa: F405
+
         # if the match has length 2, we assume that we have two sounds, so we split
         # the sound and pass it on for separate evaluation (recursive function)
+        # we add a check that makes sure there is no single-match if we take
+        # the second element
+        checked_for_two = False
         if len(match) == 2:
             sound1 = self._parse(nstring[:match[1].start()])
             sound2 = self._parse(nstring[match[1].start():])
@@ -200,23 +209,48 @@ class TranscriptionSystem(TranscriptionBase):
             # we have two known sounds of the same type (vowel or consonant), we
             # either construct a diphthong or a cluster
             if 'unknownsound' not in (sound1.type, sound2.type) and \
-                    sound1.type == sound2.type:
+                    sound1.type == sound2.type and sound1.type in [
+                            'consonant', 'vowel']:
                 # diphthong creation
                 if sound1.type == 'vowel':
                     return Diphthong.from_sounds(  # noqa: F405
                         string, sound1, sound2, self)
                 elif sound1.type == 'consonant' and \
                         sound1.manner in ('stop', 'implosive', 'click', 'nasal') and \
-                        sound2.manner in ('stop', 'implosive', 'affricate', 'fricative'):
+                        sound2.manner in ('stop', 'implosive', 'affricate'):
                     return Cluster.from_sounds(  # noqa: F405
                         string, sound1, sound2, self)
-            return UnknownSound(grapheme=nstring, source=string, ts=self)  # noqa: F405
+                elif sound1.type == 'consonant' and sound1.manner == 'click' \
+                        and sound2.manner == 'fricative':
+                    return Cluster.from_sounds(string, sound1, sound2, self)
+                # check for plosive plus fricative if they are the same in
+                # manner
+                elif sound1.manner == 'stop' and sound2.manner == 'fricative' \
+                        and sound1.place == sound2.place:
+                    # join features
+                    features = {f: v or sound2.featuredict[f] for f, v in
+                            sound1.featuredict.items()}
+                    features['manner'] = 'affricate'
+                    #new_sound = Consonant(self, nstring, **features) 
+                    new_sound = self._from_name(' '.join([v for k, v in features.items() if
+                        v])+' consonant')
+                    return new_sound
 
-        if len(match) != 1:
-            # Either no match or more than one; both is considered an error.
-            return UnknownSound(grapheme=nstring, source=string, ts=self)  # noqa: F405
-
-        pre, mid, post = nstring.partition(nstring[match[0].start():match[0].end()])
+            i = 1
+            while i < len(nstring):
+                new_match = list(self._regex.finditer(nstring[i:]))
+                if len(new_match) == 1:
+                    pre, mid, post = nstring[i:].partition(
+                            nstring[i:][new_match[0].start():new_match[0].end()])
+                    pre = nstring[:i] + pre
+                    checked_for_two = True
+                    break
+                i += 1
+            if not checked_for_two:
+                return UnknownSound(grapheme=nstring, source=string, ts=self)  # noqa: F405
+        
+        if not checked_for_two:
+            pre, mid, post = nstring.partition(nstring[match[0].start():match[0].end()])
         base_sound = self.sounds[mid]
         if isinstance(base_sound, Marker):  # noqa: F405
             assert pre or post

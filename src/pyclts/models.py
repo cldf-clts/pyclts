@@ -43,7 +43,7 @@ def is_valid_sound(sound, ts):
     return s1.name == s2.name and s1.s == s2.s
 
 
-@attr.s(cmp=False)
+@attr.s(eq=False, order=False)
 class Symbol(object):
     ts = attr.ib()
     grapheme = attr.ib()
@@ -85,12 +85,12 @@ class Symbol(object):
         return ' '.join('U+' + ('000' + hex(ord(x))[2:])[-4:] for x in str(self))
 
 
-@attr.s(cmp=False)
+@attr.s(eq=False, order=False)
 class UnknownSound(Symbol):
     pass
 
 
-@attr.s(cmp=False, repr=False)
+@attr.s(eq=False, order=False, repr=False)
 class Sound(Symbol):
     """
     Sound object stores basic features of the individual sound objects.
@@ -214,7 +214,7 @@ class Sound(Symbol):
         return tbl
 
 
-@attr.s(cmp=False)
+@attr.s(eq=False, order=False)
 class Marker(Symbol):
     alias = attr.ib(default=None)
     feature = attr.ib(default=None)
@@ -230,7 +230,7 @@ class Marker(Symbol):
         return frozenset([self.grapheme, self.type])
 
 
-@attr.s(cmp=False, repr=False)
+@attr.s(eq=False, order=False, repr=False)
 class Consonant(Sound):
 
     # features follow basic information about IPA from various sources, they
@@ -281,7 +281,7 @@ class Consonant(Sound):
         'sibilancy', 'manner']
 
 
-@attr.s(cmp=False, repr=False)
+@attr.s(eq=False, order=False, repr=False)
 class ComplexSound(Sound):
     from_sound = attr.ib(default=None)
     to_sound = attr.ib(default=None)
@@ -313,7 +313,7 @@ class ComplexSound(Sound):
         return [self.grapheme, self.from_sound.name, self.to_sound.name]
 
 
-@attr.s(cmp=False, repr=False)
+@attr.s(eq=False, order=False, repr=False)
 class Cluster(ComplexSound):
     """
     A cluster of two consonants whose manner is either plosive or implosive.
@@ -326,7 +326,7 @@ class Cluster(ComplexSound):
     """
 
 
-@attr.s(cmp=False, repr=False)
+@attr.s(eq=False, order=False, repr=False)
 class Vowel(Sound):
     roundedness = attr.ib(default=None)
     height = attr.ib(default=None)
@@ -369,14 +369,14 @@ class Vowel(Sound):
         'tone']
 
 
-@attr.s(cmp=False, repr=False)
+@attr.s(eq=False, order=False, repr=False)
 class Diphthong(ComplexSound):
     """
     A dipthong consists of two vowels.
     """
 
 
-@attr.s(cmp=False, repr=False)
+@attr.s(eq=False, order=False, repr=False)
 class Tone(Sound):
     contour = attr.ib(default=None)
     start = attr.ib(default=None)
