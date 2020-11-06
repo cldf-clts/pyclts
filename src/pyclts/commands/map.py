@@ -26,7 +26,7 @@ def run(args, test=False):
     for i, line in enumerate(data):
         rg, bg = line[gidx], line[bidx]
         if bg:
-            if bipa[b].type != 'unknownsound':
+            if bipa[bg].type != 'unknownsound':
                 pass
             else:
                 data[i][bidx] = '<NA>'
@@ -46,6 +46,8 @@ def run(args, test=False):
                                         s2.manner in ['stop', 'affricate',
                                             'fricative', 'implosive']):
                             data[i][bidx] = '*ⁿ'+s2.s
+                        else:
+                            data[i][bidx] = '?'
                     else:
                         data[i][bidx] = '<NA>'
                         count += 1
