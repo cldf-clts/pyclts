@@ -87,9 +87,11 @@ class Symbol(object):
         return ' '.join('U+' + ('000' + hex(ord(x))[2:])[-4:] for x in str(self))
 
 
+
 @attr.s(**cmp_off)
 class UnknownSound(Symbol):
     pass
+
 
 
 @attr.s(repr=False, **cmp_off)
@@ -216,6 +218,7 @@ class Sound(Symbol):
         return tbl
 
 
+
 @attr.s(**cmp_off)
 class Marker(Symbol):
     alias = attr.ib(default=None)
@@ -230,6 +233,7 @@ class Marker(Symbol):
     @property
     def featureset(self):
         return frozenset([self.grapheme, self.type])
+
 
 
 @attr.s(repr=False, **cmp_off)
