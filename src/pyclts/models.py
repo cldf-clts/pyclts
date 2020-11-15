@@ -231,6 +231,10 @@ class Marker(Symbol):
         return self.grapheme
 
     @property
+    def s(self):
+        return self.value
+
+    @property
     def featureset(self):
         return frozenset([self.grapheme, self.type])
 
