@@ -105,9 +105,6 @@
     "aspiration": [
       "aspirated"
     ],
-    "sibilancy": [
-      "sibilant"
-    ],
     "creakiness": [
       "creaky"
     ],
@@ -179,8 +176,9 @@
       "primary-stress",
       "secondary-stress"
     ],
-    "laterality": [
-      "lateral"
+    "airstream": [
+      "lateral",
+      "sibilant"
     ],
     "velarization": [
       "velarized"

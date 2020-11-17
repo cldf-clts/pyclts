@@ -259,8 +259,7 @@ class Consonant(Sound):
     voicing = attr.ib(default=None)
     breathiness = attr.ib(default=None)
     creakiness = attr.ib(default=None)
-    sibilancy = attr.ib(default=None)
-    laterality = attr.ib(default=None)
+    airstream = attr.ib(default=None)
     laminality = attr.ib(default=None)
     articulation = attr.ib(default=None)
     raising = attr.ib(default=None)
@@ -277,14 +276,16 @@ class Consonant(Sound):
             'articulation',
             'nasalization', 'palatalization', 'labialization',
             'breathiness', 'aspiration', 'glottalization', 'velarization',
-            'pharyngealization', 'release', 'duration'])
+            'pharyngealization', 'release', 'duration'
+            ])
     _name_order = [
         'raising', 'relative_articulation',
         'articulation', 'preceding', 'syllabicity', 'nasalization', 'palatalization',
         'labialization', 'glottalization', 'aspiration', 'velarization',
         'pharyngealization', 'duration', 'release', 'voicing', 'creakiness',
-        'breathiness', 'phonation', 'laminality', 'place', 'ejection', 'laterality',
-        'sibilancy', 'manner']
+        'breathiness', 'phonation', 'laminality', 'place', 'ejection', 
+        'airstream',
+        'manner']
 
 
 @attr.s(repr=False, **cmp_off)

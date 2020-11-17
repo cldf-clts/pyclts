@@ -48,6 +48,7 @@ class CLTS(API):
     def iter_transcriptionsystem(self, include_private=False, exclude=None):
         exclude = exclude or []
         for ts in sorted(self.transcriptionsystems_dir.iterdir(), key=lambda p: p.name):
+            print(ts)
             if ts.is_dir():
                 if (not ts.name.startswith('_')) or include_private:
                     if ts.name not in exclude:
