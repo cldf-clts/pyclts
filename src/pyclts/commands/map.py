@@ -25,7 +25,7 @@ def run(args, test=False):
     cluster = set()
     for i, line in enumerate(data):
         rg, bg = line[gidx], line[bidx]
-        if bg:
+        if bg and bg != '<NA>':
             if bipa[bg].type != 'unknownsound':
                 pass
             else:
@@ -48,6 +48,7 @@ def run(args, test=False):
                             data[i][bidx] = '*ⁿ'+s2.s
                         else:
                             data[i][bidx] = '?'
+                            count += 1
                     else:
                         data[i][bidx] = '<NA>'
                         count += 1
@@ -82,6 +83,7 @@ def run(args, test=False):
                     cluster.add(rg)
             else:
                 data[i][bidx] = s.s
+
     with open(args.graphemes[:-4]+'.mapped.tsv', 'w') as f:
         f.write('\t'.join(header)+'\n')
         for line in data:

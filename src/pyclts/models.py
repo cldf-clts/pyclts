@@ -264,6 +264,7 @@ class Consonant(Sound):
     articulation = attr.ib(default=None)
     raising = attr.ib(default=None)
     relative_articulation = attr.ib(default=None)
+    friction = attr.ib(default=None)
 
     # write order determines how consonants are written according to their
     # features, so this normalizes the order of diacritics preceding and
@@ -276,7 +277,7 @@ class Consonant(Sound):
             'articulation',
             'nasalization', 'palatalization', 'labialization',
             'breathiness', 'aspiration', 'glottalization', 'velarization',
-            'pharyngealization', 'release', 'duration'
+            'pharyngealization', 'release', 'friction', 'duration'
             ])
     _name_order = [
         'raising', 'relative_articulation',
@@ -285,7 +286,7 @@ class Consonant(Sound):
         'pharyngealization', 'duration', 'release', 'voicing', 'creakiness',
         'breathiness', 'phonation', 'laminality', 'place', 'ejection', 
         'airstream',
-        'manner']
+        'manner', 'friction']
 
 
 @attr.s(repr=False, **cmp_off)
@@ -338,7 +339,7 @@ class Vowel(Sound):
     roundedness = attr.ib(default=None)
     height = attr.ib(default=None)
     nasalization = attr.ib(default=None)
-    frication = attr.ib(default=None)
+    friction = attr.ib(default=None)
     duration = attr.ib(default=None)
     voicing = attr.ib(default=None)
     breathiness = attr.ib(default=None)
@@ -365,14 +366,14 @@ class Vowel(Sound):
             'voicing', 'breathiness', 'creakiness',
             'syllabicity', 'nasalization', 'tone', 'articulation', 'rhotacization',
             'pharyngealization', 'glottalization', 'velarization', 'duration',
-            'frication', 'relative_articulation'])
+            'friction', 'relative_articulation'])
     _name_order = [
         'duration', 'rhotacization', 'pharyngealization',
         'glottalization', 'velarization', 'syllabicity',
         'relative_articulation',
         'tongue_root', 'raising', 'rounding',
         'articulation', 'nasalization', 'voicing', 'creakiness',
-        'breathiness', 'roundedness', 'height', 'frication', 'centrality',
+        'breathiness', 'roundedness', 'height', 'friction', 'centrality',
         'tone']
 
 
