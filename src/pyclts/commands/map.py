@@ -31,7 +31,7 @@ def run(args, test=False):
             else:
                 data[i][bidx] = '<NA>'
                 count += 1
-        else:
+        else:            
             s = bipa[rg]
             if s.type == 'unknownsound':
                 match = list(bipa._regex.finditer(rg))
