@@ -52,8 +52,8 @@
       "open",
       "open-mid"
     ],
-    "frication": [
-      "with-frication"
+    "friction": [
+      "with-friction"
     ],
     "roundedness": [
       "rounded",
@@ -104,9 +104,6 @@
     ],
     "aspiration": [
       "aspirated"
-    ],
-    "sibilancy": [
-      "sibilant"
     ],
     "creakiness": [
       "creaky"
@@ -179,8 +176,9 @@
       "primary-stress",
       "secondary-stress"
     ],
-    "laterality": [
-      "lateral"
+    "airstream": [
+      "lateral",
+      "sibilant"
     ],
     "velarization": [
       "velarized"
