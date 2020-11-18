@@ -275,9 +275,9 @@ class Consonant(Sound):
             'raising', 'relative_articulation',
             'laminality', 'creakiness', 'phonation', 'ejection', 'syllabicity', 'voicing',
             'articulation',
-            'nasalization', 'palatalization', 'labialization',
+            'nasalization', 'release', 'palatalization', 'labialization',
             'breathiness', 'aspiration', 'glottalization', 'velarization',
-            'pharyngealization', 'release', 'friction', 'duration'
+            'pharyngealization', 'friction', 'duration'
             ])
     _name_order = [
         'raising', 'relative_articulation',
