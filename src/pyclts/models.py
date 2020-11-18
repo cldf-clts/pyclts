@@ -265,6 +265,7 @@ class Consonant(Sound):
     raising = attr.ib(default=None)
     relative_articulation = attr.ib(default=None)
     friction = attr.ib(default=None)
+    tongue_root = attr.ib(default=None)
 
     # write order determines how consonants are written according to their
     # features, so this normalizes the order of diacritics preceding and
@@ -272,21 +273,56 @@ class Consonant(Sound):
     _write_order = dict(
         pre=['preceding'],
         post=[
-            'raising', 'relative_articulation',
-            'laminality', 'creakiness', 'phonation', 'ejection', 'syllabicity', 'voicing',
+            'raising', 
+            'relative_articulation',
+            'laminality', 
+            'creakiness', 
+            'tongue_root',
+            'phonation', 
+            'ejection', 
+            'syllabicity', 
+            'voicing',
             'articulation',
-            'nasalization', 'release', 'palatalization', 'labialization',
-            'breathiness', 'aspiration', 'glottalization', 'velarization',
-            'pharyngealization', 'friction', 'duration'
+            'nasalization',
+            'release',
+            'palatalization',
+            'labialization',
+            'velarization',
+            'pharyngealization',
+            'glottalization',
+            'breathiness',
+            'aspiration',
+            'friction',
+            'duration'
             ])
+
     _name_order = [
-        'raising', 'relative_articulation',
-        'articulation', 'preceding', 'syllabicity', 'nasalization', 'palatalization',
-        'labialization', 'glottalization', 'aspiration', 'velarization',
-        'pharyngealization', 'duration', 'release', 'voicing', 'creakiness',
-        'breathiness', 'phonation', 'laminality', 'place', 'ejection', 
+        'raising', 
+        'relative_articulation',
+        'friction',
+        'articulation', 
+        'preceding', 
+        'syllabicity', 
+        'nasalization', 
+        'palatalization',
+        'labialization',
+        'velarization',
+        'pharyngealization', 
+        'glottalization', 
+        'aspiration', 
+        'duration', 
+        'release', 
+        'voicing', 
+        'creakiness',
+        'breathiness', 
+        'phonation', 
+        'laminality',
+        'tongue_root',
+        'place', 
+        'ejection', 
         'airstream',
-        'manner', 'friction']
+        'manner', 
+        ]
 
 
 @attr.s(repr=False, **cmp_off)
