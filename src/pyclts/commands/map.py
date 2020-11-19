@@ -13,8 +13,21 @@ def register(parser):
 
 
 def run(args, test=False):
+    # Instantiate BIPA
     bipa = args.repos.transcriptionsystem("bipa")
 
+    # Define list of unknown start strings
+    unknown_start = ["<NA>", "(?)", "(!)", "*"]
+
+    # Auxiliary funciton for bipa normalizing, adds a "(!)" prefix if it is changed
+    def _normalize_grapheme(bipa_grapheme):
+        normalized = str(bipa[bipa_grapheme])
+        if normalized != bipa_grapheme:
+            normalized = "(!)" + normalized
+
+        return normalized
+
+    # Iterave over graphemes and collect them
     new_rows = []
     clusters = set()
     with open(args.graphemes) as grapheme_file:
@@ -22,11 +35,15 @@ def run(args, test=False):
             bipa_grapheme = row["BIPA"]
             raw_grapheme = row["GRAPHEME"]
 
-            if bipa_grapheme and bipa_grapheme != "<NA>":
+            unknown_bipa = any([bipa_grapheme.startswith(unk) for unk in unknown_start])
+
+            if bipa_grapheme == "<NA>":
+                pass
+            elif bipa_grapheme and not unknown_bipa:
                 if bipa[bipa_grapheme].type != "unknownsound":
-                    row["BIPA"] = str(bipa[bipa_grapheme])
+                    row["BIPA"] = _normalize_grapheme(bipa_grapheme)
                 else:
-                    row["BIPA"] = "<NA>"
+                    row["BIPA"] = "(?)"
             else:
                 sound = bipa[raw_grapheme]
                 if sound.type == "unknownsound":
@@ -45,9 +62,9 @@ def run(args, test=False):
                             else:
                                 row["BIPA"] = "(?)"
                         else:
-                            row["BIPA"] = "<NA>"
+                            row["BIPA"] = "(?)"
                     else:
-                        row["BIPA"] = "<NA>"
+                        row["BIPA"] = "(?)"
                 elif sound.type == "marker":
                     row["BIPA"] = raw_grapheme
                 elif sound.type == "cluster":
@@ -68,7 +85,7 @@ def run(args, test=False):
                         if new_sound.type == "consonant":
                             row["BIPA"] = "*" + str(new_sound.to_sound)
                         else:
-                            row["BIPA"] = "<NA>"
+                            row["BIPA"] = "(?)"
                     elif (
                         sound.from_sound.manner == sound.to_sound.manner
                         and sound.from_sound.place == sound.to_sound.place
@@ -90,7 +107,7 @@ def run(args, test=False):
                         row["BIPA"] = "(!)" + str(sound)
                         clusters.add(raw_grapheme)
                 else:
-                    row["BIPA"] = str(sound)
+                    row["BIPA"] = _normalize_grapheme(bipa_grapheme)
 
             # Collect modified info
             new_rows.append(row)
@@ -99,7 +116,7 @@ def run(args, test=False):
     new_rows = sorted(
         new_rows,
         key=lambda r: (
-            not any([r["BIPA"].startswith(na) for na in ["<NA>", "(?)", "(!)", "*"]]),
+            not any([r["BIPA"].startswith(na) for na in unknown_start]),
             r["GRAPHEME"],
         ),
     )
@@ -107,7 +124,7 @@ def run(args, test=False):
     unknown = [
         row
         for row in new_rows
-        if any([row["BIPA"].startswith(na) for na in ["<NA>", "(?)", "(!)", "*"]])
+        if any([row["BIPA"].startswith(na) for na in unknown_start])
     ]
     print(
         "Unknown Sounds: {0} of {1} ({2:.2f}) ({3} of which clusters)".format(
