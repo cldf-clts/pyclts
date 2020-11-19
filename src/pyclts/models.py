@@ -20,17 +20,17 @@ EXCLUDE_FEATURES = [
     'apical',
     'laminal',
     'ejective',
-    'with_falling_tone',
-    'with_extra-low_tone',
-    'with_extra-high_tone',
-    'with_falling_tone',
-    'with_low_tone',
-    'with_global_fall',
-    'with_global_rise',
-    'with_high_tone',
-    'with_mid_tone',
-    'with_rising_tone',
-    'with_upstep'
+    'with-falling_tone',
+    'with-extra-low_tone',
+    'with-extra-high_tone',
+    'with-falling_tone',
+    'with-low_tone',
+    'with-global_fall',
+    'with-global_rise',
+    'with-high_tone',
+    'with-mid_tone',
+    'with-rising_tone',
+    'with-upstep'
 ]
 # Disable cmp in a backwards and forwards compatible way:
 cmp_off = {"eq" if getattr(attr, "__version_info__", (0,)) >= (19, 2) else "cmp": False}
