@@ -4,7 +4,8 @@ Map a given sound inventory list to CLTS
 
 from pyclts.cli_util import add_format, Table
 from pyclts import CLTS
-import csv
+from pyclts.models import is_valid_sound
+from csvw.dsv import UnicodeDictReader
 
 
 def register(parser):
@@ -16,34 +17,34 @@ def run(args, test=False):
     # Instantiate BIPA
     bipa = args.repos.transcriptionsystem("bipa")
 
-    # Define list of unknown start strings
-    unknown_start = ["<NA>", "(?)", "(!)", "*"]
-
-    # Auxiliary funciton for bipa normalizing, adds a "(!)" prefix if it is changed
-    def _normalize_grapheme(bipa_grapheme):
-        normalized = str(bipa[bipa_grapheme])
-        if normalized != bipa_grapheme:
-            normalized = "(!)" + normalized
-
-        return normalized
-
     # Iterave over graphemes and collect them
     new_rows = []
-    clusters = set()
-    with open(args.graphemes) as grapheme_file:
-        for row in csv.DictReader(grapheme_file, delimiter="\t"):
-            bipa_grapheme = row["BIPA"]
-            raw_grapheme = row["GRAPHEME"]
-
-            unknown_bipa = any([bipa_grapheme.startswith(unk) for unk in unknown_start])
-
+    unmapped, premapped, skipped, modified, mapped = 0, 0, 0, 0, 0
+    with UnicodeDictReader(args.graphemes, delimiter='\t') as reader:
+        for row in reader:
+            bipa_grapheme = row["BIPA"].strip()
+            raw_grapheme = row["GRAPHEME"].strip()
+            
+            # basic condition: do not touch <NA>
             if bipa_grapheme == "<NA>":
-                pass
-            elif bipa_grapheme and not unknown_bipa:
-                if bipa[bipa_grapheme].type != "unknownsound":
-                    row["BIPA"] = _normalize_grapheme(bipa_grapheme)
+                skipped += 1
+            # second condition: we receive a value and interpret it
+            elif bipa_grapheme:
+                sound = bipa[bipa_grapheme]
+                if sound.type != "unknownsound":
+                    if sound.type == 'marker':
+                        premapped += 1
+                    elif not is_valid_sound(sound, bipa):
+                        row["BIPA"] = '(!)'
+                        unmapped += 1
+                    elif sound.s != bipa_grapheme:
+                        row["BIPA"] = '(?)'+sound.s
+                        modified += 1
+                    else:
+                        premapped += 1
                 else:
-                    row["BIPA"] = "(?)"
+                    row["BIPA"] = '(?)'
+                    unmapped += 1
             else:
                 sound = bipa[raw_grapheme]
                 if sound.type == "unknownsound":
@@ -58,15 +59,20 @@ def run(args, test=False):
                                 or sound2.manner
                                 in ["stop", "affricate", "fricative", "implosive"]
                             ):
-                                row["BIPA"] = "*ⁿ" + str(sound2)
+                                row["BIPA"] = "(*)ⁿ" + str(sound2)
+                                mapped += 1
                             else:
                                 row["BIPA"] = "(?)"
+                                unmapped += 1
                         else:
                             row["BIPA"] = "(?)"
+                            unmapped += 1
                     else:
                         row["BIPA"] = "(?)"
+                        unmapped += 1
                 elif sound.type == "marker":
-                    row["BIPA"] = raw_grapheme
+                    row["BIPA"] = str(sound)
+                    mapped += 1
                 elif sound.type == "cluster":
                     # check for prenasalized stuff
                     if sound.from_sound.manner == "nasal" and (
@@ -74,7 +80,8 @@ def run(args, test=False):
                         or sound.to_sound.manner
                         in ["stop", "affricate", "fricative", "implosive"]
                     ):
-                        row["BIPA"] = "*ⁿ" + str(sound.to_sound)
+                        row["BIPA"] = "(*)ⁿ" + str(sound.to_sound)
+                        mapped += 1
                     elif (
                         sound.to_sound.manner == "fricative"
                         and sound.from_sound.manner == "stop"
@@ -83,9 +90,11 @@ def run(args, test=False):
                             s.to_sound.name.replace("fricative", "affricate")
                         ]
                         if new_sound.type == "consonant":
-                            row["BIPA"] = "*" + str(new_sound.to_sound)
+                            row["BIPA"] = "(*)" + str(new_sound.to_sound)
+                            mapped += 1
                         else:
                             row["BIPA"] = "(?)"
+                            unmapped += 1
                     elif (
                         sound.from_sound.manner == sound.to_sound.manner
                         and sound.from_sound.place == sound.to_sound.place
@@ -96,43 +105,39 @@ def run(args, test=False):
                             for k, v in sound.from_sound.featuredict.items()
                         }
                         features["duration"] = "long"
-                        row["BIPA"] = str(
+                        row["BIPA"] = '(*)'+str(
                             bipa[
                                 " ".join([f for f in features.values() if f])
                                 + " "
-                                + sound.from_sound.type
-                            ]
-                        )
+                                + sound.from_sound.type])
+                        mapped += 1
                     else:
                         row["BIPA"] = "(!)" + str(sound)
-                        clusters.add(raw_grapheme)
+                        mapped += 1
                 else:
-                    row["BIPA"] = _normalize_grapheme(bipa_grapheme)
+                    if is_valid_sound(sound, bipa):
+                        row["BIPA"] = sound.s
+                        mapped += 1
+                    else:
+                        row["BIPA"] = '(!)'
+                        unmapped += 1
 
             # Collect modified info
-            new_rows.append(row)
+            new_rows.append([row[h] for h in row])
 
     # Sort the new rows, write to disk, and show information
-    new_rows = sorted(
-        new_rows,
-        key=lambda r: (
-            not any([r["BIPA"].startswith(na) for na in unknown_start]),
-            r["GRAPHEME"],
-        ),
-    )
-
-    unknown = [
-        row
-        for row in new_rows
-        if any([row["BIPA"].startswith(na) for na in unknown_start])
-    ]
-    print(
-        "Unknown Sounds: {0} of {1} ({2:.2f}) ({3} of which clusters)".format(
-            len(unknown), len(new_rows), len(unknown) / len(new_rows), len(clusters)
-        )
-    )
-
-    with open(args.graphemes[:-4] + ".mapped.tsv", "w") as output:
-        writer = csv.DictWriter(output, delimiter="\t", fieldnames=new_rows[0].keys())
-        writer.writeheader()
-        writer.writerows(new_rows)
+    header = [h for h in row]
+    with open(args.graphemes[:-4] + ".mapped.tsv", "w") as f:
+        f.write('\t'.join([h for h in row])+'\n')
+        for row in sorted(new_rows, key=lambda x: (
+            x[header.index('BIPA')],
+            x[header.index('GRAPHEME')])):
+            f.write('\t'.join(row)+'\n')
+    table = [
+            ['mapped', mapped, mapped/len(new_rows), len(new_rows)],
+            ['premapped', premapped, premapped/len(new_rows), len(new_rows)],
+            ['skipped', skipped, skipped/len(new_rows), len(new_rows)],
+            ['unmapped', unmapped, unmapped/len(new_rows), len(new_rows)]
+            ]
+    with Table(args, 'type', 'items', 'proportion', 'total') as text:
+        text += table
