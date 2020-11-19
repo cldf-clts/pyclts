@@ -1,96 +1,121 @@
 """
 Map a given sound inventory list to CLTS
 """
+
 from pyclts.cli_util import add_format, Table
 from pyclts import CLTS
-from csvw.dsv import UnicodeReader
+import csv
+
 
 def register(parser):
-    add_format(parser, default='simple')
-    parser.add_argument(
-        'graphemes',
-        help='the file with the graphemes',
-        )
+    add_format(parser, default="simple")
+    parser.add_argument("graphemes", help="the file with the graphemes")
+
 
 def run(args, test=False):
-    bipa = args.repos.transcriptionsystem('bipa')
-    with UnicodeReader(args.graphemes, delimiter='\t') as reader:
-        data = []
-        for line in reader:
-            data.append(line)
-        header = data[0]
-        data = data[1:]
-    bidx, gidx = header.index('BIPA'), header.index('GRAPHEME')
-    count = 0
-    cluster = set()
-    for i, line in enumerate(data):
-        rg, bg = line[gidx], line[bidx]
-        if bg and bg != '<NA>':
-            if bipa[bg].type != 'unknownsound':
-                pass
+    bipa = args.repos.transcriptionsystem("bipa")
+
+    new_rows = []
+    clusters = set()
+    with open(args.graphemes) as grapheme_file:
+        for row in csv.DictReader(grapheme_file, delimiter="\t"):
+            bipa_grapheme = row["BIPA"]
+            raw_grapheme = row["GRAPHEME"]
+
+            if bipa_grapheme and bipa_grapheme != "<NA>":
+                if bipa[bipa_grapheme].type != "unknownsound":
+                    row["BIPA"] = str(bipa[bipa_grapheme])
+                else:
+                    row["BIPA"] = "<NA>"
             else:
-                data[i][bidx] = '<NA>'
-                count += 1
-        else:            
-            s = bipa[rg]
-            if s.type == 'unknownsound':
-                match = list(bipa._regex.finditer(rg))
-                if len(match) == 2:
-                    s1 = bipa[rg[:match[1].start()]]
-                    s2 = bipa[rg[match[1].start():]]
-                    if s1.type == 'consonant' and s2.type == \
-                            'consonant':
-                        # check for prenasalized stuff
-                        if s1.manner == 'nasal' and (
-                                s2.place == s2.place or \
-                                        s2.manner in ['stop', 'affricate',
-                                            'fricative', 'implosive']):
-                            data[i][bidx] = '*ⁿ'+s2.s
+                sound = bipa[raw_grapheme]
+                if sound.type == "unknownsound":
+                    match = list(bipa._regex.finditer(raw_grapheme))
+                    if len(match) == 2:
+                        sound1 = bipa[raw_grapheme[: match[1].start()]]
+                        sound2 = bipa[raw_grapheme[match[1].start() :]]
+                        if sound1.type == "consonant" and sound2.type == "consonant":
+                            # check for prenasalized stuff
+                            if sound1.manner == "nasal" and (
+                                sound2.place == sound2.place
+                                or sound2.manner
+                                in ["stop", "affricate", "fricative", "implosive"]
+                            ):
+                                row["BIPA"] = "*ⁿ" + str(sound2)
+                            else:
+                                row["BIPA"] = "(?)"
                         else:
-                            data[i][bidx] = '?'
-                            count += 1
+                            row["BIPA"] = "<NA>"
                     else:
-                        data[i][bidx] = '<NA>'
-                        count += 1
-                else:
-                    data[i][bidx] = '<NA>'
-                    count += 1
-            elif s.type == 'marker':
-                data[i][bidx] = rg
-            elif s.type == 'cluster':
-                # check for prenasalized stuff
-                if s.from_sound.manner == 'nasal' and (
-                        s.from_sound.place == s.to_sound.place or \
-                                s.to_sound.manner in ['stop', 'affricate',
-                                    'fricative', 'implosive']):
-                    data[i][bidx] = '*ⁿ'+s.to_sound.s
-                elif s.to_sound.manner == 'fricative' and s.from_sound.manner == 'stop':
-                    ns = bipa[s.to_sound.name.replace('fricative',
-                        'affricate')]
-                    if ns.type == 'consonant':
-                        data[i][bidx] = '*'+ns.to_sound.s
+                        row["BIPA"] = "<NA>"
+                elif sound.type == "marker":
+                    row["BIPA"] = raw_grapheme
+                elif sound.type == "cluster":
+                    # check for prenasalized stuff
+                    if sound.from_sound.manner == "nasal" and (
+                        sound.from_sound.place == sound.to_sound.place
+                        or sound.to_sound.manner
+                        in ["stop", "affricate", "fricative", "implosive"]
+                    ):
+                        row["BIPA"] = "*ⁿ" + str(sound.to_sound)
+                    elif (
+                        sound.to_sound.manner == "fricative"
+                        and sound.from_sound.manner == "stop"
+                    ):
+                        new_sound = bipa[
+                            s.to_sound.name.replace("fricative", "affricate")
+                        ]
+                        if new_sound.type == "consonant":
+                            row["BIPA"] = "*" + str(new_sound.to_sound)
+                        else:
+                            row["BIPA"] = "<NA>"
+                    elif (
+                        sound.from_sound.manner == sound.to_sound.manner
+                        and sound.from_sound.place == sound.to_sound.place
+                        and sound.from_sound.phonation == sound.to_sound.phonation
+                    ):
+                        features = {
+                            k: v or sound.to_sound.featuredict[k]
+                            for k, v in sound.from_sound.featuredict.items()
+                        }
+                        features["duration"] = "long"
+                        row["BIPA"] = str(
+                            bipa[
+                                " ".join([f for f in features.values() if f])
+                                + " "
+                                + sound.from_sound.type
+                            ]
+                        )
                     else:
-                        data[i][bidx] = '<NA>'
-                elif s.from_sound.manner == s.to_sound.manner and \
-                        s.from_sound.place == s.to_sound.place and \
-                        s.from_sound.phonation == s.to_sound.phonation:
-                    features = {k: v or s.to_sound.featuredict[k] for k, v in
-                            s.from_sound.featuredict.items()}
-                    features['duration'] = 'long'
-                    data[i][bidx] = bipa[' '.join([f for f in features.values() if f])+' '+s.from_sound.type].s
+                        row["BIPA"] = "(!)" + str(sound)
+                        clusters.add(raw_grapheme)
                 else:
-                    data[i][bidx] = '(!)'+s.s
-                    cluster.add(rg)
-            else:
-                data[i][bidx] = s.s
+                    row["BIPA"] = str(sound)
 
-    with open(args.graphemes[:-4]+'.mapped.tsv', 'w') as f:
-        f.write('\t'.join(header)+'\n')
-        for line in data:
-            f.write('\t'.join(line)+'\n')
+            # Collect modified info
+            new_rows.append(row)
 
-    print('Unknown Sounds: {0} of {1} ({2:.2f})'.format(
-        count,
-        len(data),
-        count/len(data)))
+    # Sort the new rows, write to disk, and show information
+    new_rows = sorted(
+        new_rows,
+        key=lambda r: (
+            not any([r["BIPA"].startswith(na) for na in ["<NA>", "(?)", "(!)", "*"]]),
+            r["GRAPHEME"],
+        ),
+    )
 
+    unknown = [
+        row
+        for row in new_rows
+        if any([row["BIPA"].startswith(na) for na in ["<NA>", "(?)", "(!)", "*"]])
+    ]
+    print(
+        "Unknown Sounds: {0} of {1} ({2:.2f}) ({3} of which clusters)".format(
+            len(unknown), len(new_rows), len(unknown) / len(new_rows), len(clusters)
+        )
+    )
+
+    with open(args.graphemes[:-4] + ".mapped.tsv", "w") as output:
+        writer = csv.DictWriter(output, delimiter="\t", fieldnames=new_rows[0].keys())
+        writer.writeheader()
+        writer.writerows(new_rows)
