@@ -2,7 +2,7 @@
 
 Tooling to access and curate [CLTS data](https://github.com/cldf-clts/clts).
 
-[![Build Status](https://travis-ci.org/cldf-clts/pyclts.svg?branch=master)](https://travis-ci.org/cldf-clts/pyclts)
+[![Build Status](https://github.com/cldf-clts/pyclts/workflows/tests/badge.svg)](https://github.com/cldf-clts/pyclts/actions?query=workflow%3Atests)
 [![codecov](https://codecov.io/gh/cldf-clts/pyclts/branch/master/graph/badge.svg)](https://codecov.io/gh/cldf-clts/pyclts)
 [![PyPI](https://img.shields.io/pypi/v/pyclts.svg)](https://pypi.org/project/pyclts)
 
