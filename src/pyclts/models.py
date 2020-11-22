@@ -216,6 +216,12 @@ class Sound(Symbol):
                         bundle += ['{0}:{1}'.format(f, val)]
                 tbl += [','.join(bundle)]
         return tbl
+    
+    @property
+    def symbols(self):
+        """Returns all unicode sounds separated by the empty sound marker.
+        """
+        return ' '.join(['◌'+s for s in self.s])
 
 
 
