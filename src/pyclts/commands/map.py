@@ -22,6 +22,8 @@ def run(args, test=False):
     unmapped, premapped, skipped, modified, mapped = 0, 0, 0, 0, 0
     with UnicodeDictReader(args.graphemes, delimiter='\t') as reader:
         for row in reader:
+            if not "SYMBOLS" in row:
+                row["SYMBOLS"] = ''
             bipa_grapheme = row["BIPA"].strip()
             raw_grapheme = row["GRAPHEME"].strip()
             
@@ -121,12 +123,23 @@ def run(args, test=False):
                     else:
                         row["BIPA"] = '(!)'
                         unmapped += 1
+            if row['BIPA']:
+                if row['BIPA'].startswith('*'):
+                    sound = bipa[row['BIPA'][1:]]
+                elif row['BIPA'].startswith('('):
+                    sound = bipa[row['BIPA'][3:]]
+                else:
+                    sound = bipa[row['BIPA']]
+
+                if sound.type not in ['unknownsound', 'marker']:
+                    row['SYMBOLS'] = sound.symbols
 
             # Collect modified info
             new_rows.append([row[h] for h in row])
 
     # Sort the new rows, write to disk, and show information
     header = [h for h in row]
+
     with open(args.graphemes[:-4] + ".mapped.tsv", "w") as f:
         f.write('\t'.join([h for h in row])+'\n')
         for row in sorted(new_rows, key=lambda x: (

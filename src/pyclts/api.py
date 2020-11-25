@@ -37,9 +37,15 @@ class CLTS(API):
                 if graphemesp.exists():
                     yield src, list(reader(graphemesp, dicts=True, delimiter='\t'))
 
+    def get_source(self, name, type=None):
+        graphemesp = self.repos / 'sources' / name / 'graphemes.tsv'
+        if graphemesp.exists():
+            return list(reader(graphemesp, dicts=True, delimiter='\t'))
+
     def iter_transcriptiondata(self):
         for td in sorted(self.transcriptiondata_dir.iterdir(), key=lambda p: p.name):
-            yield TranscriptionData(td, self.bipa)
+            if td.suffix == '.tsv':
+                yield TranscriptionData(td, self.bipa)
 
     def iter_soundclass(self):
         for sc in SOUNDCLASS_SYSTEMS:
