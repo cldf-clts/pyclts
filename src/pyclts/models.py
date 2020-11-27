@@ -87,11 +87,9 @@ class Symbol(object):
         return ' '.join('U+' + ('000' + hex(ord(x))[2:])[-4:] for x in str(self))
 
 
-
 @attr.s(**cmp_off)
 class UnknownSound(Symbol):
     pass
-
 
 
 @attr.s(repr=False, **cmp_off)
@@ -216,13 +214,12 @@ class Sound(Symbol):
                         bundle += ['{0}:{1}'.format(f, val)]
                 tbl += [','.join(bundle)]
         return tbl
-    
+
     @property
     def symbols(self):
         """Returns all unicode sounds separated by the empty sound marker.
         """
-        return ' '.join(['◌'+s for s in self.s])
-
+        return ' '.join(['◌' + s for s in self.s])
 
 
 @attr.s(**cmp_off)
@@ -239,7 +236,6 @@ class Marker(Symbol):
     @property
     def featureset(self):
         return frozenset([self.grapheme, self.type])
-
 
 
 @attr.s(repr=False, **cmp_off)
@@ -279,14 +275,14 @@ class Consonant(Sound):
     _write_order = dict(
         pre=['preceding'],
         post=[
-            'raising', 
+            'raising',
             'relative_articulation',
-            'laminality', 
-            'creakiness', 
+            'laminality',
+            'creakiness',
             'tongue_root',
-            'phonation', 
-            'ejection', 
-            'syllabicity', 
+            'phonation',
+            'ejection',
+            'syllabicity',
             'voicing',
             'articulation',
             'nasalization',
@@ -299,36 +295,37 @@ class Consonant(Sound):
             'breathiness',
             'aspiration',
             'friction',
-            'duration'
-            ])
+            'duration',
+        ],
+    )
 
     _name_order = [
-        'raising', 
+        'raising',
         'relative_articulation',
         'friction',
-        'articulation', 
-        'preceding', 
-        'syllabicity', 
-        'nasalization', 
+        'articulation',
+        'preceding',
+        'syllabicity',
+        'nasalization',
         'palatalization',
         'labialization',
         'velarization',
-        'pharyngealization', 
-        'glottalization', 
-        'aspiration', 
-        'duration', 
-        'release', 
-        'voicing', 
+        'pharyngealization',
+        'glottalization',
+        'aspiration',
+        'duration',
+        'release',
+        'voicing',
         'creakiness',
-        'breathiness', 
-        'phonation', 
+        'breathiness',
+        'phonation',
         'laminality',
         'tongue_root',
-        'place', 
-        'ejection', 
+        'place',
+        'ejection',
         'airstream',
-        'manner', 
-        ]
+        'manner',
+    ]
 
 
 @attr.s(repr=False, **cmp_off)

@@ -209,8 +209,7 @@ class TranscriptionSystem(TranscriptionBase):
             # we have two known sounds of the same type (vowel or consonant), we
             # either construct a diphthong or a cluster
             if 'unknownsound' not in (sound1.type, sound2.type) and \
-                    sound1.type == sound2.type and sound1.type in [
-                            'consonant', 'vowel']:
+                    sound1.type == sound2.type and sound1.type in ['consonant', 'vowel']:
                 # diphthong creation
                 if sound1.type == 'vowel':
                     return Diphthong.from_sounds(  # noqa: F405
@@ -222,18 +221,18 @@ class TranscriptionSystem(TranscriptionBase):
                         string, sound1, sound2, self)
                 elif sound1.type == 'consonant' and sound1.manner == 'click' \
                         and sound2.manner == 'fricative':
-                    return Cluster.from_sounds(string, sound1, sound2, self)
+                    return Cluster.from_sounds(string, sound1, sound2, self)  # noqa: F405
                 # check for plosive plus fricative if they are the same in
                 # manner
                 elif sound1.manner == 'stop' and sound2.manner == 'fricative' \
                         and sound1.place == sound2.place:
                     # join features
-                    features = {f: v or sound2.featuredict[f] for f, v in
-                            sound1.featuredict.items()}
+                    features = {
+                        f: v or sound2.featuredict[f] for f, v in sound1.featuredict.items()}
                     features['manner'] = 'affricate'
-                    #new_sound = Consonant(self, nstring, **features) 
-                    new_sound = self._from_name(' '.join([v for k, v in features.items() if
-                        v])+' consonant')
+                    # new_sound = Consonant(self, nstring, **features)
+                    new_sound = self._from_name(
+                        ' '.join([v for k, v in features.items() if v]) + ' consonant')
                     return new_sound
 
             i = 1
@@ -241,14 +240,14 @@ class TranscriptionSystem(TranscriptionBase):
                 new_match = list(self._regex.finditer(nstring[i:]))
                 if len(new_match) == 1:
                     pre, mid, post = nstring[i:].partition(
-                            nstring[i:][new_match[0].start():new_match[0].end()])
+                        nstring[i:][new_match[0].start():new_match[0].end()])
                     pre = nstring[:i] + pre
                     checked_for_two = True
                     break
                 i += 1
             if not checked_for_two:
                 return UnknownSound(grapheme=nstring, source=string, ts=self)  # noqa: F405
-        
+
         if not checked_for_two:
             pre, mid, post = nstring.partition(nstring[match[0].start():match[0].end()])
         base_sound = self.sounds[mid]

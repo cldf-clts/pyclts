@@ -14,7 +14,6 @@ except ImportError:
     token2class = None
     Model = None
 
-from pyclts.soundclasses import SOUNDCLASS_SYSTEMS
 from pyclts.models import is_valid_sound
 
 
@@ -63,4 +62,3 @@ def run(args):
         found, len(out), found / len(out) * 100))
     with writer('transcriptiondata', '{0}.tsv'.format(args.dataset)) as w:
         w.writerows(out)
-
