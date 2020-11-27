@@ -32,6 +32,12 @@ def test_sounds_(repos, capsys):
     assert 'kʰ' in out
 
 
+def test_map(tmp_repos, capsys, fixtures):
+    main(['--repos', str(tmp_repos), 'map', str(fixtures / 'graphemes.tsv')])
+    out, _ = capsys.readouterr()
+    assert 'premapped' in out
+
+
 def test_table(capsys, repos):
     main(['--repos', str(repos), 'table', 'a', 'kh', 'zz'])
     out, err = capsys.readouterr()

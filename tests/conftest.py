@@ -17,6 +17,12 @@ def repos():
 
 
 @pytest.fixture
+def fixtures(tmpdir, tests_dir):
+    shutil.copytree(str(tests_dir / 'fixtures'), str(tmpdir.join('fixtures')))
+    return Path(str(tmpdir)) / 'fixtures'
+
+
+@pytest.fixture
 def tmp_repos(tmpdir, tests_dir):
     shutil.copytree(str(tests_dir / 'repos'), str(tmpdir.join('repos')))
     return Path(str(tmpdir)) / 'repos'

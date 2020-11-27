@@ -37,7 +37,7 @@ class CLTS(API):
                 if graphemesp.exists():
                     yield src, list(reader(graphemesp, dicts=True, delimiter='\t'))
 
-    def get_source(self, name, type=None):
+    def get_source(self, name):
         graphemesp = self.repos / 'sources' / name / 'graphemes.tsv'
         if graphemesp.exists():
             return list(reader(graphemesp, dicts=True, delimiter='\t'))

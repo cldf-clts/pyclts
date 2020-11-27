@@ -1,4 +1,5 @@
 NAME	DESCRIPTION	REFS	TYPE	URITEMPLATE
+allenbai	c		td	
 chomsky	This is the feature system proposed by [Chomsky and Halle (1968)](:bib:Chomsky1968). The system is limited in so far as it only lists the sounds the scholars identify for English.	Chomsky1968	td	
 wiki	This data is taken from the Wikipedia description of the phonetic alphabet. We have the ambition to link to all pages on Wikipedia dedicated to specific sounds in the world's languages. For the moment, however, the data is likely to contain a lot of gaps.	Wikipedia2018	td	
 bdpa	The data is taken from the *Benchmark database of phonetic alignments* ([List and Prokić 2014](:bib:List2014e)) which offers data on sound sequences in segmented form. The frequency counts reflect the number of varieties in the data for which a given segment could be found. Since the data contains many dialectal datasets, the frequency counts to not reflect general sound distributions but rather the frequency of sound segments in the data.	List2014e	td	

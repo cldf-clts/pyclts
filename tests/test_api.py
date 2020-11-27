@@ -23,6 +23,10 @@ def test_transcriptionsystem_custom(repos, api):
     assert api.transcriptionsystem(repos / 'pkg' / 'transcriptionsystems' / 'asjpcode')
 
 
+def test_get_source(api):
+    assert len(api.get_source('allenbai')) == 6
+
+
 def test_soundclass(api):
     sc = api.soundclass('sca')
 
