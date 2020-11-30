@@ -2,9 +2,6 @@
 Prepare transcriptiondata from the transcription sources.
 """
 from uritemplate import URITemplate
-from clldutils.clilib import ParserError
-from csvw.dsv import UnicodeWriter
-from pyclts.soundclasses import SOUNDCLASS_SYSTEMS
 from pyclts.models import is_valid_sound
 
 
@@ -13,10 +10,6 @@ def register(parser):
 
 
 def run(args):
-
-    def writer(*comps):
-        return UnicodeWriter(args.repos.path('pkg', *comps), delimiter='\t')
-
     bipa = args.repos.bipa
     rows = args.repos.get_source(args.dataset)
     graphemes = {}

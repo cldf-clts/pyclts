@@ -136,5 +136,5 @@ def _test_sounds(bipa, **kw):
             assert sound.generated, "Sound not generated"
         if kw.stressed:
             assert sound.stress, "Sound not stressed"
-        assert sound.name == kw.name
+        assert sound.name == kw.name, "Names not matched"
         assert sound.codepoints == kw.codepoints, "Not matching codepoints"
