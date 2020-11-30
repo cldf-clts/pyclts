@@ -38,12 +38,6 @@ def test_map(tmp_repos, capsys, fixtures):
     assert 'BIPA' in out
 
 
-def test_make_dataset(tmp_repos, capsys, fixtures):
-    main(['--repos', str(tmp_repos), 'make_dataset', 'allenbai'])
-    out, _ = capsys.readouterr()
-
-
-
 def test_table(capsys, repos):
     main(['--repos', str(repos), 'table', 'a', 'kh', 'zz'])
     out, err = capsys.readouterr()
