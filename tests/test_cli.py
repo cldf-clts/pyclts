@@ -33,9 +33,21 @@ def test_sounds_(repos, capsys):
 
 
 def test_map(tmp_repos, capsys, fixtures):
-    main(['--repos', str(tmp_repos), 'map', str(fixtures / 'graphemes.tsv')])
+    main(['--repos', str(tmp_repos), 'map', 'allenbai'])
     out, _ = capsys.readouterr()
-    assert 'premapped' in out
+    assert 'BIPA' in out
+
+
+def test_make_dataset(tmp_repos, capsys, fixtures):
+    main(['--repos', str(tmp_repos), 'make_dataset', 'allenbai'])
+    out, _ = capsys.readouterr()
+
+
+
+def test_test_dataset(tmp_repos, capsys, fixtures):
+    main(['--repos', str(tmp_repos), 'test_dataset', 'allenbai'])
+    out, _ = capsys.readouterr()
+
 
 
 def test_table(capsys, repos):

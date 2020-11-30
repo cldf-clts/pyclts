@@ -9,7 +9,7 @@ from csvw.dsv import reader, UnicodeWriter
 
 def register(parser):
     add_format(parser, default="simple")
-    parser.add_argument("graphemes", help="the file with the graphemes")
+    parser.add_argument("dataset", help="the file with the graphemes")
 
 
 def run(args, test=False):
@@ -19,7 +19,8 @@ def run(args, test=False):
     # Iterave over graphemes and collect them
     new_rows, header = [], []
     unmapped, premapped, skipped, modified, mapped = 0, 0, 0, 0, 0
-    for row in reader(args.graphemes, delimiter='\t', dicts=True):
+    rows = args.repos.get_source(args.dataset)
+    for row in rows:
         row.setdefault("SYMBOLS", '')
         bipa_grapheme = row["BIPA"].strip()
         raw_grapheme = row["GRAPHEME"].strip()
@@ -133,19 +134,19 @@ def run(args, test=False):
 
         # Collect modified info
         new_rows.append([row[h] for h in row])
-        header = [h for h in row]
+    header = [h for h in row]
 
-    # Sort the new rows, write to disk, and show information
-    with UnicodeWriter(args.graphemes[:-4] + ".mapped.tsv", delimiter='\t') as f:
-        f.writerow(header)
-        for row in sorted(
-                new_rows, key=lambda x: (x[header.index('BIPA')], x[header.index('GRAPHEME')])):
-            f.writerow(row)
+    print('\t'.join(header))
+    for row in sorted(
+            new_rows, key=lambda x: (x[header.index('BIPA')], x[header.index('GRAPHEME')])):
+        print('\t'.join(row))
     table = [
         ['mapped', mapped, mapped / len(new_rows), len(new_rows)],
         ['premapped', premapped, premapped / len(new_rows), len(new_rows)],
         ['skipped', skipped, skipped / len(new_rows), len(new_rows)],
         ['unmapped', unmapped, unmapped / len(new_rows), len(new_rows)]
     ]
-    with Table(args, 'type', 'items', 'proportion', 'total') as text:
-        text += table
+    for row in table:
+        args.log.info('{0[0]} {0[1]} items ({0[2]:.2f}) in {0[3]} rows'.format(
+            row))
+

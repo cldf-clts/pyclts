@@ -4,6 +4,7 @@ Prepare transcriptiondata from the transcription sources.
 from uritemplate import URITemplate
 from clldutils.clilib import ParserError
 from csvw.dsv import UnicodeWriter
+from pyclts.commands.make_dataset import process_transcription_data
 
 try:
     from lingpy.sequence.sound_classes import token2class
@@ -30,30 +31,9 @@ def run(args):
     for src, rows in args.repos.iter_sources(type='td'):
         args.log.info('TranscriptionData {0} ...'.format(src['NAME']))
         uritemplate = URITemplate(src['URITEMPLATE']) if src['URITEMPLATE'] else None
-        out = [['BIPA_GRAPHEME', 'CLTS_NAME', 'GENERATED', 'EXPLICIT', 'GRAPHEME', 'URL'] + columns]
-        graphemes = set()
-        for row in rows:
-            if row['GRAPHEME'] in graphemes:
-                args.log.warn('skipping duplicate grapheme: {0}'.format(row['GRAPHEME']))
-                continue
-            graphemes.add(row['GRAPHEME'])
-            if not row['BIPA']:
-                bipa_sound = bipa[row['GRAPHEME']]
-                explicit = ''
-            else:
-                bipa_sound = bipa[row['BIPA']]
-                explicit = '+'
-            generated = '+' if bipa_sound.generated else ''
-            if is_valid_sound(bipa_sound, bipa):
-                bipa_grapheme = bipa_sound.s
-                bipa_name = bipa_sound.name
-            else:
-                bipa_grapheme, bipa_name = '<NA>', '<NA>'
-            url = uritemplate.expand(**row) if uritemplate else row.get('URL', '')
-            out.append(
-                [bipa_grapheme, bipa_name, generated, explicit, row['GRAPHEME'],
-                 url] + [
-                    row.get(c, '') for c in columns])
+        out = process_transcription_data(
+                rows, columns, src, uritemplate, bipa, args)
+
         found = len([o for o in out if o[0] != '<NA>'])
         args.log.info('... {0} of {1} graphemes found ({2:.0f}%)'.format(
             found, len(out), found / len(out) * 100))
