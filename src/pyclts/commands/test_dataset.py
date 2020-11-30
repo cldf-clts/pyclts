@@ -23,8 +23,6 @@ def register(parser):
 
 
 def run(args):
-    if not LINGPY:
-        raise ParserError('lingpy must be installed to run this command!')
 
     def writer(*comps):
         return UnicodeWriter(args.repos.path('pkg', *comps), delimiter='\t')
