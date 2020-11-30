@@ -4,16 +4,6 @@ Prepare transcriptiondata from the transcription sources.
 from uritemplate import URITemplate
 from clldutils.clilib import ParserError
 from csvw.dsv import UnicodeWriter
-
-try:
-    from lingpy.sequence.sound_classes import token2class
-    from lingpy.data import Model
-    LINGPY = True
-except ImportError:
-    LINGPY = False
-    token2class = None
-    Model = None
-
 from pyclts.models import is_valid_sound
 
 
