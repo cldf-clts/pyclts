@@ -40,7 +40,7 @@ def test_map(tmp_repos, capsys, fixtures):
 
 def test_make_dataset(tmp_repos, capsys, fixtures):
     main(['--repos', str(tmp_repos), 'make_dataset', 'allenbai'])
-
+    out, _ = capsys.readouterr()
 
 
 
