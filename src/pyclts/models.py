@@ -401,11 +401,25 @@ class Vowel(Sound):
     _write_order = dict(
         pre=[],
         post=[
-            'tongue_root', 'raising', 'centrality', 'rounding',
-            'voicing', 'breathiness', 'creakiness',
-            'syllabicity', 'nasalization', 'tone', 'articulation', 'rhotacization',
-            'pharyngealization', 'glottalization', 'velarization', 'duration',
-            'friction', 'relative_articulation'])
+            'tongue_root',
+            'raising',
+            'centrality',
+            'rounding',
+            'voicing',
+            'breathiness',
+            'creakiness',
+            'syllabicity',
+            'friction',
+            'relative_articulation',
+            'nasalization',
+            'tone',
+            'articulation',
+            'rhotacization',
+            'pharyngealization',
+            'glottalization',
+            'velarization',
+            'duration'
+            ])
     _name_order = [
         'duration', 'rhotacization', 'pharyngealization',
         'glottalization', 'velarization', 'syllabicity',
