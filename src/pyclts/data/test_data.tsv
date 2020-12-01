@@ -561,7 +561,7 @@ ã	vowel	ã	ã						nasalized unrounded open front vowel	U+0061 U+0303
 ã́	vowel	ã́	ã́	+			+		nasalized unrounded open front with-high_tone vowel	U+0061 U+0303 U+0301
 ă	vowel	ă	ă	+					ultra-short unrounded open front vowel	U+0061 U+0306
 ᴀ/a̱	vowel	a̠	a̠		+		+		retracted unrounded open front vowel	U+0061 U+0320
-ᴀ̃/ã̱	vowel	ã̠	ã̠		+		+		retracted nasalized unrounded open front vowel	U+0061 U+0303 U+0320
+ᴀ̃/ã̱	vowel	ã̠	ã̠		+		+		retracted nasalized unrounded open front vowel	U+0061 U+0320 U+0303
 a̤	vowel	a̤	a̤				+		breathy unrounded open front vowel	U+0061 U+0324
 a̤ː	vowel	a̤ː	a̤ː				+		long breathy unrounded open front vowel	U+0061 U+0324 U+02d0
 a̰	vowel	a̰	a̰						creaky unrounded open front vowel	U+0061 U+0330
