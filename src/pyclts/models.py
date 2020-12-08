@@ -3,7 +3,7 @@ import unicodedata
 import attr
 from clldutils.misc import nfilter, lazyproperty
 
-from pyclts.util import norm
+from pyclts.util import norm, jaccard
 
 __all__ = [
     'is_valid_sound',
@@ -137,8 +137,7 @@ class Sound(Symbol):
         return frozenset(self._features() + [self.type])
 
     def similarity(self, other):
-        f1, f2 = self.featureset, other.featureset
-        return len(f1.intersection(f2)) / len(f1.union(f2))
+        return jaccard(self.featureset, other.featureset)
 
     def __str__(self):
         """
@@ -401,11 +400,25 @@ class Vowel(Sound):
     _write_order = dict(
         pre=[],
         post=[
-            'tongue_root', 'raising', 'centrality', 'rounding',
-            'voicing', 'breathiness', 'creakiness',
-            'syllabicity', 'nasalization', 'tone', 'articulation', 'rhotacization',
-            'pharyngealization', 'glottalization', 'velarization', 'duration',
-            'friction', 'relative_articulation'])
+            'tongue_root',
+            'raising',
+            'centrality',
+            'rounding',
+            'voicing',
+            'breathiness',
+            'creakiness',
+            'syllabicity',
+            'friction',
+            'relative_articulation',
+            'nasalization',
+            'tone',
+            'articulation',
+            'rhotacization',
+            'pharyngealization',
+            'glottalization',
+            'velarization',
+            'duration'
+            ])
     _name_order = [
         'duration', 'rhotacization', 'pharyngealization',
         'glottalization', 'velarization', 'syllabicity',
