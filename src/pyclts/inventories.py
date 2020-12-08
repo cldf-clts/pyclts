@@ -2,7 +2,7 @@
 Module handles different aspects of inventory comparison.
 """
 import attr
-from collections import defaultdict, OrderedDict, namedtuple
+from collections import OrderedDict, namedtuple
 from pyclts.api import CLTS
 import statistics
 from pyclts.models import is_valid_sound
@@ -50,35 +50,34 @@ class Phoneme:
         return self.grapheme
 
     def similarity(self, other):
-        return self.sound.similarity(other.sound)
+        if self.type not in ['marker', 'unknownsound']:
+            return self.sound.similarity(other.sound)
+        if self == other:
+            return 1
+        return 0
 
 
 @attr.s
 class Inventory:
     id = attr.ib(default=None)
     sounds = attr.ib(default=None, repr=False)
-    unknown = attr.ib(default=None, repr=False)
     language = attr.ib(default=None, repr=False)
     ts = attr.ib(default=None, repr=False)
 
     @classmethod
     def from_list(cls, *list_of_sounds, language=None, ts=None):
         ts = ts or CLTS().bipa
-        unknown = []
-        sounds = OrderedDict()
+        sounds, unknown = OrderedDict(), OrderedDict()
         for itm in list_of_sounds:
             sound = ts[itm]
-            if sound.type in ['unknownsound', 'marker']:
-                unknown[str(sound)] = sound
-            else:
-                sounds[str(sound)] = Phoneme(
-                        grapheme=str(sound),
-                        grapheme_in_source=sound.grapheme,
-                        name=sound.name,
-                        type=sound.type,
-                        occs=[],
-                        sound=sound)
-        return cls(sounds=sounds, ts=ts, unknown=unknown, language=language)
+            sounds[str(sound)] = Phoneme(
+                    grapheme=str(sound),
+                    grapheme_in_source=sound.grapheme,
+                    name=sound.name,
+                    type=sound.type,
+                    occs=[],
+                    sound=sound)
+        return cls(sounds=sounds, ts=ts, language=language)
 
     def __len__(self):
         return len(self.sounds)
@@ -87,6 +86,16 @@ class Inventory:
     def consonants(self):
         return OrderedDict(
                 [(k, v) for k, v in self.sounds.items() if v.type=='consonant'])
+
+    @property
+    def markers(self):
+        return OrderedDict(
+                [(k, v) for k, v in self.sounds.items() if v.type == 'marker'])
+
+    @property
+    def unknownsounds(self):
+        return OrderedDict(
+                [(k, v) for k, v in self.sounds.items() if v.type == 'unknownsound'])
 
     @property
     def vowels(self):
