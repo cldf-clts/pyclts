@@ -5,7 +5,7 @@ setup(
     name='pyclts',
     version='3.0.0',
     description='A python library for the handling of phonetic transcriptions',
-    author='Johann-Mattis List, Cormac Anderson, and Robert Forkel',
+    author='Johann-Mattis List, Cormac Anderson, Tiago Tresoldi, and Robert Forkel',
     author_email='mattis.list@lingpy.org',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
