@@ -6,7 +6,7 @@ from pathlib import Path
 
 from csvw.dsv import reader
 
-__all__ = ['EMPTY', 'UNKNOWN', 'norm', 'nfd', 'TranscriptionBase']
+__all__ = ['EMPTY', 'UNKNOWN', 'norm', 'nfd', 'TranscriptionBase', 'jaccard']
 
 EMPTY = "◌"
 UNKNOWN = "�"
@@ -83,3 +83,10 @@ def read_data(fname, grapheme_col, *cols):
         names.append(row['CLTS_NAME'])
 
     return grapheme_map, data, sounds, names
+
+
+def jaccard(a, b):
+    i, u = len(a.intersection(b)), len(a.union(b))
+    if u:
+        return i / u
+    return 0

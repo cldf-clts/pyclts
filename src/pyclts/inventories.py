@@ -2,21 +2,23 @@
 Module handles different aspects of inventory comparison.
 """
 import attr
-from collections import defaultdict
+from collections import OrderedDict, namedtuple
 from pyclts.api import CLTS
 import statistics
+from pyclts.cli_util import Table
+from pyclts.util import jaccard
 
 
-def reduce_features(sound, clts=None, features=None):
-    clts = clts or CLTS().bipa
+def reduce_features(sound, ts=None, features=None):
+    ts = ts or CLTS().bipa
     features = features or {
         "consonant": ["phonation", "place", "manner"],
         "vowel": ["roundedness", "height", "centrality"],
         "tone": ["start"],
     }
-    sound_ = clts[sound] if isinstance(sound, str) else sound
+    sound_ = ts[sound] if isinstance(sound, str) else sound
     if sound_.type in ["cluster", "diphthong"]:
-        return reduce_features(sound_.from_sound, clts=clts, features=features)
+        return reduce_features(sound_.from_sound, ts=ts, features=features)
     name = "{} {}".format(
         " ".join(
             [s for s in [sound_.featuredict.get(x) for x in features[sound_.type]] if s]
@@ -24,95 +26,149 @@ def reduce_features(sound, clts=None, features=None):
         sound_.type,
     )
     if sound_.type != "tone":
-        return clts[name]
-    return clts["short " + " ".join(name.split(" "))]
+        return ts[name]
+    return ts["short " + " ".join(name.split(" "))]
+
+
+@attr.s
+class Phoneme:
+    """
+    Base class for handling sounds.
+    """
+    grapheme = attr.ib(default=None)
+    grapheme_in_source = attr.ib(default=None, repr=False)
+    name = attr.ib(default=None)
+    type = attr.ib(default=None, repr=False)
+    occs = attr.ib(default=None, repr=False)
+    sound = attr.ib(default=None)
+
+    def __len__(self):
+        return len(self.occs)
+
+    def __str__(self):
+        return self.grapheme
+
+    def similarity(self, other):
+        if self.type not in ['marker', 'unknownsound']:
+            return self.sound.similarity(other.sound)
+        if self == other:
+            return 1
+        return 0
 
 
 @attr.s
 class Inventory:
-    sounds = attr.ib()
-    clts = attr.ib(default=None)
+    id = attr.ib(default=None)
+    sounds = attr.ib(default=None, repr=False)
+    language = attr.ib(default=None, repr=False)
+    ts = attr.ib(default=None, repr=False)
 
     @classmethod
-    def from_list(cls, *list_of_sounds, clts=None):
-        clts = clts or CLTS().bipa
-
-        sounds = defaultdict(dict)
+    def from_list(cls, *list_of_sounds, language=None, ts=None):
+        ts = ts or CLTS().bipa
+        sounds = OrderedDict()
         for itm in list_of_sounds:
-            sound = clts[itm]
-            sounds[sound.type][sound.s] = sound
-            for ft, val in sound.featuredict.items():
-                if val:
-                    sounds[val][sound.s] = sound
-        return cls(sounds=sounds, clts=clts)
+            sound = ts[itm]
+            sounds[str(sound)] = Phoneme(
+                grapheme=str(sound),
+                grapheme_in_source=sound.grapheme,
+                name=sound.name,
+                type=sound.type,
+                occs=[],
+                sound=sound)
+        return cls(sounds=sounds, ts=ts, language=language)
 
-    def similar(self, other, metric="strict", aspects=None):
-        all_aspects = ["consonant", "vowel", "tone"]
+    def __len__(self):
+        return len(self.sounds)
 
-        def jac(a, b):
-            return len(set(a).intersection(set(b))) / len(set(a).union(set(b)))
+    @property
+    def consonants(self):
+        return OrderedDict(
+            [(k, v) for k, v in self.sounds.items() if v.type == 'consonant'])
 
-        if metric == "strict":
-            if not aspects:
-                soundsA, soundsB = {}, {}
-                for aspect in all_aspects:
-                    soundsA.update(self.sounds[aspect])
-                    soundsB.update(other.sounds[aspect])
+    @property
+    def markers(self):
+        return OrderedDict(
+            [(k, v) for k, v in self.sounds.items() if v.type == 'marker'])
 
-                score = jac(soundsA, soundsB)
-            else:
-                scores = []
-                for aspect in aspects:
-                    if aspect in self.sounds or aspect in other.sounds:
-                        scores += [jac(self.sounds[aspect], other.sounds[aspect])]
+    @property
+    def unknownsounds(self):
+        return OrderedDict(
+            [(k, v) for k, v in self.sounds.items() if v.type == 'unknownsound'])
 
-                if not scores:
-                    score = 0.0
-                else:
-                    score = statistics.mean(scores)
+    @property
+    def vowels(self):
+        return OrderedDict(
+            [(k, v) for k, v in self.sounds.items() if v.type == 'vowel'])
 
-        elif metric == "approximate":
-            # Define internal comparison function
-            def _approximate_comp(soundsA, soundsB):
-                matches = []
-                for sA in soundsA:
-                    best, sim = None, 0
-                    for sB in soundsB:
-                        if sA.similarity(sB) > sim:
-                            sim = sA.similarity(sB)
-                            best = sB
-                    if best:
-                        soundsB = [s for s in soundsB if s != best]
-                        matches += [sim]
-                    else:
-                        matches += [0]
-                matches += [0 for s in soundsB]
+    @property
+    def diphthongs(self):
+        return OrderedDict(
+            [(k, v) for k, v in self.sounds.items() if v.type == 'diphthong'])
 
-                if matches:
-                    return sum(matches) / len(matches)
+    @property
+    def clusters(self):
+        return OrderedDict(
+            [(k, v) for k, v in self.sounds.items() if v.type == 'cluster'])
 
-                return 0.0
+    @property
+    def tones(self):
+        return OrderedDict(
+            [(k, v) for k, v in self.sounds.items() if v.type == 'tone'])
 
-            # actual comparison
-            if not aspects:
-                soundsA, soundsB = {}, {}
-                for aspect in all_aspects:
-                    soundsA.update(self.sounds[aspect])
-                    soundsB.update(other.sounds[aspect])
+    def tabulate(self, format='pipe', types=None):
+        types = types or ['sounds']
+        table = []
+        for t in types:
+            for sound in getattr(self, t).values():
+                table += [[sound.grapheme, sound.type, sound.name, len(sound)]]
+        with Table(
+                namedtuple('args', 'format')(format),
+                'Grapheme', 'Type', 'Name', 'Frequency') as table_text:
+            table_text += table
 
-                soundsA = sorted(soundsA.values(), key=str)
-                soundsB = sorted(soundsB.values(), key=str)
+    def strict_similarity(self, other, aspects=None):
+        aspects = aspects or ['sounds']
+        scores = []
+        for aspect in aspects:
+            soundsA, soundsB = (
+                {sound for sound in getattr(self, aspect)},
+                {sound for sound in getattr(other, aspect)})
+            if soundsA or soundsB:
+                scores += [jaccard(soundsA, soundsB)]
+        if not scores:
+            return 0
+        return statistics.mean(scores)
 
-                score = _approximate_comp(soundsA, soundsB)
-            else:
-                scores = []
-                for aspect in aspects:
-                    soundsA = sorted(self.sounds[aspect].values(), key=str)
-                    soundsB = sorted(other.sounds[aspect].values(), key=str)
+    def approximate_similarity(self, other, aspects=None):
+        aspects = aspects or ['sounds']
 
-                    if soundsA or soundsB:
-                        scores.append(_approximate_comp(soundsA, soundsB))
+        def approximate(soundsA, soundsB):
+            matches = []
+            for soundA in soundsA:
+                best_match, best_sim = None, 0
+                for soundB in soundsB:
+                    current_sim = soundA.similarity(soundB)
+                    if current_sim > best_sim:
+                        best_match = soundB
+                        best_sim = current_sim
+                if best_match is not None:
+                    matches += [best_sim]
+                    soundsB = [s for s in soundsB if s != best_match]
+            matches += [0 for s in soundsB]
+            return statistics.mean(matches)
 
-                score = statistics.mean(scores)
-
-        return score
+        scores = []
+        for aspect in aspects:
+            soundsA, soundsB = (
+                getattr(self, aspect).values(),
+                getattr(other, aspect).values())
+            if soundsA and soundsB:
+                scores += [statistics.mean([
+                    approximate(soundsA, soundsB),
+                    approximate(soundsB, soundsA)])]
+            elif soundsA or soundsB:
+                scores += [0]
+        if not scores:
+            return 0
+        return statistics.mean(scores)

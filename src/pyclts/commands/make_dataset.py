@@ -45,7 +45,7 @@ def process_transcription_data(rows, columns, src, uritemplate, bipa, args):
                 bipa_grapheme, bipa_name, bipa_symbols = str(bipa_sound), '', ''
             else:
                 bipa_grapheme, bipa_name, bipa_symbols = (
-                        str(bipa_sound), bipa_sound.name, bipa_sound.symbols)
+                    str(bipa_sound), bipa_sound.name, bipa_sound.symbols)
         url = uritemplate.expand(**row) if uritemplate else row.get('URL', '')
         out.append(
             [
@@ -70,8 +70,8 @@ def run(args):
     src = [src for src in args.repos.meta if src['NAME'] == args.dataset][0]
     uritemplate = URITemplate(src['URITEMPLATE']) if src['URITEMPLATE'] else None
     out = process_transcription_data(
-            rows, columns, src, uritemplate, bipa,
-            args)
+        rows, columns, src, uritemplate, bipa,
+        args)
     found = len([o for o in out if o[0] != '<NA>'])
     args.log.info('... {0} of {1} graphemes found ({2:.0f}%)'.format(
         found, len(out), found / len(out) * 100))

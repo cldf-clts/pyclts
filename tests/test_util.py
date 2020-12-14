@@ -1,5 +1,8 @@
 from pyclts.util import *
 
+def test_jaccard():
+
+    assert jaccard(set(), set()) == 0
 
 def test_TranscriptionBase(tmpdir):
     class TS(TranscriptionBase):
