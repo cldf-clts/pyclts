@@ -2,9 +2,8 @@
 Map a given sound inventory list to CLTS
 """
 
-from pyclts.cli_util import add_format, Table
+from pyclts.cli_util import add_format
 from pyclts.models import is_valid_sound
-from csvw.dsv import reader, UnicodeWriter
 
 
 def register(parser):
@@ -149,4 +148,3 @@ def run(args, test=False):
     for row in table:
         args.log.info('{0[0]} {0[1]} items ({0[2]:.2f}) in {0[3]} rows'.format(
             row))
-

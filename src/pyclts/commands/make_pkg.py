@@ -16,7 +16,6 @@ except ImportError:
     Model = None
 
 from pyclts.soundclasses import SOUNDCLASS_SYSTEMS
-from pyclts.models import is_valid_sound
 
 
 def run(args):
@@ -32,7 +31,7 @@ def run(args):
         args.log.info('TranscriptionData {0} ...'.format(src['NAME']))
         uritemplate = URITemplate(src['URITEMPLATE']) if src['URITEMPLATE'] else None
         out = process_transcription_data(
-                rows, columns, src, uritemplate, bipa, args)
+            rows, columns, src, uritemplate, bipa, args)
 
         found = len([o for o in out if o[0] != '<NA>'])
         args.log.info('... {0} of {1} graphemes found ({2:.0f}%)'.format(

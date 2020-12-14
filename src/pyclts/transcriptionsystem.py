@@ -62,11 +62,11 @@ class TranscriptionSystem(TranscriptionBase):
                 c['name'].lower() for c in
                 self.system.tabledict['{0}s.tsv'.format(type_)]
                     .asdict()['tableSchema']['columns']]
-            for l, item in enumerate(itertable(
+            for lnum, item in enumerate(itertable(
                     self.system.tabledict['{0}s.tsv'.format(type_)])):
                 if item['grapheme'] in self.sounds:
                     raise ValueError('duplicate grapheme in {0}:{1}: {2}'.format(
-                        type_ + 's.tsv', l + 2, item['grapheme']))
+                        type_ + 's.tsv', lnum + 2, item['grapheme']))
                 sound = cls(ts=self, **item)
                 # make sure this does not take too long
                 for key, value in item.items():
@@ -76,16 +76,16 @@ class TranscriptionSystem(TranscriptionBase):
                         if type_ != 'marker' and value not in features[type_][key]:
                             raise ValueError(
                                 "Unrecognized features ({0}: {1}, line {2}))".format(
-                                    key, value, l + 2))
+                                    key, value, lnum + 2))
 
                 self.sounds[item['grapheme']] = sound
                 if not sound.alias:
                     if sound.featureset in self.features:
                         raise ValueError('duplicate features in {0}:{1}: {2}'.format(
-                            type_ + 's.tsv', l + 2, sound.name))
+                            type_ + 's.tsv', lnum + 2, sound.name))
                     self.features[sound.featureset] = sound
                 else:
-                    aliases += [(l, sound.type, sound.featureset)]
+                    aliases += [(lnum, sound.type, sound.featureset)]
         # check for consistency of aliases: if an alias has no counterpart, it
         # is orphaned and needs to be deleted or given an accepted non-aliased
         # sound
@@ -146,8 +146,9 @@ class TranscriptionSystem(TranscriptionBase):
                     # try to generate the sounds if they are not there
                     s1, s2 = self._from_name(from_ + ' ' + extension), self._from_name(
                         to_ + ' ' + extension)
-                    if not (isinstance(
-                        s1, UnknownSound) or isinstance(s2, UnknownSound)):  # noqa: F405
+                    if not (
+                            isinstance(s1, UnknownSound)  # noqa: F405
+                            or isinstance(s2, UnknownSound)):  # noqa: F405
                         if sound_class == 'diphthong':
                             return Diphthong.from_sounds(  # noqa: F405
                                 s1 + s2, s1, s2, self)

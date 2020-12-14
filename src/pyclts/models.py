@@ -417,8 +417,7 @@ class Vowel(Sound):
             'pharyngealization',
             'glottalization',
             'velarization',
-            'duration'
-            ])
+            'duration'])
     _name_order = [
         'duration', 'rhotacization', 'pharyngealization',
         'glottalization', 'velarization', 'syllabicity',

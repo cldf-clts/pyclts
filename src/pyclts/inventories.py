@@ -5,7 +5,6 @@ import attr
 from collections import OrderedDict, namedtuple
 from pyclts.api import CLTS
 import statistics
-from pyclts.models import is_valid_sound
 from pyclts.cli_util import Table
 from pyclts.util import jaccard
 
@@ -67,16 +66,16 @@ class Inventory:
     @classmethod
     def from_list(cls, *list_of_sounds, language=None, ts=None):
         ts = ts or CLTS().bipa
-        sounds, unknown = OrderedDict(), OrderedDict()
+        sounds = OrderedDict()
         for itm in list_of_sounds:
             sound = ts[itm]
             sounds[str(sound)] = Phoneme(
-                    grapheme=str(sound),
-                    grapheme_in_source=sound.grapheme,
-                    name=sound.name,
-                    type=sound.type,
-                    occs=[],
-                    sound=sound)
+                grapheme=str(sound),
+                grapheme_in_source=sound.grapheme,
+                name=sound.name,
+                type=sound.type,
+                occs=[],
+                sound=sound)
         return cls(sounds=sounds, ts=ts, language=language)
 
     def __len__(self):
@@ -85,37 +84,37 @@ class Inventory:
     @property
     def consonants(self):
         return OrderedDict(
-                [(k, v) for k, v in self.sounds.items() if v.type=='consonant'])
+            [(k, v) for k, v in self.sounds.items() if v.type == 'consonant'])
 
     @property
     def markers(self):
         return OrderedDict(
-                [(k, v) for k, v in self.sounds.items() if v.type == 'marker'])
+            [(k, v) for k, v in self.sounds.items() if v.type == 'marker'])
 
     @property
     def unknownsounds(self):
         return OrderedDict(
-                [(k, v) for k, v in self.sounds.items() if v.type == 'unknownsound'])
+            [(k, v) for k, v in self.sounds.items() if v.type == 'unknownsound'])
 
     @property
     def vowels(self):
         return OrderedDict(
-                [(k, v) for k, v in self.sounds.items() if v.type=='vowel'])
+            [(k, v) for k, v in self.sounds.items() if v.type == 'vowel'])
 
     @property
     def diphthongs(self):
         return OrderedDict(
-                [(k, v) for k, v in self.sounds.items() if v.type=='diphthong'])
+            [(k, v) for k, v in self.sounds.items() if v.type == 'diphthong'])
 
     @property
     def clusters(self):
         return OrderedDict(
-                [(k, v) for k, v in self.sounds.items() if v.type=='cluster'])
+            [(k, v) for k, v in self.sounds.items() if v.type == 'cluster'])
 
     @property
     def tones(self):
         return OrderedDict(
-                [(k, v) for k, v in self.sounds.items() if v.type=='tone'])
+            [(k, v) for k, v in self.sounds.items() if v.type == 'tone'])
 
     def tabulate(self, format='pipe', types=None):
         types = types or ['sounds']
@@ -123,9 +122,9 @@ class Inventory:
         for t in types:
             for sound in getattr(self, t).values():
                 table += [[sound.grapheme, sound.type, sound.name, len(sound)]]
-        with Table(namedtuple(
-            'args', 'format')(format), 'Grapheme', 'Type', 'Name', 
-            'Frequency') as table_text:
+        with Table(
+                namedtuple('args', 'format')(format),
+                'Grapheme', 'Type', 'Name', 'Frequency') as table_text:
             table_text += table
 
     def strict_similarity(self, other, aspects=None):
@@ -133,9 +132,8 @@ class Inventory:
         scores = []
         for aspect in aspects:
             soundsA, soundsB = (
-                    {sound for sound in getattr(self, aspect)},
-                    {sound for sound in getattr(other, aspect)}
-                    )
+                {sound for sound in getattr(self, aspect)},
+                {sound for sound in getattr(other, aspect)})
             if soundsA or soundsB:
                 scores += [jaccard(soundsA, soundsB)]
         if not scores:
@@ -163,14 +161,12 @@ class Inventory:
         scores = []
         for aspect in aspects:
             soundsA, soundsB = (
-                    getattr(self, aspect).values(), 
-                    getattr(other, aspect).values()
-                    )
+                getattr(self, aspect).values(),
+                getattr(other, aspect).values())
             if soundsA and soundsB:
                 scores += [statistics.mean([
                     approximate(soundsA, soundsB),
-                    approximate(soundsB, soundsA)
-                    ])]
+                    approximate(soundsB, soundsA)])]
             elif soundsA or soundsB:
                 scores += [0]
         if not scores:

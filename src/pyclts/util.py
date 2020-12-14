@@ -6,7 +6,7 @@ from pathlib import Path
 
 from csvw.dsv import reader
 
-__all__ = ['EMPTY', 'UNKNOWN', 'norm', 'nfd', 'TranscriptionBase']
+__all__ = ['EMPTY', 'UNKNOWN', 'norm', 'nfd', 'TranscriptionBase', 'jaccard']
 
 EMPTY = "◌"
 UNKNOWN = "�"

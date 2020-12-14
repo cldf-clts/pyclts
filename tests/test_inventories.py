@@ -57,6 +57,9 @@ def test_Inventory():
     inv2 = Inventory.from_list("a", "e", "i", "œ", "p", ts=bipa)
     inv3 = Inventory.from_list("a", "e", "i", "æ", "p", ts=bipa)
     inv4 = Inventory.from_list("u", "K", "+", "a", ts=bipa)
+    inv5 = Inventory.from_list("a", "e", "i")
+    inv6 = Inventory.from_list("p", "t", "k")
+    inv1.tabulate()
     assert 'K' in inv4.unknownsounds
     assert '+' in inv4.markers
     assert inv1.strict_similarity(inv2) == inv1.strict_similarity(inv3)
@@ -69,3 +72,8 @@ def test_Inventory():
     assert inv1.approximate_similarity(inv2) == pytest.approx(0.866666, 0.0001)
     assert inv1.approximate_similarity(
         inv2, aspects=["consonants", "vowels"]) == pytest.approx(0.916666, 0.0001)
+
+    # check for inventories without similarities
+    assert inv5.approximate_similarity(inv6, aspects=['consonants', 'vowels']) == 0
+    assert len(inv5) == 3
+    
