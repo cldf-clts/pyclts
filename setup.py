@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pyclts',
-    version='3.0.0',
+    version='3.0.1.dev0',
     description='A python library for the handling of phonetic transcriptions',
     author='Johann-Mattis List, Cormac Anderson, Tiago Tresoldi, and Robert Forkel',
     author_email='mattis.list@lingpy.org',
