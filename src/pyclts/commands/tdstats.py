@@ -23,4 +23,3 @@ def run(args):
         '',
         0 if not len(table) else sum([line[-1] for line in table]) / (len(table))])
     print(table.render(tablefmt=args.format))
-
