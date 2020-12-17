@@ -49,7 +49,9 @@ def run(args):
     # start from assembling bipa-sounds
     args.log.info('adding bipa data')
     for grapheme, sound in sorted(
-            bipa.sounds.items(), key=lambda p: p[1].alias if p[1].alias else False):
+        bipa.sounds.items(),
+        key=lambda p: (p[1].alias if p[1].alias else False, p[0], p[1].uname)
+    ):
         if sound.type not in ['marker']:
             if sound.alias:
                 assert sound.name in sounds
@@ -102,7 +104,7 @@ def run(args):
                     'normalized': '+' if bipa_sound.normalized else ''
                 }
 
-            for item in td.data[name]:
+            for item in sorted(td.data[name], key=lambda d: (d['bipa_grapheme'], d['grapheme'])):
                 sound['aliases'].add(item['grapheme'])
                 # add the values here
                 data.append(Grapheme(
@@ -124,7 +126,7 @@ def run(args):
     # separately
     args.log.info('adding sound classes')
     for sc in args.repos.iter_soundclass():
-        for name in sounds:
+        for name in sorted(sounds):
             try:
                 grapheme = sc[name]
                 data.append(Grapheme(
@@ -139,9 +141,9 @@ def run(args):
 
     # last run, check again for each of the remaining transcription systems,
     # whether we can translate the sound
-    args.log.info('adding remaining transcriptin systems')
+    args.log.info('adding remaining transcription systems')
     for ts in args.repos.iter_transcriptionsystem(exclude=['bipa']):
-        for name in sounds:
+        for name in sorted(sounds):
             try:
                 ts_sound = ts[name]
                 if is_valid_sound(ts_sound, ts):
