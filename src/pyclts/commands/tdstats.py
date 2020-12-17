@@ -18,8 +18,9 @@ def run(args):
         ln = [1 if is_valid_sound(bipa[name], bipa) else 0 for name in td.names]
         table.append([td.id, sum(ln), len(ln), sum(ln) / len(ln)])
     table.append([
-        len(table) - 1,
+        len(table),
         '',
         '',
-        0 if not len(table) - 1 else sum([line[-1] for line in table[1:]]) / (len(table) - 1)])
+        0 if not len(table) else sum([line[-1] for line in table]) / (len(table))])
     print(table.render(tablefmt=args.format))
+
