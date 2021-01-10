@@ -80,20 +80,20 @@ def test_Inventory():
     assert len(inv5) == 3
 
     # test for new properties
-    inv1 = Inventory.from_list('uː', 'u', 'ui')
+    inv1 = Inventory.from_list('uː', 'u', 'ui', ts=bipa)
     assert len(inv1.vocoids) == 3
     assert len(inv1.vowels) == 2
     assert len(inv1.vowels_by_quality) == 1
 
-    inv2 = Inventory.from_list('tː', 't', 'k')
+    inv2 = Inventory.from_list('tː', 't', 'k', ts=bipa)
     assert len(inv2.consonantoids) == 3
     assert len(inv2.consonants_by_quality) == 2
     
-    inv3 = Inventory.from_list('p', '²')
+    inv3 = Inventory.from_list('p', '²', ts=bipa)
     assert len(inv3.segmentals) == 1
 
-    inv4 = Inventory.from_list('tː', 'k')
-    inv5 = Inventory.from_list('oː', 'a')
+    inv4 = Inventory.from_list('tː', 'k', ts=bipa)
+    inv5 = Inventory.from_list('oː', 'a', ts=bipa)
     assert len(inv4.consonants_by_quality) == 2
     assert len(inv5.vowels_by_quality) == 2
     
