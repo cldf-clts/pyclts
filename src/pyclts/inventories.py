@@ -36,11 +36,24 @@ class Phoneme:
     Base class for handling sounds.
     """
     grapheme = attr.ib(default=None)
-    grapheme_in_source = attr.ib(default=None, repr=False)
-    name = attr.ib(default=None)
-    type = attr.ib(default=None, repr=False)
+    graphemes_in_source = attr.ib(default=None, repr=False)
     occs = attr.ib(default=None, repr=False)
     sound = attr.ib(default=None)
+    
+    @property
+    def type(self):
+        return self.sound.type
+
+    @property
+    def name(self):
+        return self.sound.name
+
+    @property
+    def featureset(self):
+        if hasattr(self.sound, "featureset"):
+            return self.sound.featureset
+        else:
+            return frozenset()
 
     def __len__(self):
         return len(self.occs)
@@ -56,6 +69,34 @@ class Phoneme:
         return 0
 
 
+def select_by_type(*types):
+    def wrapper(function):
+        def select_sounds(inventory):
+            return OrderedDict([(k, v) for k, v in function(inventory).items() if v.type in
+                types])
+        return select_sounds
+    return wrapper
+
+
+def filter_by_property(*properties):
+    def wrapper(function):
+        def select_sounds(inventory):
+            # manipulate the properties to strip off the property from the
+            # items
+            out = OrderedDict()
+            sounds = function(inventory)
+            for k, v in sounds.items():
+                stripped = inventory.ts.features.get(
+                        frozenset([s for s in v.featureset if s not in properties]))
+                if str(stripped) != str(v) and str(stripped) not in sounds:
+                    out[k] = v
+                elif str(stripped) == str(v):
+                    out[k] = v
+            return out
+        return select_sounds
+    return wrapper
+
+
 @attr.s
 class Inventory:
     id = attr.ib(default=None)
@@ -69,52 +110,80 @@ class Inventory:
         sounds = OrderedDict()
         for itm in list_of_sounds:
             sound = ts[itm]
-            sounds[str(sound)] = Phoneme(
-                grapheme=str(sound),
-                grapheme_in_source=sound.grapheme,
-                name=sound.name,
-                type=sound.type,
-                occs=[],
-                sound=sound)
+            try:
+                sounds[str(sound)].graphemes_in_source.append(itm)
+            except KeyError:
+                sounds[str(sound)] = Phoneme(
+                    grapheme=str(sound),
+                    graphemes_in_source=[sound.grapheme],
+                    occs=[],
+                    sound=sound)
         return cls(sounds=sounds, ts=ts, language=language)
 
     def __len__(self):
         return len(self.sounds)
 
     @property
+    @select_by_type("consonant")
     def consonants(self):
-        return OrderedDict(
-            [(k, v) for k, v in self.sounds.items() if v.type == 'consonant'])
+        return self.sounds
 
     @property
+    @select_by_type("marker")
     def markers(self):
-        return OrderedDict(
-            [(k, v) for k, v in self.sounds.items() if v.type == 'marker'])
+        return self.sounds
 
     @property
+    @select_by_type("vowel", "diphthong")
+    def vocoids(self):
+        return self.sounds
+
+    @property
+    @filter_by_property("long", "mid-long", "ultra-short", "ultra-long")
+    @select_by_type("vowel")
+    def vowels_by_quality(self):
+        return self.sounds
+
+    @property
+    @filter_by_property("long", "mid-long", "ultra-short", "ultra-long")
+    @select_by_type("consonant")
+    def consonants_by_quality(self):
+        return self.sounds
+
+    @property
+    @select_by_type("consonant", "cluster")
+    def consonantoids(self):
+        return self.sounds
+
+    @property
+    @select_by_type("consonant", "vowel", "diphthong", "cluster")
+    def segmentals(self):
+        return self.sounds
+
+    @property
+    @select_by_type("unknownsound")
     def unknownsounds(self):
-        return OrderedDict(
-            [(k, v) for k, v in self.sounds.items() if v.type == 'unknownsound'])
+        return self.sounds
 
     @property
+    @select_by_type("vowel")
     def vowels(self):
-        return OrderedDict(
-            [(k, v) for k, v in self.sounds.items() if v.type == 'vowel'])
+        return self.sounds
 
     @property
+    @select_by_type("diphthong")
     def diphthongs(self):
-        return OrderedDict(
-            [(k, v) for k, v in self.sounds.items() if v.type == 'diphthong'])
+        return self.sounds
 
     @property
+    @select_by_type("cluster")
     def clusters(self):
-        return OrderedDict(
-            [(k, v) for k, v in self.sounds.items() if v.type == 'cluster'])
+        return self.sounds
 
     @property
+    @select_by_type("tone")
     def tones(self):
-        return OrderedDict(
-            [(k, v) for k, v in self.sounds.items() if v.type == 'tone'])
+        return self.sounds
 
     def tabulate(self, format='pipe', types=None):
         types = types or ['sounds']

@@ -134,7 +134,7 @@ class Sound(Symbol):
 
     @property
     def featureset(self):
-        return frozenset(self._features() + [self.type])
+        return frozenset(self._features()+[self.type])
 
     def similarity(self, other):
         return jaccard(self.featureset, other.featureset)
@@ -340,6 +340,18 @@ class ComplexSound(Sound):
         n1 = ' '.join(self.from_sound.name.split(' ')[:-1])
         n2 = ' '.join(self.to_sound.name.split(' ')[:-1])
         return 'from ' + n1 + ' to ' + n2 + ' ' + self.type
+
+    def _features(self):
+        return ['from_'+p for p in nfilter(getattr(self.from_sound, p, None) for p in
+            self.from_sound._name_order)]+['to_'+p for p in
+                    nfilter(getattr(self.to_sound, p, None) for p in
+                        self.to_sound._name_order)]+['diphthong']
+    @property 
+    def featuredict(self):
+        return dict([('from_'+p, getattr(self.from_sound, p, None)) for p in
+                self.from_sound._name_order]+[
+                    ('to_'+p, getattr(self.to_sound, p, None)) for p in
+                        self.to_sound._name_order])
 
     @classmethod
     def from_sounds(cls, source, sound1, sound2, ts):
