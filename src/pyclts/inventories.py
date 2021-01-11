@@ -27,8 +27,14 @@ def reduce_features(sound, ts=None, features=None):
     )
     if sound_.type != "tone":
         return ts[name]
-    return ts["short " + " ".join(name.split(" "))]
+    return ts["short "+" ".join(name.split(" "))]
 
+
+class GetAttributeFromSound:
+    def __init__(self, attr):
+        self.attr = attr
+    def __get__(self, obj, objtype=None):
+        return getattr(obj.sound, self.attr, None)
 
 @attr.s
 class Phoneme:
@@ -40,20 +46,9 @@ class Phoneme:
     occs = attr.ib(default=None, repr=False)
     sound = attr.ib(default=None)
     
-    @property
-    def type(self):
-        return self.sound.type
-
-    @property
-    def name(self):
-        return self.sound.name
-
-    @property
-    def featureset(self):
-        if hasattr(self.sound, "featureset"):
-            return self.sound.featureset
-        else:
-            return frozenset()
+    type = GetAttributeFromSound('type')
+    name = GetAttributeFromSound('name')
+    featureset = GetAttributeFromSound('featureset')
 
     def __len__(self):
         return len(self.occs)
@@ -69,32 +64,31 @@ class Phoneme:
         return 0
 
 
-def select_by_type(*types):
-    def wrapper(function):
+class GetSubInventoryByType:
+    def __init__(self, types):
         def select_sounds(inventory):
-            return OrderedDict([(k, v) for k, v in function(inventory).items() if v.type in
-                types])
-        return select_sounds
-    return wrapper
+            return OrderedDict(
+                    [(k, v) for k, v in inventory.items() if v.type in types])
+        self.select_sounds = select_sounds
+    def __get__(self, obj, objtype=None):
+        return self.select_sounds(obj.sounds)
 
 
-def filter_by_property(*properties):
-    def wrapper(function):
-        def select_sounds(inventory):
-            # manipulate the properties to strip off the property from the
-            # items
-            out = OrderedDict()
-            sounds = function(inventory)
-            for k, v in sounds.items():
-                stripped = inventory.ts.features.get(
-                        frozenset([s for s in v.featureset if s not in properties]))
-                if str(stripped) != str(v) and str(stripped) not in sounds:
-                    out[k] = v
-                elif str(stripped) == str(v):
-                    out[k] = v
-            return out
-        return select_sounds
-    return wrapper
+class GetSubInventoryByProperty(GetSubInventoryByType):
+    def __init__(self, types, properties):
+        GetSubInventoryByType.__init__(self, types)
+        self.properties = properties
+    def __get__(self, obj, objtype=None):
+        out = OrderedDict()
+        sounds = self.select_sounds(obj.sounds)
+        for k, v in sounds.items():
+            stripped = obj.ts.features.get(
+                    frozenset([s for s in v.featureset if s not in self.properties]))
+            if str(stripped) != str(v) and str(stripped) not in sounds:
+                out[k] = v
+            elif str(stripped) == str(v):
+                out[k] = v
+        return out
 
 
 @attr.s
@@ -103,6 +97,22 @@ class Inventory:
     sounds = attr.ib(default=None, repr=False)
     language = attr.ib(default=None, repr=False)
     ts = attr.ib(default=None, repr=False)
+    
+    consonants = GetSubInventoryByType(['consonant'])
+    consonants_by_quality = GetSubInventoryByProperty(
+            ['consonant'], ['long', 'ultra-long', 'mid-long', 'ultra-short'])
+    consonant_sounds = GetSubInventoryByType(['consonant', 'cluster'])
+    vowels = GetSubInventoryByType(['vowel'])
+    vowels_by_quality = GetSubInventoryByProperty(
+            ['vowel'], ['long', 'ultra-long', 'mid-long', 'ultra-short'])
+    vowel_sounds = GetSubInventoryByType(['vowel', 'diphthong'])
+    segments = GetSubInventoryByType(
+            ['consonant', 'vowel', 'cluster', 'diphthong'])
+    tones = GetSubInventoryByType(['tones'])
+    markers = GetSubInventoryByType(['marker'])
+    clusters = GetSubInventoryByType(['clusters'])
+    diphthongs = GetSubInventoryByType(['diphthongs'])
+    unknownsounds = GetSubInventoryByType(['unknownsound'])
 
     @classmethod
     def from_list(cls, *list_of_sounds, language=None, ts=None):
@@ -122,68 +132,6 @@ class Inventory:
 
     def __len__(self):
         return len(self.sounds)
-
-    @property
-    @select_by_type("consonant")
-    def consonants(self):
-        return self.sounds
-
-    @property
-    @select_by_type("marker")
-    def markers(self):
-        return self.sounds
-
-    @property
-    @select_by_type("vowel", "diphthong")
-    def vocoids(self):
-        return self.sounds
-
-    @property
-    @filter_by_property("long", "mid-long", "ultra-short", "ultra-long")
-    @select_by_type("vowel")
-    def vowels_by_quality(self):
-        return self.sounds
-
-    @property
-    @filter_by_property("long", "mid-long", "ultra-short", "ultra-long")
-    @select_by_type("consonant")
-    def consonants_by_quality(self):
-        return self.sounds
-
-    @property
-    @select_by_type("consonant", "cluster")
-    def consonantoids(self):
-        return self.sounds
-
-    @property
-    @select_by_type("consonant", "vowel", "diphthong", "cluster")
-    def segmentals(self):
-        return self.sounds
-
-    @property
-    @select_by_type("unknownsound")
-    def unknownsounds(self):
-        return self.sounds
-
-    @property
-    @select_by_type("vowel")
-    def vowels(self):
-        return self.sounds
-
-    @property
-    @select_by_type("diphthong")
-    def diphthongs(self):
-        return self.sounds
-
-    @property
-    @select_by_type("cluster")
-    def clusters(self):
-        return self.sounds
-
-    @property
-    @select_by_type("tone")
-    def tones(self):
-        return self.sounds
 
     def tabulate(self, format='pipe', types=None):
         types = types or ['sounds']
