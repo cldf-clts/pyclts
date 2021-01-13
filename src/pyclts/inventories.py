@@ -108,10 +108,10 @@ class Inventory:
     vowel_sounds = GetSubInventoryByType(['vowel', 'diphthong'])
     segments = GetSubInventoryByType(
             ['consonant', 'vowel', 'cluster', 'diphthong'])
-    tones = GetSubInventoryByType(['tones'])
+    tones = GetSubInventoryByType(['tone'])
     markers = GetSubInventoryByType(['marker'])
-    clusters = GetSubInventoryByType(['clusters'])
-    diphthongs = GetSubInventoryByType(['diphthongs'])
+    clusters = GetSubInventoryByType(['cluster'])
+    diphthongs = GetSubInventoryByType(['diphthong'])
     unknownsounds = GetSubInventoryByType(['unknownsound'])
 
     @classmethod
