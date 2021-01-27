@@ -14,7 +14,7 @@
             "name": "Robert Forkel"
         }
     ],
-    "description": "<p>Cite the dataset as:</p>\n\n<blockquote>\n<p>List, Johann-Mattis; Anderson, Cormac; Tresoldi, Tiago; Forkel, Robert (2020): PyCLTS. A Python package for the handling of Cross-Linguistic Transcription Systems. With contributions by Christoph Rzymski and Simon J. Greenhill. Version 3.1.0. URL: https://doi.org/10.5281/zenodo.3515744. Jena: Max Planck Institute for the Science of Human History.</p>\n</blockquote>",
+    "description": "<p>Cite the library as:</p>\n\n<blockquote>\n<p>List, Johann-Mattis; Anderson, Cormac; Tresoldi, Tiago; Forkel, Robert (2021): PyCLTS. A Python package for the handling of Cross-Linguistic Transcription Systems. With contributions by Christoph Rzymski and Simon J. Greenhill. Version 3.2.0. URL: https://doi.org/10.5281/zenodo.3515744. Jena: Max Planck Institute for the Science of Human History.</p>\n</blockquote>",
     "access_right": "open",
     "keywords": [
         "linguistics",
