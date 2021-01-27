@@ -27,28 +27,31 @@ def reduce_features(sound, ts=None, features=None):
     )
     if sound_.type != "tone":
         return ts[name]
-    return ts["short "+" ".join(name.split(" "))]
+    return ts["short " + " ".join(name.split(" "))]
 
 
 class GetAttributeFromSound:
     def __init__(self, attr):
         self.attr = attr
+
     def __get__(self, obj, objtype=None):
         return getattr(obj.sound, self.attr, None)
+
 
 @attr.s
 class Phoneme:
     """
     Base class for handling sounds.
     """
+
     grapheme = attr.ib(default=None)
     graphemes_in_source = attr.ib(default=None, repr=False)
     occs = attr.ib(default=None, repr=False)
     sound = attr.ib(default=None)
-    
-    type = GetAttributeFromSound('type')
-    name = GetAttributeFromSound('name')
-    featureset = GetAttributeFromSound('featureset')
+
+    type = GetAttributeFromSound("type")
+    name = GetAttributeFromSound("name")
+    featureset = GetAttributeFromSound("featureset")
 
     def __len__(self):
         return len(self.occs)
@@ -57,7 +60,7 @@ class Phoneme:
         return self.grapheme
 
     def similarity(self, other):
-        if self.type not in ['marker', 'unknownsound']:
+        if self.type not in ["marker", "unknownsound"]:
             return self.sound.similarity(other.sound)
         if self == other:
             return 1
@@ -68,8 +71,11 @@ class GetSubInventoryByType:
     def __init__(self, types):
         def select_sounds(inventory):
             return OrderedDict(
-                    [(k, v) for k, v in inventory.items() if v.type in types])
+                [(k, v) for k, v in inventory.items() if v.type in types]
+            )
+
         self.select_sounds = select_sounds
+
     def __get__(self, obj, objtype=None):
         return self.select_sounds(obj.sounds)
 
@@ -78,12 +84,14 @@ class GetSubInventoryByProperty(GetSubInventoryByType):
     def __init__(self, types, properties):
         GetSubInventoryByType.__init__(self, types)
         self.properties = properties
+
     def __get__(self, obj, objtype=None):
         out = OrderedDict()
         sounds = self.select_sounds(obj.sounds)
         for k, v in sounds.items():
             stripped = obj.ts.features.get(
-                    frozenset([s for s in v.featureset if s not in self.properties]))
+                frozenset([s for s in v.featureset if s not in self.properties])
+            )
             if str(stripped) != str(v) and str(stripped) not in sounds:
                 out[k] = v
             elif str(stripped) == str(v):
@@ -94,28 +102,29 @@ class GetSubInventoryByProperty(GetSubInventoryByType):
 @attr.s
 class Inventory:
     id = attr.ib(default=None)
+    language = attr.ib(default=None)
     sounds = attr.ib(default=None, repr=False)
-    language = attr.ib(default=None, repr=False)
     ts = attr.ib(default=None, repr=False)
-    
-    consonants = GetSubInventoryByType(['consonant'])
+
+    consonants = GetSubInventoryByType(["consonant"])
     consonants_by_quality = GetSubInventoryByProperty(
-            ['consonant'], ['long', 'ultra-long', 'mid-long', 'ultra-short'])
-    consonant_sounds = GetSubInventoryByType(['consonant', 'cluster'])
-    vowels = GetSubInventoryByType(['vowel'])
+        ["consonant"], ["long", "ultra-long", "mid-long", "ultra-short"]
+    )
+    consonant_sounds = GetSubInventoryByType(["consonant", "cluster"])
+    vowels = GetSubInventoryByType(["vowel"])
     vowels_by_quality = GetSubInventoryByProperty(
-            ['vowel'], ['long', 'ultra-long', 'mid-long', 'ultra-short'])
-    vowel_sounds = GetSubInventoryByType(['vowel', 'diphthong'])
-    segments = GetSubInventoryByType(
-            ['consonant', 'vowel', 'cluster', 'diphthong'])
-    tones = GetSubInventoryByType(['tone'])
-    markers = GetSubInventoryByType(['marker'])
-    clusters = GetSubInventoryByType(['cluster'])
-    diphthongs = GetSubInventoryByType(['diphthong'])
-    unknownsounds = GetSubInventoryByType(['unknownsound'])
+        ["vowel"], ["long", "ultra-long", "mid-long", "ultra-short"]
+    )
+    vowel_sounds = GetSubInventoryByType(["vowel", "diphthong"])
+    segments = GetSubInventoryByType(["consonant", "vowel", "cluster", "diphthong"])
+    tones = GetSubInventoryByType(["tone"])
+    markers = GetSubInventoryByType(["marker"])
+    clusters = GetSubInventoryByType(["cluster"])
+    diphthongs = GetSubInventoryByType(["diphthong"])
+    unknownsounds = GetSubInventoryByType(["unknownsound"])
 
     @classmethod
-    def from_list(cls, *list_of_sounds, language=None, ts=None):
+    def from_list(cls, *list_of_sounds, id=None, language=None, ts=None):
         ts = ts or CLTS().bipa
         sounds = OrderedDict()
         for itm in list_of_sounds:
@@ -127,30 +136,36 @@ class Inventory:
                     grapheme=str(sound),
                     graphemes_in_source=[sound.grapheme],
                     occs=[],
-                    sound=sound)
-        return cls(sounds=sounds, ts=ts, language=language)
+                    sound=sound,
+                )
+        return cls(sounds=sounds, ts=ts, language=language, id=id)
 
     def __len__(self):
         return len(self.sounds)
 
-    def tabulate(self, format='pipe', types=None):
-        types = types or ['sounds']
+    def tabulate(self, format="pipe", types=None):
+        types = types or ["sounds"]
         table = []
         for t in types:
             for sound in getattr(self, t).values():
                 table += [[sound.grapheme, sound.type, sound.name, len(sound)]]
         with Table(
-                namedtuple('args', 'format')(format),
-                'Grapheme', 'Type', 'Name', 'Frequency') as table_text:
+            namedtuple("args", "format")(format),
+            "Grapheme",
+            "Type",
+            "Name",
+            "Frequency",
+        ) as table_text:
             table_text += table
 
     def strict_similarity(self, other, aspects=None):
-        aspects = aspects or ['sounds']
+        aspects = aspects or ["sounds"]
         scores = []
         for aspect in aspects:
             soundsA, soundsB = (
                 {sound for sound in getattr(self, aspect)},
-                {sound for sound in getattr(other, aspect)})
+                {sound for sound in getattr(other, aspect)},
+            )
             if soundsA or soundsB:
                 scores += [jaccard(soundsA, soundsB)]
         if not scores:
@@ -158,7 +173,7 @@ class Inventory:
         return statistics.mean(scores)
 
     def approximate_similarity(self, other, aspects=None):
-        aspects = aspects or ['sounds']
+        aspects = aspects or ["sounds"]
 
         def approximate(soundsA, soundsB):
             matches = []
@@ -179,11 +194,14 @@ class Inventory:
         for aspect in aspects:
             soundsA, soundsB = (
                 getattr(self, aspect).values(),
-                getattr(other, aspect).values())
+                getattr(other, aspect).values(),
+            )
             if soundsA and soundsB:
-                scores += [statistics.mean([
-                    approximate(soundsA, soundsB),
-                    approximate(soundsB, soundsA)])]
+                scores += [
+                    statistics.mean(
+                        [approximate(soundsA, soundsB), approximate(soundsB, soundsA)]
+                    )
+                ]
             elif soundsA or soundsB:
                 scores += [0]
         if not scores:
