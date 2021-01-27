@@ -56,11 +56,16 @@ def test_Inventory():
     )
 
     inv1 = Inventory.from_list("a", "e", "i", "o", "p", ts=bipa)
-    inv2 = Inventory.from_list("a", "e", "i", "œ", "p", ts=bipa)
+    inv2 = Inventory.from_list(
+            "a", "e", "i", "œ", "p", ts=bipa, id='ID', language='language')
     inv3 = Inventory.from_list("a", "e", "i", "æ", "p", ts=bipa)
     inv4 = Inventory.from_list("u", "K", "+", "a", ts=bipa)
     inv5 = Inventory.from_list("a", "e", "i", ts=bipa)
     inv6 = Inventory.from_list("p", "t", "k", ts=bipa)
+    assert inv1.language is None
+    assert inv1.id is None
+    assert inv2.language == 'language'
+    assert inv2.id == 'ID'
     inv1.tabulate()
     assert 'K' in inv4.unknownsounds
     assert '+' in inv4.markers
