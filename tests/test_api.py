@@ -27,6 +27,12 @@ def test_get_source(api):
     assert len(api.get_source('allenbai')) == 6
 
 
+def test_diphthong(api):
+    d = api.bipa['ai']
+    assert 'diphthong' in d._features()
+    assert 'from_centrality' in d.featuredict
+
+
 def test_soundclass(api):
     sc = api.soundclass('sca')
 
