@@ -38,6 +38,13 @@ by installing [`cldfbench`](https://pypi.org/cldfbench) and running
 `cldfbench catconfig` (please note that command depends on the `pyglottolog` and `pyconcepticon` libraries).
 
 
+### Compatibility
+
+Note that the CLTS data release and the `pyclts` version **must be compatible**.
+- `pyclts` < 3.0 works with CLTS data up to version 1.4.1
+- `pyclts` >= 3.0 works with CLTS data >= 2.0
+
+
 ## Overview
 
 Using `pyclts` is exemplified in this short code snippet:
