@@ -1,5 +1,5 @@
 """
-Create a distribution of the CLTS collection in CLDF format for convenient reuse.
+Create a distribution of the CLTS dataset in CLDF format for convenient reuse.
 
 Writes:
 - CLDF Dataset section of README.md
@@ -93,7 +93,10 @@ METADATA = {
                             "and marker. Features are defined for consonants, vowels, and tones.",
                         "datatype": {"base": "string", "format": "consonant|vowel|tone"}
                     },
-                    {"name": "FEATURE", "datatype": {"base": "string"}},
+                    {
+                        "name": "FEATURE",
+                        "dc:description": "Note that CLTS features are not necessarily binary.",
+                        "datatype": {"base": "string"}},
                     {"name": "VALUE", "datatype": {"base": "string"}}
                 ],
                 "primaryKey": ["ID"]
@@ -106,14 +109,14 @@ METADATA = {
                     {"name": "PK", "datatype": {"base": "integer"}},
                     {
                         "name": "GRAPHEME",
-                        "dc:description": "Grapheme used in a particular transcription to denote a "
-                                          "sound",
+                        "dc:description":
+                            "Grapheme used in a particular transcription to denote a sound",
                         "datatype": {"base": "string"}
                     },
                     {
                         "name": "NAME",
-                        "dc:description": "The ordered concatenation of feature values of the "
-                                          "denoted sound",
+                        "dc:description":
+                            "The ordered concatenation of feature values of the denoted sound",
                         "datatype": {"base": "string"}
                     },
                     {
