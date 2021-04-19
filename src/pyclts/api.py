@@ -1,7 +1,8 @@
 from clldutils.apilib import API
-from clldutils.misc import lazyproperty
+from clldutils.misc import lazyproperty, nfilter
 from csvw.dsv import iterrows as reader
 from cldfcatalog import Config
+from pybtex.database import parse_string
 
 from pyclts import TranscriptionData, TranscriptionSystem, SoundClasses
 from pyclts.soundclasses import SOUNDCLASS_SYSTEMS
@@ -23,7 +24,15 @@ class CLTS(API):
 
     @lazyproperty
     def meta(self):
-        return list(reader(self.repos / 'sources' / 'index.tsv', dicts=True, delimiter='\t'))
+        res = list(reader(self.repos / 'sources' / 'index.tsv', dicts=True, delimiter='\t'))
+        for src in res:
+            src['REFS'] = nfilter([s.strip() for s in src['REFS'].split(',')])
+        return res
+
+    @lazyproperty
+    def references(self):
+        return parse_string(
+            self.path('data', 'references.bib').read_text(encoding='utf8'), 'bibtex').entries
 
     def get_meta(self, obj):
         for src in self.meta:

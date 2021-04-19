@@ -1,6 +1,11 @@
-import pathlib
+import logging
 
-from pyclts.__main__ import main
+from pyclts.__main__ import main as main_
+
+
+def main(*args, **kw):
+    kw['log'] = logging.getLogger(__name__)
+    main_(*args, **kw)
 
 
 def test_ls(capsys, repos):
@@ -16,7 +21,7 @@ def test_features(capsys, repos):
 
 
 def test_stats(capsys, tmp_repos):
-    main(['--repos', str(tmp_repos), 'dump'])
+    main(['--repos', str(tmp_repos), 'dist'])
     main(['--repos', str(tmp_repos), 'stats'])
     out, err = capsys.readouterr()
     assert 'STATS' in out
@@ -72,8 +77,8 @@ def test_make_pkg_and_app(capsys, tmp_repos, mocker):
     main(['--repos', str(tmp_repos), 'test', '--test'])
 
 
-def test_dump(tmp_repos, tmpdir):
-    p = pathlib.Path(str(tmpdir)) / 'test.zip'
-    main(['--repos', str(tmp_repos), 'dump', '--destination', str(p)])
+def test_dist(tmp_repos, tmp_path):
+    p = tmp_path / 'test.zip'
+    main(['--repos', str(tmp_repos), 'dist', '--destination', str(p)])
     assert tmp_repos.joinpath('data', 'graphemes.tsv').exists()
     assert p.exists()

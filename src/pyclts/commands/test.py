@@ -1,8 +1,8 @@
 """
 Check repository data for consistency
 """
-import argparse
 import pathlib
+import argparse
 
 from csvw.dsv import reader
 
@@ -20,6 +20,10 @@ def register(parser):
 
 def run(args):
     clts = args.repos
+
+    for src in clts.meta:
+        for ref in src['REFS']:
+            assert ref in clts.references, 'Missing bibtex key: {}'.format(ref)
 
     if not args.test:  # pragma: no cover
         test_transcriptiondata(
@@ -55,7 +59,6 @@ def test_transcriptiondata(sca, dolgo, asjpd, phoible, bipa):  # pragma: no cove
     assert sca.resolve_sound(bipa['ʰb']) == 'P'
     assert sca.resolve_sound(bipa['ae']) == 'A'
     assert sca.resolve_sound(bipa['tk']) == 'T'
-
     assert phoible.resolve_sound('m') == 'm'
     try:
         phoible.resolve_sound(bipa['tk'])

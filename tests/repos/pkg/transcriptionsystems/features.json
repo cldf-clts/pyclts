@@ -114,6 +114,10 @@
       "with-mid-central-vowel-release",
       "with-nasal-release"
     ],
+    "tongue_root": [
+      "advanced-tongue-root",
+      "retracted-tongue-root"
+    ],
     "ejection": [
       "ejective"
     ],

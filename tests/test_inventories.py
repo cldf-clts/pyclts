@@ -1,34 +1,24 @@
 import pytest
 from pyclts.inventories import reduce_features, Inventory, Phoneme
-from pathlib import Path
 from pyclts.transcriptionsystem import TranscriptionSystem
 
 
-def test_reduce_features():
-    bipa = TranscriptionSystem(
-        Path(__file__).parent.joinpath("repos", "pkg", "transcriptionsystems", "bipa"),
-        Path(__file__).parent.joinpath(
-            "repos", "pkg", "transcriptionsystems", "transcription-system-metadata.json"
-        ),
-        Path(__file__).parent.joinpath(
-            "repos", "pkg", "transcriptionsystems", "features.json"
-        ),
+@pytest.fixture
+def bipa(repos):
+    return TranscriptionSystem(
+        repos / "pkg" / "transcriptionsystems" / "bipa",
+        repos / "pkg" / "transcriptionsystems" / "transcription-system-metadata.json",
+        repos / "pkg" / "transcriptionsystems" / "features.json",
     )
+
+
+def test_reduce_features(bipa):
     assert reduce_features("th", ts=bipa).s == "t"
     assert reduce_features("oe", ts=bipa).s == "o"
     assert reduce_features("⁵⁵", ts=bipa).s == "⁵"
 
 
-def test_Phoneme():
-    bipa = TranscriptionSystem(
-        Path(__file__).parent.joinpath("repos", "pkg", "transcriptionsystems", "bipa"),
-        Path(__file__).parent.joinpath(
-            "repos", "pkg", "transcriptionsystems", "transcription-system-metadata.json"
-        ),
-        Path(__file__).parent.joinpath(
-            "repos", "pkg", "transcriptionsystems", "features.json"
-        ),
-    )
+def test_Phoneme(bipa):
     soundA = bipa['K']
     soundB = bipa['U']
     soundC = bipa['K']
@@ -44,17 +34,7 @@ def test_Phoneme():
 
 
 
-def test_Inventory():
-    bipa = TranscriptionSystem(
-        Path(__file__).parent.joinpath("repos", "pkg", "transcriptionsystems", "bipa"),
-        Path(__file__).parent.joinpath(
-            "repos", "pkg", "transcriptionsystems", "transcription-system-metadata.json"
-        ),
-        Path(__file__).parent.joinpath(
-            "repos", "pkg", "transcriptionsystems", "features.json"
-        ),
-    )
-
+def test_Inventory(bipa):
     inv1 = Inventory.from_list("a", "e", "i", "o", "p", ts=bipa)
     inv2 = Inventory.from_list(
             "a", "e", "i", "œ", "p", ts=bipa, id='ID', language='language')
@@ -101,4 +81,3 @@ def test_Inventory():
     inv5 = Inventory.from_list('oː', 'a', ts=bipa)
     assert len(inv4.consonants_by_quality) == 2
     assert len(inv5.vowels_by_quality) == 2
-    

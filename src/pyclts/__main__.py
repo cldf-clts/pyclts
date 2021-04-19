@@ -12,7 +12,7 @@ from clldutils.loglib import Logging
 from pyclts import CLTS
 
 
-def main(args=None, catch_all=False, parsed_args=None):
+def main(args=None, catch_all=False, parsed_args=None, log=None):
     import pyclts.commands
 
     try:
@@ -41,7 +41,10 @@ def main(args=None, catch_all=False, parsed_args=None):
         return 1
 
     with contextlib.ExitStack() as stack:
-        stack.enter_context(Logging(args.log, level=args.log_level))
+        if log is None:  # pragma: no cover
+            stack.enter_context(Logging(args.log, level=args.log_level))
+        else:
+            args.log = log
         if args.repos_version:  # pragma: no cover
             # If a specific version of the data is to be used, we make
             # use of a Catalog as context manager:
