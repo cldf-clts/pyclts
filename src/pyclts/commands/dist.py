@@ -137,14 +137,14 @@ METADATA = {
                         "dc:description": "Image of the typeset grapheme.",
                         "valueUrl":
                             "http://web.uvic.ca/ling/resources/ipa/charts/IPAlab/images/{IMAGE}",
-                        "datatype": {"base": "anyURI"}
+                        "datatype": {"base": "string"}
                     },
                     {
                         "name": "SOUND",
                         "dc:description": "Audio recording of the sound being pronounced.",
                         "valueUrl":
                             "http://web.uvic.ca/ling/resources/ipa/charts/IPAlab/IPAsounds/{SOUND}",
-                        "datatype": {"base": "anyURI"}
+                        "datatype": {"base": "string"}
                     },
                     {
                         "name": "EXPLICIT",
