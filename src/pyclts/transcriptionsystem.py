@@ -100,6 +100,10 @@ class TranscriptionSystem(TranscriptionBase):
         self._regex = None
         self._update_regex()
 
+        self._diacritic_regexes = None
+        self._update_diacritic_regex()
+
+
         # normalization data
         self._normalize = {
             norm(r['source']): norm(r['target'])
@@ -109,6 +113,43 @@ class TranscriptionSystem(TranscriptionBase):
         self._regex = re.compile('|'.join(
             map(re.escape, sorted(self.sounds, key=lambda x: (len(x),
                 -ord(x[0])), reverse=True))))
+
+    def _update_diacritic_regex(self):
+        """ Initializes the regexes for diacritics from the diacritic dictionnary.
+
+        The structure of self.diacritic_regexes is:
+
+        ```
+            {type: (regex_pre, regex_post)}
+        ```
+
+
+        """
+        self._diacritic_regexes = {}
+
+        for d_type in self.diacritics:
+            pre_diacritics = []
+            post_diacritics = []
+
+            for d in self.diacritics[d_type]:
+                if d is not None: # Syllabic has None as a value: is this intended ?
+                    if d[-1] == EMPTY:
+                        pre_diacritics.append(d[:-1])
+                    elif d[0] == EMPTY:
+                        post_diacritics.append(d[1:])
+                    else:
+                        raise ValueError("Diacritics must contain {}".format(EMPTY))
+
+            pre_regex = re.compile('(' + '|'.join(map(re.escape,
+                sorted(pre_diacritics, key=lambda x: (len(x),
+                -ord(x[0])), reverse=True))) +')')
+            post_regex = re.compile('(' + '|'.join(map(re.escape,
+                sorted(post_diacritics, key=lambda x: (len(x),
+                -ord(x[0])), reverse=True))) + ')')
+
+            self._diacritic_regexes[d_type] =  (pre_regex, post_regex)
+
+
 
     def _norm(self, string):
         """Extended normalization: normalize by list of norm-characers, split
@@ -268,29 +309,38 @@ class TranscriptionSystem(TranscriptionBase):
         # we search for aliases and normalize them (as our features system for
         # diacritics may well define aliases
         grapheme, sound = '', ''
-        for dia in [p + EMPTY for p in pre]:
-            feature = self.diacritics[base_sound.type].get(dia, {})
-            if not feature:
-                return UnknownSound(  # noqa: F405
-                    grapheme=nstring, source=string, ts=self)
-            features[self._feature_values[feature]] = feature
-            # we add the unaliased version to the grapheme
-            grapheme += dia[0]
-            # we add the corrected version (if this is needed) to the sound
-            sound += self.features[base_sound.type][feature][0]
+        pre_dia_regex, post_dia_regex = self._diacritic_regexes[base_sound.type]
+
+        for dia in pre_dia_regex.split(pre):
+            # split with match group returns empty strings between matches
+            # empty strings can be ignored
+            if dia:
+                feature = self.diacritics[base_sound.type].get(dia + EMPTY, {})
+                if not feature:
+                    return UnknownSound(  # noqa: F405
+                        grapheme=nstring, source=string, ts=self)
+                features[self._feature_values[feature]] = feature
+                # we add the unaliased version to the grapheme
+                grapheme += dia
+                # we add the corrected version (if this is needed) to the sound
+                sound += self.features[base_sound.type][feature][0]
+
         # add the base sound
         grapheme += base_sound.grapheme
         sound += base_sound.s
-        for dia in [EMPTY + p for p in post]:
-            feature = self.diacritics[base_sound.type].get(dia, {})
-            # we are strict: if we don't know the feature, it's an unknown
-            # sound
-            if not feature:
-                return UnknownSound(  # noqa: F405
-                    grapheme=nstring, source=string, ts=self)
-            features[self._feature_values[feature]] = feature
-            grapheme += dia[1]
-            sound += self.features[base_sound.type][feature][1]
+        for dia in post_dia_regex.split(post):
+            # split with match group returns empty strings between matches
+            # empty strings can be ignored
+            if dia:
+                feature = self.diacritics[base_sound.type].get(EMPTY + dia, {})
+                # we are strict: if we don't know the feature, it's an unknown
+                # sound
+                if not feature:
+                    return UnknownSound(  # noqa: F405
+                        grapheme=nstring, source=string, ts=self)
+                features[self._feature_values[feature]] = feature
+                grapheme += dia
+                sound += self.features[base_sound.type][feature][1]
 
         features['grapheme'] = sound
         new_sound = self.sound_classes[base_sound.type](**features)
