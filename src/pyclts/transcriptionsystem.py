@@ -12,6 +12,7 @@ import attr
 from pyclts.util import nfd, norm, EMPTY, itertable, TranscriptionBase
 from pyclts.models import *  # noqa: F403
 
+import warnings
 
 class TranscriptionSystem(TranscriptionBase):
     """
@@ -64,9 +65,13 @@ class TranscriptionSystem(TranscriptionBase):
                     .asdict()['tableSchema']['columns']]
             for lnum, item in enumerate(itertable(
                     self.system.tabledict['{0}s.tsv'.format(type_)])):
+                # Area where JG made changes
                 if item['grapheme'] in self.sounds:
-                    raise ValueError('duplicate grapheme in {0}:{1}: {2}'.format(
+                    #raise ValueError('duplicate grapheme in {0}:{1}: {2}'.format(
+                    #    type_ + 's.tsv', lnum + 2, item['grapheme']))
+                	warnings.warn('duplicate grapheme in {0}:{1}: {2}'.format(
                         type_ + 's.tsv', lnum + 2, item['grapheme']))
+
                 sound = cls(ts=self, **item)
                 # make sure this does not take too long
                 for key, value in item.items():
@@ -74,8 +79,10 @@ class TranscriptionSystem(TranscriptionBase):
                             value and value not in self._feature_values:
                         self._feature_values[value] = key
                         if type_ != 'marker' and value not in features[type_][key]:
-                            raise ValueError(
-                                "Unrecognized features ({0}: {1}, line {2}))".format(
+                            #raise ValueError(
+                            #    "Unrecognized features ({0}: {1}, line {2}))".format(
+                            #        key, value, lnum + 2))
+                            warnings.warn("Unrecognized features ({0}: {1}, line {2}))".format(
                                     key, value, lnum + 2))
 
                 self.sounds[item['grapheme']] = sound
