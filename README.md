@@ -3,11 +3,10 @@
 Tooling to access and curate [CLTS data](https://github.com/cldf-clts/clts).
 
 [![Build Status](https://github.com/cldf-clts/pyclts/workflows/tests/badge.svg)](https://github.com/cldf-clts/pyclts/actions?query=workflow%3Atests)
-[![codecov](https://codecov.io/gh/cldf-clts/pyclts/branch/master/graph/badge.svg)](https://codecov.io/gh/cldf-clts/pyclts)
 [![PyPI](https://img.shields.io/pypi/v/pyclts.svg)](https://pypi.org/project/pyclts)
 
 
-This is an attempt to create a system that allows to translate and compare different phonetic transcription systems.
+CLTS is an attempt to create a system that allows to translate and compare different phonetic transcription systems and `pyclts` provides a Python API to data and comparison functionality.
 
 
 ## Install
