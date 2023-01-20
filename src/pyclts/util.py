@@ -1,8 +1,7 @@
 """Auxiliary functions for pyclts."""
-
+import pathlib
+import collections
 import unicodedata
-from collections import defaultdict
-from pathlib import Path
 
 from clldutils.markup import iter_markdown_sections
 from csvw.dsv import reader
@@ -17,7 +16,7 @@ class TranscriptionBase(object):
     __type__ = None
 
     def __init__(self, path, system=None):
-        self.path = Path(path)
+        self.path = pathlib.Path(path)
         self.system = system
 
     @property
@@ -71,7 +70,7 @@ def itertable(table):
 
 
 def read_data(fname, grapheme_col, *cols):
-    grapheme_map, data, sounds, names = {}, defaultdict(list), [], []
+    grapheme_map, data, sounds, names = {}, collections.defaultdict(list), [], []
 
     for row in reader(fname, delimiter='\t', dicts=True):
         grapheme_map[nfd(row[grapheme_col])] = row['BIPA_GRAPHEME']
@@ -88,9 +87,7 @@ def read_data(fname, grapheme_col, *cols):
 
 def jaccard(a, b):
     i, u = len(a.intersection(b)), len(a.union(b))
-    if u:
-        return i / u
-    return 0
+    return i / u if u else 0
 
 
 def upsert_section(p, in_header, level, new):  # pragma: no cover

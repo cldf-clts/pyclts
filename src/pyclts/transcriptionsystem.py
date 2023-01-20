@@ -66,7 +66,7 @@ class TranscriptionSystem(TranscriptionBase):
                     self.system.tabledict['{0}s.tsv'.format(type_)])):
                 if item['grapheme'] in self.sounds:
                     raise ValueError('duplicate grapheme in {0}:{1}: {2}'.format(
-                        type_ + 's.tsv', lnum + 2, item['grapheme']))
+                        type_ + 's.tsv', lnum + 2, item['grapheme']))  # pragma: no cover
                 sound = cls(ts=self, **item)
                 # make sure this does not take too long
                 for key, value in item.items():
@@ -76,11 +76,11 @@ class TranscriptionSystem(TranscriptionBase):
                         if type_ != 'marker' and value not in features[type_][key]:
                             raise ValueError(
                                 "Unrecognized features ({0}: {1}, line {2}))".format(
-                                    key, value, lnum + 2))
+                                    key, value, lnum + 2))  # pragma: no cover
 
                 self.sounds[item['grapheme']] = sound
                 if not sound.alias:
-                    if sound.featureset in self.features:
+                    if sound.featureset in self.features:  # pragma: no cover
                         raise ValueError('duplicate features in {0}:{1}: {2}'.format(
                             type_ + 's.tsv', lnum + 2, sound.name))
                     self.features[sound.featureset] = sound
@@ -111,7 +111,7 @@ class TranscriptionSystem(TranscriptionBase):
                 -ord(x[0])), reverse=True))))
 
     def _norm(self, string):
-        """Extended normalization: normalize by list of norm-characers, split
+        """Extended normalization: normalize by list of norm-characters, split
         by character "/"."""
         nstring = norm(string)
         if "/" in string:
@@ -153,7 +153,7 @@ class TranscriptionSystem(TranscriptionBase):
                             return Diphthong.from_sounds(  # noqa: F405
                                 s1 + s2, s1, s2, self)
                         return Cluster.from_sounds(s1 + s2, s1, s2, self)  # noqa: F405
-                    raise ValueError('components could not be found in system')
+                    raise ValueError('components could not be found in system')  # pragma: no cover
             else:
                 raise ValueError('name string is erroneously encoded')
 
@@ -169,7 +169,7 @@ class TranscriptionSystem(TranscriptionBase):
         if sound.featureset not in self.features:
             sound.generated = True
             return sound
-        return self.features[sound.featureset]
+        return self.features[sound.featureset]  # pragma: no cover
 
     def _parse(self, string):
         """Parse a string and return its features.
@@ -246,7 +246,7 @@ class TranscriptionSystem(TranscriptionBase):
                     checked_for_two = True
                     break
                 i += 1
-            if not checked_for_two:
+            if not checked_for_two:  # pragma: no cover
                 return UnknownSound(grapheme=nstring, source=string, ts=self)  # noqa: F405
 
         if not checked_for_two:

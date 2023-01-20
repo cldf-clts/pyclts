@@ -48,11 +48,28 @@ def test_make_dataset(tmp_repos, capsys, fixtures):
     out, _ = capsys.readouterr()
 
 
-
-def test_test_dataset(tmp_repos, capsys, fixtures):
+def test_test_dataset(tmp_repos, capsys, fixtures, caplog):
     main(['--repos', str(tmp_repos), 'test_dataset', 'allenbai'])
     out, _ = capsys.readouterr()
-
+    graphemes = tmp_repos.joinpath('sources', 'allenbai', 'graphemes.tsv')
+    orig = graphemes.read_text(encoding='utf8')
+    graphemes.write_text(
+        """BIPA	GRAPHEME	COUNT	SYMBOLS
+<NA>	66	1	
+a	a	9	◌a
+u	a	9	◌a
+A	x	9	◌a
+ai	ai	1	◌a ◌i
+ai	ai	1	◌a ◌i
+ao	ao	3	◌a ◌o
+ã	ã	5	◌a ◌̃
+ão	ão	2	◌a ◌̃ ◌o
+	ãx	2	◌a ◌̃ ◌o
+""", encoding='utf8')
+    main(['--repos', str(tmp_repos), 'test_dataset', 'allenbai'])
+    out, _ = capsys.readouterr()
+    assert caplog.records[-1].levelname == 'WARNING'
+    graphemes.write_text(orig, encoding='utf8')
 
 
 def test_table(capsys, repos):

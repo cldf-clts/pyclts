@@ -1,11 +1,14 @@
 """
 Module handles different aspects of inventory comparison.
 """
-import attr
-from collections import OrderedDict, namedtuple
-from pyclts.api import CLTS
+import argparse
 import statistics
-from pyclts.cli_util import Table
+import collections
+
+import attr
+from clldutils.clilib import Table
+
+from pyclts.api import CLTS
 from pyclts.util import jaccard
 
 
@@ -70,7 +73,7 @@ class Phoneme:
 class GetSubInventoryByType:
     def __init__(self, types):
         def select_sounds(inventory):
-            return OrderedDict(
+            return collections.OrderedDict(
                 [(k, v) for k, v in inventory.items() if v.type in types]
             )
 
@@ -86,7 +89,7 @@ class GetSubInventoryByProperty(GetSubInventoryByType):
         self.properties = properties
 
     def __get__(self, obj, objtype=None):
-        out = OrderedDict()
+        out = collections.OrderedDict()
         sounds = self.select_sounds(obj.sounds)
         for k, v in sounds.items():
             stripped = obj.ts.features.get(
@@ -126,7 +129,7 @@ class Inventory:
     @classmethod
     def from_list(cls, *list_of_sounds, id=None, language=None, ts=None):
         ts = ts or CLTS().bipa
-        sounds = OrderedDict()
+        sounds = collections.OrderedDict()
         for itm in list_of_sounds:
             sound = ts[itm]
             try:
@@ -150,7 +153,7 @@ class Inventory:
             for sound in getattr(self, t).values():
                 table += [[sound.grapheme, sound.type, sound.name, len(sound)]]
         with Table(
-            namedtuple("args", "format")(format),
+            argparse.Namespace(format=format),
             "Grapheme",
             "Type",
             "Name",
@@ -168,9 +171,7 @@ class Inventory:
             )
             if soundsA or soundsB:
                 scores += [jaccard(soundsA, soundsB)]
-        if not scores:
-            return 0
-        return statistics.mean(scores)
+        return statistics.mean(scores) if scores else 0
 
     def approximate_similarity(self, other, aspects=None):
         aspects = aspects or ["sounds"]
@@ -204,6 +205,4 @@ class Inventory:
                 ]
             elif soundsA or soundsB:
                 scores += [0]
-        if not scores:
-            return 0
-        return statistics.mean(scores)
+        return statistics.mean(scores) if scores else 0

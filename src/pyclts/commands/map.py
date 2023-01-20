@@ -2,12 +2,10 @@
 Map a given sound inventory list to CLTS
 """
 
-from pyclts.cli_util import add_format
 from pyclts.models import is_valid_sound
 
 
 def register(parser):
-    add_format(parser, default="simple")
     parser.add_argument("dataset", help="the file with the graphemes")
 
 
@@ -133,6 +131,7 @@ def run(args, test=False):
 
         # Collect modified info
         new_rows.append([row[h] for h in row])
+
     header = [h for h in row]
 
     print('\t'.join(header))

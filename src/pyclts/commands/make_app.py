@@ -1,11 +1,11 @@
 """
 Create the CLTS javascript app.
 """
-import collections
 import json
+import collections
 
 
-def run(args, test=False):
+def run(args):
     tts = args.repos.bipa
 
     def sound_to_dict(snd):
@@ -29,8 +29,6 @@ def run(args, test=False):
                         all_sounds[item['grapheme']] = all_sounds[glyph]
 
                 all_sounds[glyph][td.id] = td.data[sound]
-        if test:
-            break
 
     # add sounds from transcription system
     for sound in tts:
@@ -53,8 +51,6 @@ def run(args, test=False):
             if i == 0:
                 if hasattr(sound, 's'):
                     all_sounds[sound]['bipa'] = tts[sound].s
-        if test:
-            break
 
     datafile = args.repos.repos / 'app' / 'data.js'
     with datafile.open('w', encoding='utf8') as handler:

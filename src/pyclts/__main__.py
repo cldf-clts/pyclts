@@ -48,7 +48,7 @@ def main(args=None, catch_all=False, parsed_args=None, log=None):
         if args.repos_version:  # pragma: no cover
             # If a specific version of the data is to be used, we make
             # use of a Catalog as context manager:
-            stack.enter_contet(Catalog(args.repos, tag=args.repos_version))
+            stack.enter_context(Catalog(args.repos, tag=args.repos_version))
         args.repos = CLTS(args.repos)
         args.log.info('cldf-clts/clts at {0}'.format(args.repos.repos))
         try:

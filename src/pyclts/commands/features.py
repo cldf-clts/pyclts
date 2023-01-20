@@ -1,11 +1,11 @@
 """
 
 """
-from pyclts.cli_util import add_format, Table
+from clldutils.clilib import add_format, Table
 
 
 def register(parser):
-    add_format(parser)
+    add_format(parser, default='pipe')
 
 
 def run(args):

@@ -1,7 +1,7 @@
 """
 Display basic info about sounds
 """
-from pyclts.cli_util import add_format, Table
+from clldutils.clilib import add_format, Table
 
 
 def register(parser):

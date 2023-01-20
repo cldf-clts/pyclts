@@ -34,7 +34,7 @@ class Segment:
 
     @classmethod
     def from_sound(cls, sound, **kw):
-        return cls(sound_bipa=str(sound), sound_name=sound.name, **kw)
+        return cls(sound_bipa=str(sound), sound_name=sound.name, **kw)  # pragma: no cover
 
     @lazyproperty
     def features(self):
@@ -144,7 +144,7 @@ class Diagram:
         feature) and `element` is the ElementTree element where matching segments should be
         appended.
         """
-        raise NotImplementedError()
+        raise NotImplementedError()  # pragma: no cover
 
     def fill_slots(self, inventory):
         """
@@ -176,10 +176,10 @@ class Diagram:
         """
         Diagrams must provide a method to format segments as ElementTree elements.
         """
-        raise NotImplementedError()
+        raise NotImplementedError()  # pragma: no cover
 
     def css(self, colorspec):
-        return ''
+        return ''  # pragma: no cover
 
     def render(self, colorspec=None):
         for e, segments in self.slots.values():
@@ -211,7 +211,7 @@ class PulmonicConsonants(Diagram):
         ee = et.SubElement(e, 'a', attrib=segment.html_link_attrib)
         ee.text = segment.label
         if not is_last:
-            ee.tail = '\xa0'
+            ee.tail = '\xa0'  # pragma: no cover
 
     def css(self, colorspec):
         return html_css(self.id, colorspec)
@@ -235,7 +235,7 @@ class VowelTrapezoid(Diagram):
         title.text = segment.title
         ee.text = segment.label
         if not is_last:
-            ee.tail = ' '
+            ee.tail = ' '  # pragma: no cover
 
     def css(self, colorspec):
         return """\

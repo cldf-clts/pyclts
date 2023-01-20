@@ -3,7 +3,7 @@
 """
 import collections
 
-from pyclts.cli_util import Table, add_format
+from clldutils.clilib import Table, add_format
 
 
 def register(parser):
