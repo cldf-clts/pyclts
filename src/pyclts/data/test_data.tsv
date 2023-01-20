@@ -547,7 +547,6 @@ pw	unknownsound
 ⁰²	unknownsound									
 ³²¹	unknownsound									
 a	vowel	a	a						unrounded open front vowel	U+0061
-aa	vowel	aa	aː			+			long unrounded open front vowel	U+0061 U+02d0
 aː	vowel	aː	aː						long unrounded open front vowel	U+0061 U+02d0
 a:	vowel	aː	aː		+				long unrounded open front vowel	U+0061 U+02d0
 à	vowel	à	à	+			+		unrounded open front with-low_tone vowel	U+0061 U+0300
@@ -555,7 +554,6 @@ a:	vowel	aː	aː		+				long unrounded open front vowel	U+0061 U+02d0
 â	vowel	â	â	+			+		unrounded open front with-falling_tone vowel	U+0061 U+0302
 ã	vowel	ã	ã						nasalized unrounded open front vowel	U+0061 U+0303
 ã	vowel	ã	ã	+					nasalized unrounded open front vowel	U+0061 U+0303
-ãã	vowel	ãã	ãː	+		+			long nasalized unrounded open front vowel	U+0061 U+0303 U+02d0
 ãː	vowel	ãː	ãː	+					long nasalized unrounded open front vowel	U+0061 U+0303 U+02d0
 ã̀	vowel	ã̀	ã̀	+			+		nasalized unrounded open front with-low_tone vowel	U+0061 U+0303 U+0300
 ã́	vowel	ã́	ã́	+			+		nasalized unrounded open front with-high_tone vowel	U+0061 U+0303 U+0301
@@ -567,7 +565,6 @@ a̤ː	vowel	a̤ː	a̤ː				+		long breathy unrounded open front vowel	U+0061 U+0
 a̰	vowel	a̰	a̰						creaky unrounded open front vowel	U+0061 U+0330
 e	vowel	e	e						unrounded close-mid front vowel	U+0065
 &/e	vowel	e	e		+				unrounded close-mid front vowel	U+0065
-ee	vowel	ee	eː			+			long unrounded close-mid front vowel	U+0065 U+02d0
 eː	vowel	eː	eː						long unrounded close-mid front vowel	U+0065 U+02d0
 e:	vowel	eː	eː		+				long unrounded close-mid front vowel	U+0065 U+02d0
 è	vowel	è	è	+			+		unrounded close-mid front with-low_tone vowel	U+0065 U+0300
@@ -575,7 +572,6 @@ e:	vowel	eː	eː		+				long unrounded close-mid front vowel	U+0065 U+02d0
 ê	vowel	ê	ê	+			+		unrounded close-mid front with-falling_tone vowel	U+0065 U+0302
 ẽ	vowel	ẽ	ẽ						nasalized unrounded close-mid front vowel	U+0065 U+0303
 ẽ	vowel	ẽ	ẽ	+					nasalized unrounded close-mid front vowel	U+0065 U+0303
-ẽẽ	vowel	ẽẽ	ẽː	+		+			long nasalized unrounded close-mid front vowel	U+0065 U+0303 U+02d0
 ẽ̀	vowel	ẽ̀	ẽ̀	+			+		nasalized unrounded close-mid front with-low_tone vowel	U+0065 U+0303 U+0300
 ẽ́	vowel	ẽ́	ẽ́	+			+		nasalized unrounded close-mid front with-high_tone vowel	U+0065 U+0303 U+0301
 ᴇ/e̞	vowel	e̞	e̞		+				unrounded mid front vowel	U+0065 U+031e
@@ -586,7 +582,6 @@ e̤ː	vowel	e̤ː	e̤ː				+		long breathy unrounded close-mid front vowel	U+006
 ḛ	vowel	ḛ	ḛ	+					creaky unrounded close-mid front vowel	U+0065 U+0330
 i	vowel	i	i						unrounded close front vowel	U+0069
 i̱/i	vowel	i	i		+				unrounded close front vowel	U+0069
-ii	vowel	ii	iː			+			long unrounded close front vowel	U+0069 U+02d0
 iː	vowel	iː	iː						long unrounded close front vowel	U+0069 U+02d0
 i:	vowel	iː	iː		+				long unrounded close front vowel	U+0069 U+02d0
 ì	vowel	ì	ì	+			+		unrounded close front with-low_tone vowel	U+0069 U+0300
@@ -594,7 +589,6 @@ i:	vowel	iː	iː		+				long unrounded close front vowel	U+0069 U+02d0
 î	vowel	î	î	+			+		unrounded close front with-falling_tone vowel	U+0069 U+0302
 ĩ	vowel	ĩ	ĩ						nasalized unrounded close front vowel	U+0069 U+0303
 ĩ	vowel	ĩ	ĩ	+					nasalized unrounded close front vowel	U+0069 U+0303
-ĩĩ	vowel	ĩĩ	ĩː	+		+			long nasalized unrounded close front vowel	U+0069 U+0303 U+02d0
 ĩ́	vowel	ĩ́	ĩ́	+			+		nasalized unrounded close front with-high_tone vowel	U+0069 U+0303 U+0301
 ï	vowel	ï	i				+		centralized unrounded close front vowel	U+0069 U+0308
 i̤	vowel	i̤	i̤						breathy unrounded close front vowel	U+0069 U+0324
@@ -604,14 +598,12 @@ i̤ː	vowel	i̤ː	i̤ː				+		long breathy unrounded close front vowel	U+0069 U+
 o	vowel	o	o						rounded close-mid back vowel	U+006f
 o̱/o	vowel	o	o		+				rounded close-mid back vowel	U+006f
 Õ/o	vowel	o	o		+				rounded close-mid back vowel	U+006f
-oo	vowel	oo	oː			+			long rounded close-mid back vowel	U+006f U+02d0
 oː	vowel	oː	oː						long rounded close-mid back vowel	U+006f U+02d0
 ò	vowel	ò	ò	+			+		rounded close-mid back with-low_tone vowel	U+006f U+0300
 ó	vowel	ó	ó	+			+		rounded close-mid back with-high_tone vowel	U+006f U+0301
 ô	vowel	ô	ô	+			+		rounded close-mid back with-falling_tone vowel	U+006f U+0302
 õ	vowel	õ	õ						nasalized rounded close-mid back vowel	U+006f U+0303
 õ	vowel	õ	õ	+					nasalized rounded close-mid back vowel	U+006f U+0303
-õõ	vowel	õõ	õ	+		+			nasalized rounded close-mid back vowel	U+006f U+0303
 õ̀	vowel	õ̀	õ̀	+			+		nasalized rounded close-mid back with-low_tone vowel	U+006f U+0303 U+0300
 ṍ	vowel	ṍ	ṍ	+			+		nasalized rounded close-mid back with-high_tone vowel	U+006f U+0303 U+0301
 õ̂	vowel	õ̂	õ̂	+			+		nasalized rounded close-mid back with-falling_tone vowel	U+006f U+0303 U+0302
@@ -622,7 +614,6 @@ o̰	vowel	o̰	o̰						creaky rounded close-mid back vowel	U+006f U+0330
 u	vowel	u	u						rounded close back vowel	U+0075
 u̱/u	vowel	u	u		+				rounded close back vowel	U+0075
 ù/u	vowel	u	u		+				rounded close back vowel	U+0075
-uu	vowel	uu	uː			+			long rounded close back vowel	U+0075 U+02d0
 uː	vowel	uː	uː						long rounded close back vowel	U+0075 U+02d0
 u:	vowel	uː	uː		+				long rounded close back vowel	U+0075 U+02d0
 ú	vowel	ú	ú	+			+		rounded close back with-high_tone vowel	U+0075 U+0301
@@ -678,7 +669,6 @@ yː	vowel	yː	yː						long rounded close front vowel	U+0079 U+02d0
 ɤː	vowel	ɤː	ɤː						long unrounded close-mid back vowel	U+0264 U+02d0
 ɤ̃	vowel	ɤ̃	ɤ̃						nasalized unrounded close-mid back vowel	U+0264 U+0303
 ɨ	vowel	ɨ	ɨ						unrounded close central vowel	U+0268
-ɨɨ	vowel	ɨɨ	ɨː			+			long unrounded close central vowel	U+0268 U+02d0
 ɨː	vowel	ɨː	ɨː						long unrounded close central vowel	U+0268 U+02d0
 ïï/ɨː	vowel	ɨː	ɨː		+				long unrounded close central vowel	U+0268 U+02d0
 ɨ̤	vowel	ɨ̤	ɨ̤				+		breathy unrounded close central vowel	U+0268 U+0324
