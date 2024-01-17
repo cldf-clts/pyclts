@@ -347,7 +347,10 @@ class ComplexSound(Sound):
         res.extend([
             'to_' + p for p in nfilter(
                 getattr(self.to_sound, p, None) for p in self.to_sound._name_order)])
-        res.append('diphthong')
+        if self.from_sound.type == "vowel":
+            res.append("diphthong")
+        if self.from_sound.type == "consonant":
+            res.append("cluster")
         return res
 
     @property
