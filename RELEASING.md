@@ -14,7 +14,7 @@ flake8 src
 ```
 
 - Update the version number, by removing the trailing `.dev0` in:
-  - `setup.py`
+  - `setup.cfg`
   - `src/pyclts/__init__.py`
 
 - Create the release commit:
@@ -42,7 +42,7 @@ git push --tags
 
 - Change version for the next release cycle, i.e. incrementing and adding .dev0
 
-  - `setup.py`
+  - `setup.cfg`
   - `src/pyclts/__init__.py`
 
 - Commit/push the version change:

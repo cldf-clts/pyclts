@@ -3,4 +3,4 @@ from pyclts.transcriptiondata import TranscriptionData  # noqa: F401
 from pyclts.soundclasses import SoundClasses  # noqa: F401
 from pyclts.api import CLTS  # noqa: F401
 
-__version__ = '3.1.2.dev0'
+__version__ = '3.2.0'
