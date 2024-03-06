@@ -1,6 +1,8 @@
+import functools
+
 from clldutils.apilib import API
-from clldutils.misc import lazyproperty, nfilter
-from csvw.dsv import iterrows as reader
+from clldutils.misc import nfilter
+from csvw.dsv import reader
 from cldfcatalog import Config
 from pybtex.database import parse_string
 
@@ -18,18 +20,18 @@ class CLTS(API):
         self.transcriptiondata_dir = self.pkg_dir / 'transcriptiondata'
         self.soundclasses_dir = self.pkg_dir / 'soundclasses'
 
-    @lazyproperty
+    @functools.cached_property
     def bipa(self):
         return self.transcriptionsystem('bipa')
 
-    @lazyproperty
+    @functools.cached_property
     def meta(self):
         res = list(reader(self.repos / 'sources' / 'index.tsv', dicts=True, delimiter='\t'))
         for src in res:
             src['REFS'] = nfilter([s.strip() for s in src['REFS'].split(',')])
         return res
 
-    @lazyproperty
+    @functools.cached_property
     def references(self):
         return parse_string(
             self.path('data', 'references.bib').read_text(encoding='utf8'), 'bibtex').entries
@@ -72,7 +74,7 @@ class CLTS(API):
                             self.transcriptionsystems_dir / 'features.json',
                         )
 
-    @lazyproperty
+    @functools.cached_property
     def transcriptionsystem_dict(self):
         return {ts.id: ts for ts in self.iter_transcriptionsystem()}
 
@@ -85,7 +87,7 @@ class CLTS(API):
             self.transcriptionsystems_dir / 'features.json',
         )
 
-    @lazyproperty
+    @functools.cached_property
     def transcriptiondata_dict(self):
         return {ts.id: ts for ts in self.iter_transcriptiondata()}
 
@@ -94,7 +96,7 @@ class CLTS(API):
             return self.transcriptiondata_dict[key]
         return TranscriptionData(key, self.bipa)
 
-    @lazyproperty
+    @functools.cached_property
     def soundclasses_dict(self):
         return {ts.id: ts for ts in self.iter_soundclass()}
 

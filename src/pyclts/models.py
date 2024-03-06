@@ -1,7 +1,8 @@
+import functools
 import unicodedata
 
 import attr
-from clldutils.misc import nfilter, lazyproperty
+from clldutils.misc import nfilter
 
 from pyclts.util import norm, jaccard
 
@@ -53,7 +54,7 @@ class Symbol(object):
     generated = attr.ib(default=False, validator=attr.validators.instance_of(bool))
     note = attr.ib(default=None)
 
-    @lazyproperty
+    @functools.cached_property
     def type(self):
         return self.__class__.__name__.lower()
 

@@ -6,10 +6,10 @@ See also https://en.wikipedia.org/wiki/International_Phonetic_Alphabet_chart
 import io
 import copy
 import pathlib
+import functools
 from xml.etree import ElementTree as et
 
 import attr
-from clldutils.misc import lazyproperty
 
 __all__ = ['Segment', 'VowelTrapezoid', 'PulmonicConsonants', 'ipa_charts']
 
@@ -36,7 +36,7 @@ class Segment:
     def from_sound(cls, sound, **kw):
         return cls(sound_bipa=str(sound), sound_name=sound.name, **kw)  # pragma: no cover
 
-    @lazyproperty
+    @functools.cached_property
     def features(self):
         return set(s.replace('-', '') for s in self.sound_name.split())
 
