@@ -9,18 +9,18 @@ Writes:
 - data/features.tsv
 - data/clts.zip
 """
+import dataclasses
 import json
 import zipfile
 import collections
 
-import attr
 from csvw.dsv import UnicodeWriter
 from clldutils.clilib import PathType
 from clldutils.jsonlib import load, dump
 from pycldf import Dataset
 from pycldf.markdown import metadata2markdown
 
-from pyclts.models import is_valid_sound
+from pyclts.models import is_valid_sound, fieldnames
 from pyclts.util import upsert_section, iter_markdown_sections
 
 METADATA = {
@@ -263,18 +263,18 @@ def register(parser):
     )
 
 
-@attr.s
-class Grapheme(object):
-    GRAPHEME = attr.ib()
-    NAME = attr.ib()
-    EXPLICIT = attr.ib()
-    DATASET = attr.ib()
-    FREQUENCY = attr.ib(default=0)
-    URL = attr.ib(default='')
-    FEATURES = attr.ib(default='')
-    IMAGE = attr.ib(default='')
-    SOUND = attr.ib(default='')
-    NOTE = attr.ib(default='')
+@dataclasses.dataclass
+class Grapheme:
+    GRAPHEME: str
+    NAME: str
+    EXPLICIT: str
+    DATASET: str
+    FREQUENCY: int = 0
+    URL: str = ''
+    FEATURES: str = ''
+    IMAGE: str = ''
+    SOUND: str = ''
+    NOTE: str = ''
 
 
 def run(args):
@@ -323,6 +323,7 @@ def run(args):
     for td in args.repos.iter_transcriptiondata():
         for name in td.names:
             bipa_sound = bipa[name]
+
             # check for consistency of mapping here
             if not is_valid_sound(bipa_sound, bipa):
                 continue
@@ -445,9 +446,9 @@ def run(args):
             counts['sounds.tsv'] += 1
 
     with writer('graphemes.tsv') as w:
-        w.writerow(['PK'] + [f.name for f in attr.fields(Grapheme)])
+        w.writerow(['PK'] + [f.name for f in dataclasses.fields(Grapheme)])
         for pk, row in enumerate(data, start=1):
-            w.writerow([pk] + list(attr.astuple(row)))
+            w.writerow([str(pk)] + list(dataclasses.astuple(row)))
             counts['graphemes.tsv'] += 1
 
     for table in METADATA['tables']:

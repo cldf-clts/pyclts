@@ -1,10 +1,14 @@
 import functools
+import dataclasses
 import unicodedata
+from typing import Optional, TYPE_CHECKING
 
-import attr
 from clldutils.misc import nfilter
 
 from pyclts.util import norm, jaccard
+
+if TYPE_CHECKING:
+    from pyclts.transcriptionsystem import TranscriptionSystem
 
 __all__ = [
     'is_valid_sound',
@@ -34,11 +38,11 @@ EXCLUDE_FEATURES = [
     'with-upstep'
 ]
 # Disable cmp in a backwards and forwards compatible way:
-cmp_off = {"eq" if getattr(attr, "__version_info__", (0,)) >= (19, 2) else "cmp": False}
+#cmp_off = {"eq" if getattr(attr, "__version_info__", (0,)) >= (19, 2) else "cmp": False}
 
 
 def is_valid_sound(sound, ts):
-    """Check the consistency of a given transcription system conversino"""
+    """Check the consistency of a given transcription system conversion"""
     if isinstance(sound, (Marker, UnknownSound)):
         return False
     s1 = ts[sound.name]
@@ -46,13 +50,16 @@ def is_valid_sound(sound, ts):
     return s1.name == s2.name and s1.s == s2.s
 
 
-@attr.s(**cmp_off)
-class Symbol(object):
-    ts = attr.ib()
-    grapheme = attr.ib()
-    source = attr.ib(default=None)
-    generated = attr.ib(default=False, validator=attr.validators.instance_of(bool))
-    note = attr.ib(default=None)
+@dataclasses.dataclass
+class Symbol:
+    ts: 'TranscriptionSystem'
+    grapheme: str
+    source: Optional[str] = None
+    generated: bool = False
+    note: Optional[str] = None
+
+    def __post_init__(self):
+        assert isinstance(self.generated, bool)
 
     @functools.cached_property
     def type(self):
@@ -88,24 +95,32 @@ class Symbol(object):
         return ' '.join('U+' + ('000' + hex(ord(x))[2:])[-4:] for x in str(self))
 
 
-@attr.s(**cmp_off)
+@dataclasses.dataclass
 class UnknownSound(Symbol):
     pass
 
 
-@attr.s(repr=False, **cmp_off)
+@functools.cache
+def fieldnames(cls):
+    return [f.name for f in dataclasses.fields(cls)]
+
+
+@dataclasses.dataclass(eq=False, repr=False)
 class Sound(Symbol):
     """
     Sound object stores basic features of the individual sound objects.
     """
-    base = attr.ib(default=None)
-    alias = attr.ib(default=None)
-    normalized = attr.ib(default=None)
-    unknown = attr.ib(default=None)
-    stress = attr.ib(default=None)
+    base: Optional[str] = None
+    alias: Optional[str] = None
+    normalized: Optional[str] = None
+    unknown: Optional[str] = None
+    stress: Optional[str] = None
 
     _name_order = []
     _write_order = dict(pre=[], post=[])
+
+    def asdict(self):
+        return {f: getattr(self, f) for f in fieldnames(self.__class__)}
 
     def __eq__(self, other):
         if isinstance(other, Sound):
@@ -222,12 +237,12 @@ class Sound(Symbol):
         return ' '.join(['◌' + s for s in self.s])
 
 
-@attr.s(**cmp_off)
+@dataclasses.dataclass(eq=False)
 class Marker(Symbol):
-    alias = attr.ib(default=None)
-    feature = attr.ib(default=None)
-    value = attr.ib(default=None)
-    unknown = attr.ib(default=None)
+    alias: Optional[str] = None
+    feature: Optional[str] = None
+    value: Optional[str] = None
+    unknown: Optional[str] = None
 
     @property
     def name(self):
@@ -238,36 +253,36 @@ class Marker(Symbol):
         return frozenset([self.grapheme, self.type])
 
 
-@attr.s(repr=False, **cmp_off)
+@dataclasses.dataclass(eq=False, repr=False)
 class Consonant(Sound):
 
     # features follow basic information about IPA from various sources, they
     # are potentially not yet exhaustive and should be updated at some point
-    manner = attr.ib(default=None)
-    place = attr.ib(default=None)
-    aspiration = attr.ib(default=None)
-    labialization = attr.ib(default=None)
-    palatalization = attr.ib(default=None)
-    preceding = attr.ib(default=None)
-    velarization = attr.ib(default=None)
-    duration = attr.ib(default=None)
-    phonation = attr.ib(default=None)
-    release = attr.ib(default=None)
-    syllabicity = attr.ib(default=None)
-    nasalization = attr.ib(default=None)
-    glottalization = attr.ib(default=None)
-    pharyngealization = attr.ib(default=None)
-    ejection = attr.ib(default=None)
-    voicing = attr.ib(default=None)
-    breathiness = attr.ib(default=None)
-    creakiness = attr.ib(default=None)
-    airstream = attr.ib(default=None)
-    laminality = attr.ib(default=None)
-    articulation = attr.ib(default=None)
-    raising = attr.ib(default=None)
-    relative_articulation = attr.ib(default=None)
-    friction = attr.ib(default=None)
-    tongue_root = attr.ib(default=None)
+    manner: Optional[str] = None
+    place: Optional[str] = None
+    aspiration: Optional[str] = None
+    labialization: Optional[str] = None
+    palatalization: Optional[str] = None
+    preceding: Optional[str] = None
+    velarization: Optional[str] = None
+    duration: Optional[str] = None
+    phonation: Optional[str] = None
+    release: Optional[str] = None
+    syllabicity: Optional[str] = None
+    nasalization: Optional[str] = None
+    glottalization: Optional[str] = None
+    pharyngealization: Optional[str] = None
+    ejection: Optional[str] = None
+    voicing: Optional[str] = None
+    breathiness: Optional[str] = None
+    creakiness: Optional[str] = None
+    airstream: Optional[str] = None
+    laminality: Optional[str] = None
+    articulation: Optional[str] = None
+    raising: Optional[str] = None
+    relative_articulation: Optional[str] = None
+    friction: Optional[str] = None
+    tongue_root: Optional[str] = None
 
     # write order determines how consonants are written according to their
     # features, so this normalizes the order of diacritics preceding and
@@ -328,10 +343,10 @@ class Consonant(Sound):
     ]
 
 
-@attr.s(repr=False, **cmp_off)
+@dataclasses.dataclass(repr=False, eq=False)
 class ComplexSound(Sound):
-    from_sound = attr.ib(default=None)
-    to_sound = attr.ib(default=None)
+    from_sound: Optional[str] = None
+    to_sound: Optional[str] = None
 
     def __str__(self):
         return str(self.from_sound) + str(self.to_sound)
@@ -378,7 +393,7 @@ class ComplexSound(Sound):
         return [self.grapheme, self.from_sound.name, self.to_sound.name]
 
 
-@attr.s(repr=False, **cmp_off)
+@dataclasses.dataclass(repr=False, eq=False)
 class Cluster(ComplexSound):
     """
     A cluster of two consonants whose manner is either plosive or implosive.
@@ -391,29 +406,29 @@ class Cluster(ComplexSound):
     """
 
 
-@attr.s(repr=False, **cmp_off)
+@dataclasses.dataclass(repr=False, eq=False)
 class Vowel(Sound):
-    roundedness = attr.ib(default=None)
-    height = attr.ib(default=None)
-    nasalization = attr.ib(default=None)
-    friction = attr.ib(default=None)
-    duration = attr.ib(default=None)
-    voicing = attr.ib(default=None)
-    breathiness = attr.ib(default=None)
-    creakiness = attr.ib(default=None)
-    release = attr.ib(default=None)
-    syllabicity = attr.ib(default=None)
-    pharyngealization = attr.ib(default=None)
-    rhotacization = attr.ib(default=None)
-    centrality = attr.ib(default=None)
-    glottalization = attr.ib(default=None)
-    velarization = attr.ib(default=None)
-    relative_articulation = attr.ib(default=None)
-    tone = attr.ib(default=None)
-    raising = attr.ib(default=None)
-    rounding = attr.ib(default=None)
-    tongue_root = attr.ib(default=None)
-    articulation = attr.ib(default=None)  # compare
+    roundedness: Optional[str] = None
+    height: Optional[str] = None
+    nasalization: Optional[str] = None
+    friction: Optional[str] = None
+    duration: Optional[str] = None
+    voicing: Optional[str] = None
+    breathiness: Optional[str] = None
+    creakiness: Optional[str] = None
+    release: Optional[str] = None
+    syllabicity: Optional[str] = None
+    pharyngealization: Optional[str] = None
+    rhotacization: Optional[str] = None
+    centrality: Optional[str] = None
+    glottalization: Optional[str] = None
+    velarization: Optional[str] = None
+    relative_articulation: Optional[str] = None
+    tone: Optional[str] = None
+    raising: Optional[str] = None
+    rounding: Optional[str] = None
+    tongue_root: Optional[str] = None
+    articulation: Optional[str] = None  # compare
     # https://en.wikipedia.org/wiki/Faucalized_voice
 
     _write_order = dict(
@@ -447,18 +462,18 @@ class Vowel(Sound):
         'tone']
 
 
-@attr.s(repr=False, **cmp_off)
+@dataclasses.dataclass(repr=False, eq=False)
 class Diphthong(ComplexSound):
     """
     A dipthong consists of two vowels.
     """
 
 
-@attr.s(repr=False, **cmp_off)
+@dataclasses.dataclass(repr=False, eq=False)
 class Tone(Sound):
-    contour = attr.ib(default=None)
-    start = attr.ib(default=None)
-    middle = attr.ib(default=None)
-    end = attr.ib(default=None)
+    contour: Optional[str] = None
+    start: Optional[str] = None
+    middle: Optional[str] = None
+    end: Optional[str] = None
 
     _name_order = ['contour', 'start', 'middle', 'end']

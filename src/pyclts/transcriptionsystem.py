@@ -7,7 +7,6 @@ import re
 
 from csvw import TableGroup
 from clldutils import jsonlib
-import attr
 
 from pyclts.util import nfd, norm, EMPTY, itertable, TranscriptionBase
 from pyclts.models import *  # noqa: F403
@@ -257,7 +256,7 @@ class TranscriptionSystem(TranscriptionBase):
             return UnknownSound(grapheme=nstring, source=string, ts=self)  # noqa: F405
 
         # A base sound with diacritics or a custom symbol.
-        features = attr.asdict(base_sound)
+        features = base_sound.asdict() # dataclasses.asdict(base_sound)
         features.update(
             source=string,
             generated=True,
@@ -305,7 +304,7 @@ class TranscriptionSystem(TranscriptionBase):
     def resolve_sound(self, string):
         if isinstance(string, Sound):  # noqa: F405
             return self.features[string.featureset]
-        elif isinstance(string, Symbol):  # noqa: F405
+        if isinstance(string, Symbol):  # noqa: F405
             return string
         if set(string.split(' ')).intersection(
                 list(self.sound_classes) + ['diphthong', 'cluster']):

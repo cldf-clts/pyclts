@@ -7,26 +7,28 @@ import io
 import copy
 import pathlib
 import functools
+import dataclasses
 from xml.etree import ElementTree as et
 
-import attr
 
 __all__ = ['Segment', 'VowelTrapezoid', 'PulmonicConsonants', 'ipa_charts']
 
 
-@attr.s
+@dataclasses.dataclass
 class Segment:
     """
     Bag of attributes controlling display of a segment in an IPA chart.
     """
-    sound_bipa = attr.ib(validator=attr.validators.instance_of(str))
-    sound_name = attr.ib(validator=attr.validators.instance_of(str))
-    label = attr.ib(default=None)
-    href = attr.ib(default=None)
-    css_class = attr.ib(default=None)
-    title = attr.ib(default=None)
+    sound_bipa: str
+    sound_name: str
+    label: str = None
+    href: str = None
+    css_class: str = None
+    title: str = None
 
-    def __attrs_post_init__(self):
+    def __post_init__(self):
+        assert isinstance(self.sound_bipa, str)
+        assert isinstance(self.sound_name, str)
         if not self.label:
             self.label = self.sound_bipa
         if not self.title:

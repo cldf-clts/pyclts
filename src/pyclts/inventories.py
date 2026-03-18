@@ -4,11 +4,14 @@ Module handles different aspects of inventory comparison.
 import argparse
 import statistics
 import collections
+import dataclasses
+from typing import Optional
 
-import attr
 from clldutils.clilib import Table
 
 from pyclts.api import CLTS
+from pyclts.models import Sound
+from pyclts.transcriptionsystem import TranscriptionSystem
 from pyclts.util import jaccard
 
 
@@ -41,16 +44,16 @@ class GetAttributeFromSound:
         return getattr(obj.sound, self.attr, None)
 
 
-@attr.s
+@dataclasses.dataclass
 class Phoneme:
     """
     Base class for handling sounds.
     """
 
-    grapheme = attr.ib(default=None)
-    graphemes_in_source = attr.ib(default=None, repr=False)
-    occs = attr.ib(default=None, repr=False)
-    sound = attr.ib(default=None)
+    grapheme: str = None
+    graphemes_in_source: list[str] = dataclasses.field(default_factory=list, repr=False)
+    occs: list = dataclasses.field(default_factory=list, repr=False)
+    sound: Optional[Sound] = None
 
     type = GetAttributeFromSound("type")
     name = GetAttributeFromSound("name")
@@ -102,12 +105,12 @@ class GetSubInventoryByProperty(GetSubInventoryByType):
         return out
 
 
-@attr.s
+@dataclasses.dataclass
 class Inventory:
-    id = attr.ib(default=None)
-    language = attr.ib(default=None)
-    sounds = attr.ib(default=None, repr=False)
-    ts = attr.ib(default=None, repr=False)
+    id: Optional[str] = None
+    language: Optional[str] = None
+    sounds: dict[str, Phoneme] = dataclasses.field(default_factory=dict, repr=False)
+    ts: Optional[TranscriptionSystem] = dataclasses.field(default=None, repr=False)
 
     consonants = GetSubInventoryByType(["consonant"])
     consonants_by_quality = GetSubInventoryByProperty(
