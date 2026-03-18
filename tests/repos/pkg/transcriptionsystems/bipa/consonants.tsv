@@ -380,6 +380,8 @@ fˠ	voiceless	labio-dental	fricative		velarization:velarized
 fʷː	voiceless	labio-dental	fricative		labialization:labialized,duration:long
 fːʷ	voiceless	labio-dental	fricative	+	labialization:labialized,duration:long
 kǁ	voiceless	alveolar	click	+
+gǁ	voiced	alveolar	click		airstream:lateral
+ǁ	voiceless	alveolar	click		airstream:lateral
 ŋgǁ	voiced	alveolar	click	+	preceding:pre-nasalized
 ⁿgǁ	voiced	alveolar	click		preceding:pre-nasalized
 ŋǀǀ	voiced	alveolar	nasal-click	+
