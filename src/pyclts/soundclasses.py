@@ -1,5 +1,5 @@
 from pyclts.transcriptionsystem import Symbol
-from pyclts.util import read_data, TranscriptionBase
+from pyclts.util import read_data, TranscriptionBase, SoundsType, NamesType
 
 SOUNDCLASS_SYSTEMS = ['sca', 'cv', 'art', 'dolgo', 'asjp', 'color']
 
@@ -14,6 +14,8 @@ class SoundClasses(TranscriptionBase):
         assert id_ in SOUNDCLASS_SYSTEMS
         super().__init__(path, system)
         self._id = id_
+        self.sounds: SoundsType
+        self.names: NamesType
         _, data, self.sounds, self.names = read_data(self.path, self._id)
         self.data = {}
         self.classes = set()

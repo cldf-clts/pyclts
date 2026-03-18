@@ -8,6 +8,7 @@ import re
 from csvw import TableGroup
 from clldutils import jsonlib
 
+from pyclts.models import fieldnames
 from pyclts.util import nfd, norm, EMPTY, itertable, TranscriptionBase
 from pyclts.models import *  # noqa: F403
 
@@ -66,12 +67,30 @@ class TranscriptionSystem(TranscriptionBase):
                 if item['grapheme'] in self.sounds:
                     raise ValueError('duplicate grapheme in {0}:{1}: {2}'.format(
                         type_ + 's.tsv', lnum + 2, item['grapheme']))  # pragma: no cover
-                sound = cls(ts=self, **item)
+
+                # FIXME: wrap in try except, add line number to error message!
+                try:
+                    sound = cls.from_kw(ts=self, **item)
+                except ValueError as e:
+                    raise ValueError(f"{type_ + 's.tsv'}:{lnum + 2} {e}") from e
+
+                for key in fieldnames(sound.__annotations__['features']):
+                    value = getattr(sound.features, key)
+                    if value and value not in self._feature_values:
+                        self._feature_values[value] = key
+
                 # make sure this does not take too long
                 for key, value in item.items():
+                    #
+                    # FIXME: use sound.features object to collect actual feature values!
+                    #
                     if key not in {'grapheme', 'note', 'alias'} and \
                             value and value not in self._feature_values:
                         self._feature_values[value] = key
+                        #
+                        # FIXME: The following is obsolete with the valid values now enforced by
+                        # features.py!
+                        #
                         if type_ != 'marker' and value not in features[type_][key]:
                             raise ValueError(
                                 "Unrecognized features ({0}: {1}, line {2}))".format(
@@ -164,7 +183,7 @@ class TranscriptionSystem(TranscriptionBase):
             raise ValueError('string contains unknown features')
         args['grapheme'] = ''
         args['ts'] = self
-        sound = self.sound_classes[sound_class](**args)
+        sound = self.sound_classes[sound_class].from_kw(**args)
         if sound.featureset not in self.features:
             sound.generated = True
             return sound
@@ -292,7 +311,7 @@ class TranscriptionSystem(TranscriptionBase):
             sound += self.features[base_sound.type][feature][1]
 
         features['grapheme'] = sound
-        new_sound = self.sound_classes[base_sound.type](**features)
+        new_sound = self.sound_classes[base_sound.type].from_kw(**features)
         # check whether grapheme differs from re-generated sound
         if str(new_sound) != sound:
             new_sound.alias = True

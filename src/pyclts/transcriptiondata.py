@@ -1,4 +1,5 @@
-from pyclts.util import read_data, TranscriptionBase
+from pyclts.util import (
+    read_data, TranscriptionBase, GraphemeMapType, DataType, SoundsType, NamesType)
 from pyclts.transcriptionsystem import Sound
 
 
@@ -10,6 +11,10 @@ class TranscriptionData(TranscriptionBase):
 
     def __init__(self, path, system):
         super().__init__(path, system)
+        self.grapheme_map: GraphemeMapType
+        self.data: DataType
+        self.sounds: SoundsType
+        self.names: NamesType
         self.grapheme_map, self.data, self.sounds, self.names = read_data(
             self.path,
             'GRAPHEME',

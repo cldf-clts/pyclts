@@ -1,5 +1,8 @@
 """
 Check repository data for consistency
+
+FIXME: must also check implementation in pyclts/features.py for compatibility with
+pkg/transcriptionsystems/features.json
 """
 import pathlib
 import argparse
@@ -120,7 +123,7 @@ def test_clicks(bipa):
 
 def _test_clicks(bipa, grapheme, gtype):
     if gtype == 'stop-cluster':
-        assert bipa[grapheme].type == 'cluster'
+        assert bipa[grapheme].type == 'cluster', bipa[grapheme].type
 
 
 def _test_sounds(bipa, **kw):

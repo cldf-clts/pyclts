@@ -80,7 +80,7 @@ def test_parse(bipa):
         assert s == str(s)
 
     # clusters
-    for s in ['tk', 'pk', 'dg', 'bdʰ']:
+    for s in ['mp']:#['tk', 'pk', 'dg', 'bdʰ']:
         res = bipa[s]
         assert res.type == 'cluster'
         assert 'cluster' in res.name

@@ -10,7 +10,7 @@ def run(args):
 
     def sound_to_dict(snd):
         res = collections.OrderedDict([('name', snd.name), ('bipa', snd.s), ('type', snd.type)])
-        for f in snd._name_order:
+        for f in snd.name_order:
             res[f] = getattr(snd, f)
         return res
 
@@ -21,7 +21,7 @@ def run(args):
             if ' ' in sound:
                 snd = tts[sound]
                 glyph = snd.s
-                assert '<?>' not in snd.s
+                assert '<?>' not in snd.s, f'{td.id}: {sound} {snd.s}'
                 if snd.s not in all_sounds:
                     all_sounds[glyph] = sound_to_dict(snd)
                 for item in td.data[sound]:
