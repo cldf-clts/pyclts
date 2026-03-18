@@ -18,7 +18,7 @@ from csvw.dsv import UnicodeWriter
 from clldutils.clilib import PathType
 from clldutils.jsonlib import load, dump
 from pycldf import Dataset
-from pycldf.util import metadata2markdown
+from pycldf.markdown import metadata2markdown
 
 from pyclts.models import is_valid_sound
 from pyclts.util import upsert_section, iter_markdown_sections
