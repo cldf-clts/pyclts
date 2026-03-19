@@ -4,13 +4,14 @@ Transcription System module for consistent IPA handling.
 
 """
 import re
-from typing import Literal, get_args
+from typing import Literal, get_args, Union
 
 from csvw import TableGroup
 
 from pyclts.models import fieldnames
 from pyclts.util import nfd, norm, EMPTY, itertable, TranscriptionBase
-from pyclts.models import *  # noqa: F403
+from pyclts.models import (
+    Sound, UnknownSound, Cluster, Diphthong, Vowel, Consonant, Tone, Marker, Symbol)
 
 SoundsByFeatures = dict[frozenset, Sound]
 BaseSoundclassType = Literal['consonant', 'vowel', 'tone']
@@ -126,9 +127,6 @@ class TranscriptionSystem(TranscriptionBase):
             return self.features_to_sound[frozenset(components)]
 
         rest, sound_class = components[:-1], components[-1]
-        if (sound_class not in self.sound_classes) and (sound_class not in COMPLEX_SOUNDS):
-            raise ValueError('no sound class specified')
-
         if sound_class in COMPLEX_SOUNDS:
             m = re.fullmatch('from (?P<from>.*?) to (?P<to>.*?)', ' '.join(rest))
             if m:
@@ -152,18 +150,21 @@ class TranscriptionSystem(TranscriptionBase):
                 raise ValueError('components could not be found in system')  # pragma: no cover
             raise ValueError('name string is erroneously encoded')
 
-        args = {self._feature_values.get(comp, '?'): comp for comp in rest}
-        if '?' in args:
-            raise ValueError('string contains unknown features')
-        args['grapheme'] = ''
-        args['ts'] = self
-        sound = self.sound_classes[sound_class].from_kw(**args)
-        if sound.featureset not in self.features_to_sound:
-            sound.generated = True
-            return sound
-        return self.features_to_sound[sound.featureset]  # pragma: no cover
+        if sound_class in self.sound_classes:
+            args = {self._feature_values.get(comp, '?'): comp for comp in rest}
+            if '?' in args:
+                raise ValueError('string contains unknown features')
+            args['grapheme'] = ''
+            args['ts'] = self
+            sound = self.sound_classes[sound_class].from_kw(**args)
+            if sound.featureset not in self.features_to_sound:
+                sound.generated = True
+                return sound
+            return self.features_to_sound[sound.featureset]  # pragma: no cover
 
-    def _parse(self, string):
+        raise ValueError('no sound class specified')
+
+    def _from_symbol(self, string) -> Union[Sound, UnknownSound]:
         """Parse a string and return its features.
 
         :param string: A one-symbol string in NFD
@@ -186,42 +187,40 @@ class TranscriptionSystem(TranscriptionBase):
 
         match = list(self._regex.finditer(nstring))
 
-        if len(match) != 1 and len(match) != 2:
-            # Either no match or more than one; both is considered an error.
+        if len(match) not in (1, 2):  # No match or more than two; both is considered an error.
             return UnknownSound(grapheme=nstring, source=string, ts=self)  # noqa: F405
 
-        # if the match has length 2, we assume that we have two sounds, so we split
-        # the sound and pass it on for separate evaluation (recursive function)
-        # we add a check that makes sure there is no single-match if we take
-        # the second element
-        checked_for_two = False
+        # if the match has length 2, we assume that we have two sounds, so we split the sound and
+        # pass it on for separate evaluation (recursive function) we add a check that makes sure
+        # there is no single-match if we take the second element
+        checked_for_two, pre, mid, post = False, None, None, None
         if len(match) == 2:
-            sound1 = self._parse(nstring[:match[1].start()])
-            sound2 = self._parse(nstring[match[1].start():])
+            sound1 = self._from_symbol(nstring[:match[1].start()])
+            sound2 = self._from_symbol(nstring[match[1].start():])
             # if we have ANY unknown sound, we mark the whole sound as unknown, if
             # we have two known sounds of the same type (vowel or consonant), we
             # either construct a diphthong or a cluster
-            if 'unknownsound' not in (sound1.type, sound2.type) and \
-                    sound1.type == sound2.type and sound1.type in ['consonant', 'vowel']:
-                # diphthong creation
+            if sound1.type == sound2.type and sound1.type in ['consonant', 'vowel']:
                 if Diphthong.match(sound1, sound2):
                     return Diphthong.from_sounds(string, sound1, sound2, self)
-                elif Cluster.match(sound1, sound2):
-                    return Cluster.from_sounds(string, sound1, sound2, self)
-                # check for plosive plus fricative if they are the same in manner
-                elif sound1.manner == 'stop' and sound2.manner == 'fricative' \
-                        and sound1.place == sound2.place:
-                    # join features
-                    features = {
-                        f: v or sound2.featuredict[f] for f, v in sound1.featuredict.items()}
-                    features['manner'] = 'affricate'
-                    # new_sound = Consonant(self, nstring, **features)
-                    new_sound = self._from_name(
-                        ' '.join([v for k, v in features.items() if v]) + ' consonant')
-                    return new_sound
 
+                if Cluster.match(sound1, sound2):
+                    return Cluster.from_sounds(string, sound1, sound2, self)
+
+                # check for plosive plus fricative if they are the same in manner
+                if all((sound1.place == sound2.place,
+                        sound1.manner == sound1.validated('manner', 'stop'),
+                        sound2.manner == sound2.validated('manner', 'fricative'))):
+                    # join features
+                    features = {k: v for k, v in sound1.featuredict.items() if v}
+                    for k, v in sound2.featuredict.items():
+                        if v:
+                            features.setdefault(k, v)
+                    features['manner'] = sound1.validated('manner', 'affricate')
+                    return self._from_name(' '.join(features.values()) + ' consonant')
+            # So, two matches, but no Diphthong or Cluster.
             i = 1
-            while i < len(nstring):
+            while i < len(nstring):  # We try matching with prefixes/diacritics chopped off ...
                 new_match = list(self._regex.finditer(nstring[i:]))
                 if len(new_match) == 1:
                     pre, mid, post = nstring[i:].partition(
@@ -235,28 +234,30 @@ class TranscriptionSystem(TranscriptionBase):
 
         if not checked_for_two:
             pre, mid, post = nstring.partition(nstring[match[0].start():match[0].end()])
+        return self._sound_with_custom_diacritics(string, nstring, pre, mid, post)
+
+    def _sound_with_custom_diacritics(self, string, nstring, pre, mid, post):
         base_sound = self.sounds[mid]
         if isinstance(base_sound, Marker):  # noqa: F405
             assert pre or post
             return UnknownSound(grapheme=nstring, source=string, ts=self)  # noqa: F405
 
         # A base sound with diacritics or a custom symbol.
-        features = base_sound.asdict() # dataclasses.asdict(base_sound)
+        features = base_sound.asdict()
         features.update(
             source=string,
             generated=True,
             normalized=nstring != string,
             base=base_sound.grapheme)
 
-        # we construct two versions: the "normal" version and the version where
-        # we search for aliases and normalize them (as our features system for
-        # diacritics may well define aliases
+        # We construct two versions: the "normal" version and the version where we search for
+        # aliases and normalize them (as our features system for diacritics may well define
+        # aliases).
         grapheme, sound = '', ''
         for dia in [p + EMPTY for p in pre]:
             feature = self.diacritics_value_by_grapheme[base_sound.type].get(dia, {})
             if not feature:
-                return UnknownSound(  # noqa: F405
-                    grapheme=nstring, source=string, ts=self)
+                return UnknownSound(grapheme=nstring, source=string, ts=self)
             features[self._feature_values[feature]] = feature
             # we add the unaliased version to the grapheme
             grapheme += dia[0]
@@ -267,11 +268,9 @@ class TranscriptionSystem(TranscriptionBase):
         sound += base_sound.s
         for dia in [EMPTY + p for p in post]:
             feature = self.diacritics_value_by_grapheme[base_sound.type].get(dia, {})
-            # we are strict: if we don't know the feature, it's an unknown
-            # sound
+            # we are strict: if we don't know the feature, it's an unknown sound
             if not feature:
-                return UnknownSound(  # noqa: F405
-                    grapheme=nstring, source=string, ts=self)
+                return UnknownSound(grapheme=nstring, source=string, ts=self)
             features[self._feature_values[feature]] = feature
             grapheme += dia[1]
             sound += self.diacritics_grapheme_by_value[base_sound.type][feature][1]
@@ -295,7 +294,7 @@ class TranscriptionSystem(TranscriptionBase):
                 list(self.sound_classes) + ['diphthong', 'cluster']):
             return self._from_name(string)
         string = nfd(string)
-        return self._parse(string)
+        return self._from_symbol(string)
 
     @property
     def feature_system(self):

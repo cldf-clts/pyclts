@@ -88,7 +88,7 @@ class Sound(Symbol):
     """
     base: Optional[str] = None
     alias: Optional[str] = None
-    normalized: Optional[str] = None
+    normalized: Optional[bool] = None
     unknown: Optional[str] = None
     stress: Optional[str] = None
 

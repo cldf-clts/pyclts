@@ -47,7 +47,7 @@ class Features:
 
     def validated(self, feature, *vals):
         assert all(val in  self.__class__.valid_values()[feature] for val in vals)
-        return vals
+        return vals[0] if len(vals) == 1 else vals
 
     @classmethod
     @functools.lru_cache(maxsize=N_SUBCLASSES)
