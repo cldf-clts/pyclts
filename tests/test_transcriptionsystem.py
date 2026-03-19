@@ -5,7 +5,7 @@ from pyclts.transcriptionsystem import TranscriptionSystem
 
 def test_ts():
     with pytest.raises(ValueError):
-        TranscriptionSystem(__file__, __file__, __file__)
+        TranscriptionSystem(__file__, __file__)
 
 
 def test_unknown_sound(bipa):

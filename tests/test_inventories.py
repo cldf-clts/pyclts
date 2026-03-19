@@ -8,7 +8,6 @@ def bipa(repos):
     return TranscriptionSystem(
         repos / "pkg" / "transcriptionsystems" / "bipa",
         repos / "pkg" / "transcriptionsystems" / "transcription-system-metadata.json",
-        repos / "pkg" / "transcriptionsystems" / "features.json",
     )
 
 

@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from pyclts.transcriptionsystem import TranscriptionSystem
 
 __all__ = [
-    'is_valid_sound',
+    'is_valid_sound', 'fieldnames',
     'Symbol', 'Sound', 'Consonant', 'Vowel', 'Tone', 'Marker',
     'Diphthong', 'Cluster', 'UnknownSound']
 
@@ -159,7 +159,7 @@ class Sound(Symbol):
     def _iter_normed_feature_values(self, features: list[str], base_vals):
         for feature in features:
             if feature not in base_vals and getattr(self.features, feature, '') in self._features():
-                yield norm(self.ts.diacritics_grapheme_by_value[self.type].get(getattr(self.features, feature, ''), '<!>'))
+                yield norm(self.ts.diacritics.grapheme_by_value[self.type].get(getattr(self.features, feature, ''), '<!>'))
 
     def __str__(self) -> str:
         """

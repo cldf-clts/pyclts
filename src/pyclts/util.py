@@ -1,14 +1,17 @@
 """Auxiliary functions for pyclts."""
 import pathlib
 import collections
-from collections.abc import Iterable
+from collections.abc import Iterable, Generator
 import unicodedata
 from typing import Union
 
 from clldutils.markup import iter_markdown_sections
+from csvw import Table
 from csvw.dsv import reader
 
-__all__ = ['EMPTY', 'UNKNOWN', 'norm', 'nfd', 'TranscriptionBase', 'jaccard', 'upsert_section']
+__all__ = [
+    'EMPTY', 'UNKNOWN', 'norm', 'nfd', 'TranscriptionBase', 'jaccard', 'upsert_section',
+    'itertable']
 
 EMPTY = "◌"
 UNKNOWN = "�"
@@ -71,7 +74,7 @@ def nfd(string: str) -> str:
     return unicodedata.normalize("NFD", string)
 
 
-def itertable(table):
+def itertable(table: Table) -> Generator[dict[str, str]]:
     """Auxiliary function for iterating over a data table."""
     for item in table:
         res = {

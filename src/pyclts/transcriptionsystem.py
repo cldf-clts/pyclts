@@ -3,12 +3,12 @@ Transcription System module for consistent IPA handling.
 ========================================================
 
 """
-import dataclasses
 import re
+import dataclasses
+from collections.abc import Generator
 from typing import Literal, get_args, Union
 
-from csvw import TableGroup
-from six import with_metaclass
+from csvw import TableGroup, Table
 
 from pyclts.models import fieldnames
 from pyclts.util import nfd, norm, EMPTY, itertable, TranscriptionBase
@@ -26,12 +26,33 @@ COMPLEX_SOUNDS = {
     cls.__name__.lower(): (cls, base) for cls, base in [(Diphthong, Vowel), (Cluster, Consonant)]}
 
 
-class TranscriptionSystem(TranscriptionBase):
+@dataclasses.dataclass(frozen=True)
+class Diacritics:
+    """Lookup tables for a system's diacritics."""
+    grapheme_by_value: BaseSoundclassMappingType = dataclasses.field(
+        default_factory=lambda: {sc: {} for sc in get_args(BaseSoundclassType)})
+    value_by_grapheme: BaseSoundclassMappingType = dataclasses.field(
+        default_factory=lambda: {sc: {} for sc in get_args(BaseSoundclassType)})
+
+    @classmethod
+    def from_table(cls, table: Table, feature_values):
+        """Initialize the lookup tables from the data in the system's diacritics file."""
+        res = cls()
+        for dia in itertable(table):
+            if not dia['alias'] and not dia['typography']:
+                res.grapheme_by_value[dia['type']][dia['value']] = dia['grapheme']
+            # assign feature values to the dictionary
+            feature_values[dia['value']] = dia['feature']
+            res.value_by_grapheme[dia['type']][dia['grapheme']] = dia['value']
+        return res
+
+
+class TranscriptionSystem(TranscriptionBase):  # pylint: disable=R0902
     """
     A transcription System."""
     __type__ = 'ts'
 
-    def __init__(self, path, metadata, features):
+    def __init__(self, path, metadata):
         """
         :param system: The name of a transcription system or a directory containing one.
         """
@@ -39,7 +60,7 @@ class TranscriptionSystem(TranscriptionBase):
         if not (self.path.exists() and self.path.is_dir()):
             raise ValueError(f'unknown system: {self.path}')
 
-        self.system = TableGroup.from_file(metadata)
+        self.system: TableGroup = TableGroup.from_file(metadata)
         self.system._fname = path / 'metadata.json'
 
         self.features_to_sound: SoundsByFeatures = {}
@@ -47,17 +68,8 @@ class TranscriptionSystem(TranscriptionBase):
         # write_order to make sure no output is doubled
         self._feature_values: dict[FeatureValueType, FeatureNameType] = {}
 
-        self.diacritics_grapheme_by_value: BaseSoundclassMappingType = \
-            {sc: {} for sc in get_args(BaseSoundclassType)}
-        self.diacritics_value_by_grapheme: BaseSoundclassMappingType = \
-            {sc: {} for sc in get_args(BaseSoundclassType)}
-
-        for dia in itertable(self.system.tabledict['diacritics.tsv']):
-            if not dia['alias'] and not dia['typography']:
-                self.diacritics_grapheme_by_value[dia['type']][dia['value']] = dia['grapheme']
-            # assign feature values to the dictionary
-            self._feature_values[dia['value']] = dia['feature']
-            self.diacritics_value_by_grapheme[dia['type']][dia['grapheme']] = dia['value']
+        self.diacritics = Diacritics.from_table(
+            self.system.tabledict['diacritics.tsv'], self._feature_values)
 
         self.sound_classes: dict[BaseSoundclassOrMarkerType, type] = {}
         # the basic column structure, to allow for rendering
@@ -112,12 +124,11 @@ class TranscriptionSystem(TranscriptionBase):
             norm(r['source']): norm(r['target'])
             for r in itertable(self.system.tabledict['normalize.tsv'])}
 
-    def _norm(self, string: str) -> str:
+    def _norm(self, string: str, sep='/') -> str:
         """Extended normalization: normalize by list of norm-characters, split by character "/"."""
         nstring = norm(string)
-        if "/" in string:
-            s, t = string.split('/')
-            nstring = t
+        if sep in string:
+            nstring = string.partition(sep)[2]
         return self.normalize(nstring)
 
     def normalize(self, string):
@@ -140,17 +151,13 @@ class TranscriptionSystem(TranscriptionBase):
                 s2 = self.features_to_sound.get(frozenset(to_.split(' ') + [base_sound_class]))
 
                 if s1 and s2:
-                    if sound_class == 'diphthong':
-                        return Diphthong.from_sounds(s1 + s2, s1, s2, self)  # noqa: F405
-                    return Cluster.from_sounds(s1 + s2, s1, s2, self)  # noqa: F405
+                    return COMPLEX_SOUNDS[sound_class][0].from_sounds(s1 + s2, s1, s2, self)
 
                 # try to generate the sounds if they are not there
                 s1 = self._from_name(from_ + ' ' + base_sound_class)
                 s2 = self._from_name(to_ + ' ' + base_sound_class)
                 if not (isinstance(s1, UnknownSound) or isinstance(s2, UnknownSound)):
-                    if sound_class == 'diphthong':
-                        return Diphthong.from_sounds(s1 + s2, s1, s2, self)
-                    return Cluster.from_sounds(s1 + s2, s1, s2, self)  # noqa: F405
+                    return COMPLEX_SOUNDS[sound_class][0].from_sounds(s1 + s2, s1, s2, self)
                 raise ValueError('components could not be found in system')  # pragma: no cover
             raise ValueError('name string is erroneously encoded')
 
@@ -205,23 +212,15 @@ class TranscriptionSystem(TranscriptionBase):
             # we have two known sounds of the same type (vowel or consonant), we
             # either construct a diphthong or a cluster
             if sound1.type == sound2.type and sound1.type in ['consonant', 'vowel']:
-                if Diphthong.match(sound1, sound2):
-                    return Diphthong.from_sounds(string, sound1, sound2, self)
-
-                if Cluster.match(sound1, sound2):
-                    return Cluster.from_sounds(string, sound1, sound2, self)
+                for cls in [Diphthong, Cluster]:
+                    if cls.match(sound1, sound2):
+                        return cls.from_sounds(string, sound1, sound2, self)
 
                 # check for plosive plus fricative if they are the same in manner
                 if all((sound1.place == sound2.place,
                         sound1.manner == sound1.validated('manner', 'stop'),
                         sound2.manner == sound2.validated('manner', 'fricative'))):
-                    # join features
-                    features = {k: v for k, v in sound1.featuredict.items() if v}
-                    for k, v in sound2.featuredict.items():
-                        if v:
-                            features.setdefault(k, v)
-                    features['manner'] = sound1.validated('manner', 'affricate')
-                    return self._from_name(' '.join(features.values()) + ' consonant')
+                    return self._affricate_consonant(sound1, sound2)
             # So, two matches, but no Diphthong or Cluster.
             i = 1
             while i < len(nstring):  # We try matching with prefixes/diacritics chopped off ...
@@ -240,6 +239,15 @@ class TranscriptionSystem(TranscriptionBase):
             with_diacritics = SymbolWithDiacritics(
                 *nstring.partition(nstring[match[0].start():match[0].end()]))
         return self._sound_with_custom_diacritics(string, nstring, with_diacritics)
+
+    def _affricate_consonant(self, sound1, sound2):
+        # join features
+        features = {k: v for k, v in sound1.featuredict.items() if v}
+        for k, v in sound2.featuredict.items():
+            if v:
+                features.setdefault(k, v)
+        features['manner'] = sound1.validated('manner', 'affricate')
+        return self._from_name(' '.join(features.values()) + ' consonant')
 
     def _sound_with_custom_diacritics(self, string, nstring, comps):
         base_sound = self.sounds[comps.base]
@@ -260,10 +268,12 @@ class TranscriptionSystem(TranscriptionBase):
         # aliases).
         grapheme, sound = [], []
         try:
-            comps.add_pre(self, base_sound, features, grapheme, sound)
+            for feature in comps.iter_add_pre(self.diacritics, base_sound, grapheme, sound):
+                features[self._feature_values[feature]] = feature
             grapheme.append(base_sound.grapheme)
             sound.append(base_sound.s)
-            comps.add_post(self, base_sound, features, grapheme, sound)
+            for feature in comps.iter_add_post(self.diacritics, base_sound, grapheme, sound):
+                features[self._feature_values[feature]] = feature
         except ValueError:
             return UnknownSound(grapheme=nstring, source=string, ts=self)
         grapheme = ''.join(grapheme)
@@ -314,19 +324,34 @@ class SymbolWithDiacritics:
     base: str = ''
     post: str = ''
 
-    def add_pre(self, ts, base_sound, features, grapheme, sound):
-        self._add('pre', ts, base_sound, features, grapheme, sound)
+    def iter_add_pre(
+            self,
+            diacritics: Diacritics,
+            base_sound: Sound,
+            grapheme: list[str],
+            sound: list[str],
+    ) -> Generator[str, None, None]:
+        """Add left-attaching diacritics to sound and grapheme, yielding new features."""
+        yield from self._add('pre', diacritics, base_sound, grapheme, sound)
 
-    def add_post(self, ts, base_sound, features, grapheme, sound):
-        self._add('post', ts, base_sound, features, grapheme, sound)
+    def iter_add_post(
+            self,
+            diacritics: Diacritics,
+            base_sound: Sound,
+            grapheme: list[str],
+            sound: list[str],
+    ) -> Generator[str, None, None]:
+        """Add right-attaching diacritics to sound and grapheme, yielding new features."""
+        yield from self._add('post', diacritics, base_sound, grapheme, sound)
 
-    def _add(self, what: Literal['pre', 'post'], ts, base_sound, features, grapheme, sound):
+    def _add(  # pylint: disable=R0913,R0917
+            self, what: Literal['pre', 'post'], diacritics, base_sound, grapheme, sound):
         dias = [EMPTY + p for p in self.post] if what == 'post' else [p + EMPTY for p in self.pre]
         index = 1 if what == 'post' else 0
         for dia in dias:
-            feature = ts.diacritics_value_by_grapheme[base_sound.type].get(dia, {})
+            feature = diacritics.value_by_grapheme[base_sound.type].get(dia, {})
             if not feature:
                 raise ValueError(dia)
-            features[ts._feature_values[feature]] = feature
+            yield feature
             grapheme.append(dia[index])
-            sound.append(ts.diacritics_grapheme_by_value[base_sound.type][feature][index])
+            sound.append(diacritics.grapheme_by_value[base_sound.type][feature][index])

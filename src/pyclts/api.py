@@ -71,7 +71,6 @@ class CLTS(API):
                         yield TranscriptionSystem(
                             ts,
                             self.transcriptionsystems_dir / 'transcription-system-metadata.json',
-                            self.transcriptionsystems_dir / 'features.json',
                         )
 
     @functools.cached_property
@@ -84,7 +83,6 @@ class CLTS(API):
         return TranscriptionSystem(
             key,
             self.transcriptionsystems_dir / 'transcription-system-metadata.json',
-            self.transcriptionsystems_dir / 'features.json',
         )
 
     @functools.cached_property
