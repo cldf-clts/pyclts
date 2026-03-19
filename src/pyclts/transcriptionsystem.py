@@ -4,13 +4,18 @@ Transcription System module for consistent IPA handling.
 
 """
 import re
+from typing import Literal, get_args
 
 from csvw import TableGroup
-from clldutils import jsonlib
 
 from pyclts.models import fieldnames
 from pyclts.util import nfd, norm, EMPTY, itertable, TranscriptionBase
 from pyclts.models import *  # noqa: F403
+
+SoundsByFeatures = dict[frozenset, Sound]
+BaseSoundclassType = Literal['consonant', 'vowel', 'tone']
+BaseSoundclassOrMarkerType = Literal['consonant', 'vowel', 'tone', 'marker']
+BaseSoundclassMappingType = dict[BaseSoundclassType, dict[str, str]]
 
 
 class TranscriptionSystem(TranscriptionBase):
@@ -24,36 +29,37 @@ class TranscriptionSystem(TranscriptionBase):
         """
         super().__init__(path, None)
         if not (self.path.exists() and self.path.is_dir()):
-            raise ValueError('unknown system: {0}'.format(self.path))
+            raise ValueError(f'unknown system: {self.path}')
 
         self.system = TableGroup.from_file(metadata)
         self.system._fname = path / 'metadata.json'
 
-        self.features = {'consonant': {}, 'vowel': {}, 'tone': {}}
+        self.features_to_sound: SoundsByFeatures = {}
         # dictionary for feature values, checks when writing elements from
         # write_order to make sure no output is doubled
         self._feature_values = {}
 
-        # load the general features
-        features = jsonlib.load(features)
+        self.diacritics_grapheme_by_value: BaseSoundclassMappingType = \
+            {sc: {} for sc in get_args(BaseSoundclassType)}
+        self.diacritics_value_by_grapheme: BaseSoundclassMappingType = \
+            {sc: {} for sc in get_args(BaseSoundclassType)}
 
-        self.diacritics = dict(
-            consonant={}, vowel={}, click={}, diphthong={}, tone={}, cluster={})
         for dia in itertable(self.system.tabledict['diacritics.tsv']):
             if not dia['alias'] and not dia['typography']:
-                self.features[dia['type']][dia['value']] = dia['grapheme']
+                self.diacritics_grapheme_by_value[dia['type']][dia['value']] = dia['grapheme']
             # assign feature values to the dictionary
             self._feature_values[dia['value']] = dia['feature']
-            self.diacritics[dia['type']][dia['grapheme']] = dia['value']
+            self.diacritics_value_by_grapheme[dia['type']][dia['grapheme']] = dia['value']
 
         self.sound_classes = {}
-        self.columns = {}  # the basic column structure, to allow for rendering
+        # the basic column structure, to allow for rendering
+        self.columns: dict[BaseSoundclassOrMarkerType, list[str]] = {}
         self.sounds = {}  # Sounds by grapheme
         self._covered = {}
         # check for unresolved aliased sounds
         aliases = []
         for cls in [Consonant, Vowel, Tone, Marker]:  # noqa: F405
-            type_ = cls.__name__.lower()
+            type_: BaseSoundclassOrMarkerType = cls.__name__.lower()
             self.sound_classes[type_] = cls
             # store information on column structure to allow for rendering of a
             # sound in this form, which will make it easier to insert it when
@@ -80,37 +86,26 @@ class TranscriptionSystem(TranscriptionBase):
                         self._feature_values[value] = key
 
                 # make sure this does not take too long
-                for key, value in item.items():
-                    #
-                    # FIXME: use sound.features object to collect actual feature values!
-                    #
-                    if key not in {'grapheme', 'note', 'alias'} and \
-                            value and value not in self._feature_values:
+                for key in fieldnames(sound.features):
+                    value = getattr(sound.features, key)
+                    if value and value not in self._feature_values:
                         self._feature_values[value] = key
-                        #
-                        # FIXME: The following is obsolete with the valid values now enforced by
-                        # features.py!
-                        #
-                        if type_ != 'marker' and value not in features[type_][key]:
-                            raise ValueError(
-                                "Unrecognized features ({0}: {1}, line {2}))".format(
-                                    key, value, lnum + 2))  # pragma: no cover
 
                 self.sounds[item['grapheme']] = sound
                 if not sound.alias:
-                    if sound.featureset in self.features:  # pragma: no cover
+                    if sound.featureset in self.features_to_sound:  # pragma: no cover
                         raise ValueError('duplicate features in {0}:{1}: {2}'.format(
                             type_ + 's.tsv', lnum + 2, sound.name))
-                    self.features[sound.featureset] = sound
+                    self.features_to_sound[sound.featureset] = sound
                 else:
                     aliases += [(lnum, sound.type, sound.featureset)]
         # check for consistency of aliases: if an alias has no counterpart, it
         # is orphaned and needs to be deleted or given an accepted non-aliased
         # sound
-        if [x for x in aliases if x[2] not in self.features]:  # pragma: no cover
+        if [x for x in aliases if x[2] not in self.features_to_sound]:  # pragma: no cover
             error = ', '.join(
                 str(x[0] + 2) + '/' + str(x[1])
-                for x in aliases if x[2] not in self.features)
+                for x in aliases if x[2] not in self.features_to_sound)
             raise ValueError(
                 'Orphaned aliases in line(s) {0}'.format(error))
 
@@ -144,8 +139,8 @@ class TranscriptionSystem(TranscriptionBase):
     def _from_name(self, string):
         """Parse a sound from its name"""
         components = string.split(' ')
-        if frozenset(components) in self.features:
-            return self.features[frozenset(components)]
+        if frozenset(components) in self.features_to_sound:
+            return self.features_to_sound[frozenset(components)]
         rest, sound_class = components[:-1], components[-1]
         if sound_class in ['diphthong', 'cluster']:
             if string.startswith('from ') and 'to ' in string:
@@ -154,8 +149,8 @@ class TranscriptionSystem(TranscriptionBase):
                 from_, to_ = string_.split(' to ')
                 v1, v2 = frozenset(from_.split(' ') + [extension]), frozenset(
                     to_.split(' ') + [extension])
-                if v1 in self.features and v2 in self.features:
-                    s1, s2 = (self.features[v1], self.features[v2])
+                if v1 in self.features_to_sound and v2 in self.features_to_sound:
+                    s1, s2 = (self.features_to_sound[v1], self.features_to_sound[v2])
                     if sound_class == 'diphthong':
                         return Diphthong.from_sounds(s1 + s2, s1, s2, self)  # noqa: F405
                     else:
@@ -184,10 +179,10 @@ class TranscriptionSystem(TranscriptionBase):
         args['grapheme'] = ''
         args['ts'] = self
         sound = self.sound_classes[sound_class].from_kw(**args)
-        if sound.featureset not in self.features:
+        if sound.featureset not in self.features_to_sound:
             sound.generated = True
             return sound
-        return self.features[sound.featureset]  # pragma: no cover
+        return self.features_to_sound[sound.featureset]  # pragma: no cover
 
     def _parse(self, string):
         """Parse a string and return its features.
@@ -279,7 +274,7 @@ class TranscriptionSystem(TranscriptionBase):
         # diacritics may well define aliases
         grapheme, sound = '', ''
         for dia in [p + EMPTY for p in pre]:
-            feature = self.diacritics[base_sound.type].get(dia, {})
+            feature = self.diacritics_value_by_grapheme[base_sound.type].get(dia, {})
             if not feature:
                 return UnknownSound(  # noqa: F405
                     grapheme=nstring, source=string, ts=self)
@@ -287,12 +282,12 @@ class TranscriptionSystem(TranscriptionBase):
             # we add the unaliased version to the grapheme
             grapheme += dia[0]
             # we add the corrected version (if this is needed) to the sound
-            sound += self.features[base_sound.type][feature][0]
+            sound += self.diacritics_grapheme_by_value[base_sound.type][feature][0]
         # add the base sound
         grapheme += base_sound.grapheme
         sound += base_sound.s
         for dia in [EMPTY + p for p in post]:
-            feature = self.diacritics[base_sound.type].get(dia, {})
+            feature = self.diacritics_value_by_grapheme[base_sound.type].get(dia, {})
             # we are strict: if we don't know the feature, it's an unknown
             # sound
             if not feature:
@@ -300,7 +295,7 @@ class TranscriptionSystem(TranscriptionBase):
                     grapheme=nstring, source=string, ts=self)
             features[self._feature_values[feature]] = feature
             grapheme += dia[1]
-            sound += self.features[base_sound.type][feature][1]
+            sound += self.diacritics_grapheme_by_value[base_sound.type][feature][1]
 
         features['grapheme'] = sound
         new_sound = self.sound_classes[base_sound.type].from_kw(**features)
@@ -314,7 +309,7 @@ class TranscriptionSystem(TranscriptionBase):
 
     def resolve_sound(self, string):
         if isinstance(string, Sound):  # noqa: F405
-            return self.features[string.featureset]
+            return self.features_to_sound[string.featureset]
         if isinstance(string, Symbol):  # noqa: F405
             return string
         if set(string.split(' ')).intersection(
@@ -329,7 +324,7 @@ class TranscriptionSystem(TranscriptionBase):
 
     def __contains__(self, item):
         if isinstance(item, Sound):  # noqa: F405
-            return item.featureset in self.features
+            return item.featureset in self.features_to_sound
         return item in self.sounds
 
     def __iter__(self):

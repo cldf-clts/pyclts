@@ -95,7 +95,7 @@ class GetSubInventoryByProperty(GetSubInventoryByType):
         out = collections.OrderedDict()
         sounds = self.select_sounds(obj.sounds)
         for k, v in sounds.items():
-            stripped = obj.ts.features.get(
+            stripped = obj.ts.features_to_sound.get(
                 frozenset([s for s in v.featureset if s not in self.properties])
             )
             if str(stripped) != str(v) and str(stripped) not in sounds:

@@ -159,7 +159,7 @@ class Sound(Symbol):
     def _iter_normed_feature_values(self, features: list[str], base_vals):
         for feature in features:
             if feature not in base_vals and getattr(self.features, feature, '') in self._features():
-                yield norm(self.ts.features[self.type].get(getattr(self.features, feature, ''), '<!>'))
+                yield norm(self.ts.diacritics_grapheme_by_value[self.type].get(getattr(self.features, feature, ''), '<!>'))
 
     def __str__(self) -> str:
         """
@@ -174,8 +174,8 @@ class Sound(Symbol):
         if not self.generated:
             if not self.alias and self.grapheme in self.ts.sounds:
                 return self.grapheme
-            elif self.alias and self.featureset in self.ts.features:
-                return str(self.ts.features[self.featureset])
+            elif self.alias and self.featureset in self.ts.features_to_sound:
+                return str(self.ts.features_to_sound[self.featureset])
             # this can usually not happen, as we catch these errors when loading a ts!
             raise ValueError(f'Orphaned alias {self.grapheme}')  # pragma: no cover
 
@@ -185,7 +185,7 @@ class Sound(Symbol):
         base_str = self.base or '<?>'
         base_graphemes = []
         while elements:
-            base = self.ts.features.get(frozenset(elements))
+            base = self.ts.features_to_sound.get(frozenset(elements))
             if base:
                 base_graphemes.append(base.grapheme)
             elements.pop(0)
