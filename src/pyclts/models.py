@@ -15,22 +15,6 @@ __all__ = [
     'is_valid_sound',
     'Symbol', 'Sound', 'Consonant', 'Vowel', 'Tone', 'Marker',
     'Diphthong', 'Cluster', 'UnknownSound']
-EXCLUDE_FEATURES = [
-    'apical',
-    'laminal',
-    'ejective',
-    'with-falling_tone',
-    'with-extra-low_tone',
-    'with-extra-high_tone',
-    'with-falling_tone',
-    'with-low_tone',
-    'with-global_fall',
-    'with-global_rise',
-    'with-high_tone',
-    'with-mid_tone',
-    'with-rising_tone',
-    'with-upstep'
-]
 
 
 def is_valid_sound(sound: 'Symbol', ts: 'TranscriptionSystem') -> bool:
@@ -196,7 +180,8 @@ class Sound(Symbol):
             raise ValueError(f'Orphaned alias {self.grapheme}')  # pragma: no cover
 
         # search for best base-string
-        elements = [f for f in self._features() if f not in EXCLUDE_FEATURES] + [self.type]
+        excluded = self.features.feature_values_excluded_in_str()
+        elements = [f for f in self._features() if f not in excluded] + [self.type]
         base_str = self.base or '<?>'
         base_graphemes = []
         while elements:

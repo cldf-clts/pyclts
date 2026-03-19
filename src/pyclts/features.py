@@ -4,24 +4,13 @@
 #
 import functools
 import dataclasses
+import itertools
 from typing import Literal, get_args
 
-EXCLUDE_FEATURES = [  # FIXME: compute from metadata!
-    'apical',
-    'laminal',  # laminality
-    'ejective',  # ejection
-    'with-falling_tone',  # tone
-    'with-extra-low_tone',
-    'with-extra-high_tone',
-    'with-falling_tone',
-    'with-low_tone',
-    'with-global_fall',
-    'with-global_rise',
-    'with-high_tone',
-    'with-mid_tone',
-    'with-rising_tone',
-    'with-upstep'
-]
+__all__ = ['Features', 'ConsonantFeatures', 'VowelFeatures', 'ToneFeatures']
+
+# We cache some feature metadata per subclass of `Features`, using `functools.lru_cache`.
+N_SUBCLASSES = 4
 
 
 @functools.cache
@@ -41,21 +30,27 @@ class Features:
                         f'Invalid {self.__class__.__name__}:{field.name} value {value}')
 
     @classmethod
-    @functools.lru_cache(maxsize=3)  # Maxsize should be the number of subclasses.
+    @functools.lru_cache(maxsize=N_SUBCLASSES)  # Maxsize should be the number of subclasses.
     def fields(cls):
         return fields(cls)
 
     @classmethod
-    @functools.lru_cache(maxsize=3)
+    @functools.lru_cache(maxsize=N_SUBCLASSES)
     def valid_values(cls) -> dict[str, tuple[str]]:
         return {field.name: get_args(cls.__annotations__[field.name]) for field in cls.fields()}
+
+    @classmethod
+    @functools.lru_cache(maxsize=N_SUBCLASSES)
+    def feature_values_excluded_in_str(cls):
+        return list(itertools.chain.from_iterable(
+            cls.valid_values()[f.name] for f in cls.fields() if f.metadata.get('exclude')))
 
     def validated(self, feature, *vals):
         assert all(val in  self.__class__.valid_values()[feature] for val in vals)
         return vals
 
     @classmethod
-    @functools.lru_cache(maxsize=3)
+    @functools.lru_cache(maxsize=N_SUBCLASSES)
     def name_order(cls):
         """The order of features used for composing the name of a sound."""
         return [f.name for f in cls.fields()]
@@ -72,13 +67,13 @@ class Features:
         return [f.name for f in sorted(fields, key=lambda f_: f_.metadata[name])]
 
     @classmethod
-    @functools.lru_cache(maxsize=3)
+    @functools.lru_cache(maxsize=N_SUBCLASSES)
     def post_order(cls):
         """Features or their markers appearing after the base part of a symbol."""
         return cls._order('post')
 
     @classmethod
-    @functools.lru_cache(maxsize=3)
+    @functools.lru_cache(maxsize=N_SUBCLASSES)
     def pre_order(cls):
         """Features or their markers appearing before the base part of a symbol."""
         return cls._order('pre')
