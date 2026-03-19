@@ -17,6 +17,9 @@ BaseSoundclassType = Literal['consonant', 'vowel', 'tone']
 BaseSoundclassOrMarkerType = Literal['consonant', 'vowel', 'tone', 'marker']
 BaseSoundclassMappingType = dict[BaseSoundclassType, dict[str, str]]
 
+COMPLEX_SOUNDS = {
+    cls.__name__.lower(): (cls, base) for cls, base in [(Diphthong, Vowel), (Cluster, Consonant)]}
+
 
 class TranscriptionSystem(TranscriptionBase):
     """
@@ -51,42 +54,32 @@ class TranscriptionSystem(TranscriptionBase):
             self._feature_values[dia['value']] = dia['feature']
             self.diacritics_value_by_grapheme[dia['type']][dia['grapheme']] = dia['value']
 
-        self.sound_classes = {}
+        self.sound_classes: dict[BaseSoundclassOrMarkerType, type] = {}
         # the basic column structure, to allow for rendering
         self.columns: dict[BaseSoundclassOrMarkerType, list[str]] = {}
-        self.sounds = {}  # Sounds by grapheme
-        self._covered = {}
+        self.sounds: dict[str, Sound] = {}  # Sounds by grapheme
         # check for unresolved aliased sounds
-        aliases = []
+        aliases: list[tuple[str, frozenset[str]]] = []
         for cls in [Consonant, Vowel, Tone, Marker]:  # noqa: F405
             type_: BaseSoundclassOrMarkerType = cls.__name__.lower()
             self.sound_classes[type_] = cls
-            # store information on column structure to allow for rendering of a
-            # sound in this form, which will make it easier to insert it when
-            # finding generated sounds
+            # store information on column structure to allow for rendering of a sound in this form,
+            # which will make it easier to insert it when finding generated sounds
             self.columns[type_] = [
                 c['name'].lower() for c in
-                self.system.tabledict['{0}s.tsv'.format(type_)]
-                    .asdict()['tableSchema']['columns']]
-            for lnum, item in enumerate(itertable(
-                    self.system.tabledict['{0}s.tsv'.format(type_)])):
-                if item['grapheme'] in self.sounds:
-                    raise ValueError('duplicate grapheme in {0}:{1}: {2}'.format(
-                        type_ + 's.tsv', lnum + 2, item['grapheme']))  # pragma: no cover
+                self.system.tabledict[f'{type_}s.tsv'].asdict()['tableSchema']['columns']]
 
-                # FIXME: wrap in try except, add line number to error message!
+            for lnum, item in enumerate(itertable(self.system.tabledict[f'{type_}s.tsv'])):
+                floc = f'{type_}s.tsv:{lnum + 2}:'
+                if item['grapheme'] in self.sounds:
+                    raise ValueError(f'{floc} duplicate grapheme: {item["grapheme"]}')
+
                 try:
                     sound = cls.from_kw(ts=self, **item)
                 except ValueError as e:
-                    raise ValueError(f"{type_ + 's.tsv'}:{lnum + 2} {e}") from e
+                    raise ValueError(f"{floc} {e}") from e
 
                 for key in fieldnames(sound.__annotations__['features']):
-                    value = getattr(sound.features, key)
-                    if value and value not in self._feature_values:
-                        self._feature_values[value] = key
-
-                # make sure this does not take too long
-                for key in fieldnames(sound.features):
                     value = getattr(sound.features, key)
                     if value and value not in self._feature_values:
                         self._feature_values[value] = key
@@ -94,38 +87,28 @@ class TranscriptionSystem(TranscriptionBase):
                 self.sounds[item['grapheme']] = sound
                 if not sound.alias:
                     if sound.featureset in self.features_to_sound:  # pragma: no cover
-                        raise ValueError('duplicate features in {0}:{1}: {2}'.format(
-                            type_ + 's.tsv', lnum + 2, sound.name))
+                        raise ValueError(f'{floc} duplicate features: {sound.name}')
                     self.features_to_sound[sound.featureset] = sound
                 else:
-                    aliases += [(lnum, sound.type, sound.featureset)]
-        # check for consistency of aliases: if an alias has no counterpart, it
-        # is orphaned and needs to be deleted or given an accepted non-aliased
-        # sound
-        if [x for x in aliases if x[2] not in self.features_to_sound]:  # pragma: no cover
-            error = ', '.join(
-                str(x[0] + 2) + '/' + str(x[1])
-                for x in aliases if x[2] not in self.features_to_sound)
-            raise ValueError(
-                'Orphaned aliases in line(s) {0}'.format(error))
+                    aliases.append((floc, sound.featureset))
+        # Check for consistency of aliases: if an alias has no counterpart, it is orphaned and
+        # needs to be deleted or given an accepted non-aliased sound.
+        orphans = [floc for floc, featureset in aliases if featureset not in self.features_to_sound]
+        if orphans:  # pragma: no cover
+            raise ValueError(f'{" ".join(orphans)} orphaned aliases')
 
-        # basic regular expression, used to match the basic sounds in the system.
-        self._regex = None
-        self._update_regex()
+        # basic regular expression, used to match the basic sounds in the system, matching longest
+        # first, then alphabetically.
+        self._regex = re.compile('|'.join(
+            map(re.escape, sorted(self.sounds, key=lambda x: (len(x), -ord(x[0])), reverse=True))))
 
         # normalization data
-        self._normalize = {
+        self._normalize: dict[str, str] = {
             norm(r['source']): norm(r['target'])
             for r in itertable(self.system.tabledict['normalize.tsv'])}
 
-    def _update_regex(self):
-        self._regex = re.compile('|'.join(
-            map(re.escape, sorted(self.sounds, key=lambda x: (len(x),
-                -ord(x[0])), reverse=True))))
-
-    def _norm(self, string):
-        """Extended normalization: normalize by list of norm-characters, split
-        by character "/"."""
+    def _norm(self, string: str) -> str:
+        """Extended normalization: normalize by list of norm-characters, split by character "/"."""
         nstring = norm(string)
         if "/" in string:
             s, t = string.split('/')
@@ -136,42 +119,38 @@ class TranscriptionSystem(TranscriptionBase):
         """Normalize the string according to normalization list"""
         return ''.join([self._normalize.get(x, x) for x in nfd(string)])
 
-    def _from_name(self, string):
+    def _from_name(self, string: str) -> Sound:
         """Parse a sound from its name"""
         components = string.split(' ')
         if frozenset(components) in self.features_to_sound:
             return self.features_to_sound[frozenset(components)]
+
         rest, sound_class = components[:-1], components[-1]
-        if sound_class in ['diphthong', 'cluster']:
-            if string.startswith('from ') and 'to ' in string:
-                extension = {'diphthong': 'vowel', 'cluster': 'consonant'}[sound_class]
-                string_ = ' '.join(string.split(' ')[1:-1])
-                from_, to_ = string_.split(' to ')
-                v1, v2 = frozenset(from_.split(' ') + [extension]), frozenset(
-                    to_.split(' ') + [extension])
-                if v1 in self.features_to_sound and v2 in self.features_to_sound:
-                    s1, s2 = (self.features_to_sound[v1], self.features_to_sound[v2])
+        if (sound_class not in self.sound_classes) and (sound_class not in COMPLEX_SOUNDS):
+            raise ValueError('no sound class specified')
+
+        if sound_class in COMPLEX_SOUNDS:
+            m = re.fullmatch('from (?P<from>.*?) to (?P<to>.*?)', ' '.join(rest))
+            if m:
+                base_sound_class = COMPLEX_SOUNDS[sound_class][1].__name__.lower()
+                from_, to_ = m.group('from'), m.group('to')
+                s1 = self.features_to_sound.get(frozenset(from_.split(' ') + [base_sound_class]))
+                s2 = self.features_to_sound.get(frozenset(to_.split(' ') + [base_sound_class]))
+
+                if s1 and s2:
                     if sound_class == 'diphthong':
                         return Diphthong.from_sounds(s1 + s2, s1, s2, self)  # noqa: F405
-                    else:
-                        return Cluster.from_sounds(s1 + s2, s1, s2, self)  # noqa: F405
-                else:
-                    # try to generate the sounds if they are not there
-                    s1, s2 = self._from_name(from_ + ' ' + extension), self._from_name(
-                        to_ + ' ' + extension)
-                    if not (
-                            isinstance(s1, UnknownSound)  # noqa: F405
-                            or isinstance(s2, UnknownSound)):  # noqa: F405
-                        if sound_class == 'diphthong':
-                            return Diphthong.from_sounds(  # noqa: F405
-                                s1 + s2, s1, s2, self)
-                        return Cluster.from_sounds(s1 + s2, s1, s2, self)  # noqa: F405
-                    raise ValueError('components could not be found in system')  # pragma: no cover
-            else:
-                raise ValueError('name string is erroneously encoded')
+                    return Cluster.from_sounds(s1 + s2, s1, s2, self)  # noqa: F405
 
-        if sound_class not in self.sound_classes:
-            raise ValueError('no sound class specified')
+                # try to generate the sounds if they are not there
+                s1 = self._from_name(from_ + ' ' + base_sound_class)
+                s2 = self._from_name(to_ + ' ' + base_sound_class)
+                if not (isinstance(s1, UnknownSound) or isinstance(s2, UnknownSound)):
+                    if sound_class == 'diphthong':
+                        return Diphthong.from_sounds(s1 + s2, s1, s2, self)
+                    return Cluster.from_sounds(s1 + s2, s1, s2, self)  # noqa: F405
+                raise ValueError('components could not be found in system')  # pragma: no cover
+            raise ValueError('name string is erroneously encoded')
 
         args = {self._feature_values.get(comp, '?'): comp for comp in rest}
         if '?' in args:
