@@ -10,8 +10,8 @@ def run(args):
 
     def sound_to_dict(snd):
         res = collections.OrderedDict([('name', snd.name), ('bipa', snd.s), ('type', snd.type)])
-        for f in snd.name_order:
-            res[f] = getattr(snd, f)
+        for f, val in snd.features:
+            res[f] = val
         return res
 
     # retrieve all sounds in the datasets

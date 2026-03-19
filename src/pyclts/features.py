@@ -5,7 +5,8 @@
 import functools
 import dataclasses
 import itertools
-from typing import Literal, get_args
+from typing import Literal, get_args, Union, Optional
+from collections.abc import Generator
 
 __all__ = ['Features', 'ConsonantFeatures', 'VowelFeatures', 'ToneFeatures']
 
@@ -13,15 +14,12 @@ __all__ = ['Features', 'ConsonantFeatures', 'VowelFeatures', 'ToneFeatures']
 N_SUBCLASSES = 4
 
 
-@functools.cache
-def fields(cls):
-    return dataclasses.fields(cls)
-
-
 @dataclasses.dataclass(frozen=True)
 class Features:
     """Base class for feature implementations."""
     def __post_init__(self):
+        # Since Features instances are frozen, we can check the validity of the attribute values
+        # once at instantiation.
         for field in self.fields():
             value = getattr(self, field.name)
             if value:
@@ -32,28 +30,35 @@ class Features:
     @classmethod
     @functools.lru_cache(maxsize=N_SUBCLASSES)  # Maxsize should be the number of subclasses.
     def fields(cls):
-        return fields(cls)
+        """The fields of the class."""
+        return dataclasses.fields(cls)
 
     @classmethod
     @functools.lru_cache(maxsize=N_SUBCLASSES)
     def valid_values(cls) -> dict[str, tuple[str]]:
+        """The feature system, i.e. all feature names with all valid values."""
         return {field.name: get_args(cls.__annotations__[field.name]) for field in cls.fields()}
 
     @classmethod
     @functools.lru_cache(maxsize=N_SUBCLASSES)
-    def feature_values_excluded_in_str(cls):
+    def feature_values_excluded_in_str(cls) -> list[str]:
+        """All feature values which should not appear in the string representation of a sound."""
         return list(itertools.chain.from_iterable(
             cls.valid_values()[f.name] for f in cls.fields() if f.metadata.get('exclude')))
 
-    def validated(self, feature, *vals):
+    def validated(self, feature: str, *vals: str) -> Union[str, tuple[str]]:
+        """
+        Makes sure, values listed in `vals` are valid for feature `feature`.
+
+        Returns a single string if just one value was passed, a tuple of all values otherwise.
+        """
         assert all(val in  self.__class__.valid_values()[feature] for val in vals)
         return vals[0] if len(vals) == 1 else vals
 
-    @classmethod
-    @functools.lru_cache(maxsize=N_SUBCLASSES)
-    def name_order(cls):
-        """The order of features used for composing the name of a sound."""
-        return [f.name for f in cls.fields()]
+    def __iter__(self) -> Generator[tuple[str, Optional[str]], None, None]:
+        """Yield (feature name, value) pairs in name_order()."""
+        for f in self.fields():
+            yield f.name, getattr(self, f.name)
 
     @classmethod
     def _order(cls, name):
@@ -63,8 +68,8 @@ class Features:
 
         Fields can specify an index as value of metadata fields "pre" or "post".
         """
-        fields = (f for f in cls.fields() if name in f.metadata)
-        return [f.name for f in sorted(fields, key=lambda f_: f_.metadata[name])]
+        fields_ = (f for f in cls.fields() if name in f.metadata)
+        return [f.name for f in sorted(fields_, key=lambda f_: f_.metadata[name])]
 
     @classmethod
     @functools.lru_cache(maxsize=N_SUBCLASSES)
@@ -80,7 +85,7 @@ class Features:
 
 
 @dataclasses.dataclass(frozen=True)
-class ConsonantFeatures(Features):
+class ConsonantFeatures(Features):  # pylint: disable=R0902,C0115
     raising: Literal[
         "lowered", "raised"
     ] = dataclasses.field(default=None, metadata={'post': 1})
@@ -167,7 +172,7 @@ class ConsonantFeatures(Features):
 
 
 @dataclasses.dataclass(frozen=True)
-class VowelFeatures(Features):
+class VowelFeatures(Features):  # pylint: disable=R0902,C0115
     duration: Literal[
         "long", "mid-long", "ultra-long", "ultra-short"
     ] = dataclasses.field(default=None, metadata={'post': 18})
@@ -234,6 +239,7 @@ class VowelFeatures(Features):
 
 @dataclasses.dataclass(frozen=True)
 class ToneFeatures(Features):
+    """Features of a tone."""
     contour: Literal[
         "contour", "falling", "flat", "rising", "short"] = None
     start: Literal[

@@ -88,12 +88,12 @@ class TranscriptionSystem(TranscriptionBase):  # pylint: disable=R0902
 
             for lnum, item in enumerate(itertable(self.system.tabledict[f'{type_}s.tsv'])):
                 floc = f'{type_}s.tsv:{lnum + 2}:'
-                if item['grapheme'] in self.sounds:
+                if item['grapheme'] in self.sounds:  # pragma: no cover
                     raise ValueError(f'{floc} duplicate grapheme: {item["grapheme"]}')
 
                 try:
                     sound = cls.from_kw(ts=self, **item)
-                except ValueError as e:
+                except ValueError as e:  # pragma: no cover
                     raise ValueError(f"{floc} {e}") from e
 
                 for key in fieldnames(sound.__annotations__['features']):
@@ -217,9 +217,9 @@ class TranscriptionSystem(TranscriptionBase):  # pylint: disable=R0902
                         return cls.from_sounds(string, sound1, sound2, self)
 
                 # check for plosive plus fricative if they are the same in manner
-                if all((sound1.place == sound2.place,
-                        sound1.manner == sound1.validated('manner', 'stop'),
-                        sound2.manner == sound2.validated('manner', 'fricative'))):
+                if all((sound1.features.place == sound2.features.place,
+                        sound1.features.manner == sound1.features.validated('manner', 'stop'),
+                        sound2.features.manner == sound2.features.validated('manner', 'fricative'))):
                     return self._affricate_consonant(sound1, sound2)
             # So, two matches, but no Diphthong or Cluster.
             i = 1
@@ -240,13 +240,13 @@ class TranscriptionSystem(TranscriptionBase):  # pylint: disable=R0902
                 *nstring.partition(nstring[match[0].start():match[0].end()]))
         return self._sound_with_custom_diacritics(string, nstring, with_diacritics)
 
-    def _affricate_consonant(self, sound1, sound2):
+    def _affricate_consonant(self, sound1: Sound, sound2: Sound):
         # join features
         features = {k: v for k, v in sound1.featuredict.items() if v}
         for k, v in sound2.featuredict.items():
             if v:
                 features.setdefault(k, v)
-        features['manner'] = sound1.validated('manner', 'affricate')
+        features['manner'] = sound1.features.validated('manner', 'affricate')
         return self._from_name(' '.join(features.values()) + ' consonant')
 
     def _sound_with_custom_diacritics(self, string, nstring, comps):
