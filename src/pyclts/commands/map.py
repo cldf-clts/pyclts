@@ -5,11 +5,11 @@ Map a given sound inventory list to CLTS
 from pyclts.models import is_valid_sound
 
 
-def register(parser):
+def register(parser):  # pylint: disable=C0116
     parser.add_argument("dataset", help="the file with the graphemes")
 
 
-def run(args, test=False):
+def run(args, test=False):  # pylint: disable=C0116
     # Instantiate BIPA
     bipa = args.repos.transcriptionsystem("bipa")
 

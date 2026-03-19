@@ -1,6 +1,11 @@
+"""
+Transcription data provides metadata for graphemes/sounds.
+"""
+from typing import Union
+
 from pyclts.util import (
     read_data, TranscriptionBase, GraphemeMapType, DataType, SoundsType, NamesType)
-from pyclts.transcriptionsystem import Sound
+from pyclts.transcriptionsystem import Sound, Symbol
 
 
 class TranscriptionData(TranscriptionBase):
@@ -31,7 +36,7 @@ class TranscriptionData(TranscriptionBase):
             'EXPLICIT'
         )
 
-    def resolve_sound(self, sound):
+    def resolve_sound(self, sound: Union[str, Sound]) -> str:
         """Function tries to identify a sound in the data.
 
         Notes
@@ -46,5 +51,6 @@ class TranscriptionData(TranscriptionBase):
             return '//'.join([x['grapheme'] for x in self.data[sound.name]])
         raise KeyError(":td:resolve_sound: No sound could be found.")
 
-    def resolve_grapheme(self, grapheme):
+    def resolve_grapheme(self, grapheme: str) -> Union[Sound, Symbol]:
+        """Resolve a grapheme to a sound."""
         return self.system[self.grapheme_map[grapheme]]

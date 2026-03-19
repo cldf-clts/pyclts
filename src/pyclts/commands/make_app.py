@@ -5,7 +5,7 @@ import json
 import collections
 
 
-def run(args):
+def run(args):  # pylint: disable=C0116
     tts = args.repos.bipa
 
     def sound_to_dict(snd):
@@ -40,7 +40,7 @@ def run(args):
                 else:
                     all_sounds[sound] = sound_to_dict(snd)
 
-    args.log.info('{0} unique graphemes loaded'.format(len(all_sounds)))
+    args.log.info('%s unique graphemes loaded', len(all_sounds))
 
     for i, sc in enumerate(args.repos.iter_soundclass()):
         for sound in all_sounds:
@@ -56,4 +56,4 @@ def run(args):
     with datafile.open('w', encoding='utf8') as handler:
         handler.write('var BIPA = ' + json.dumps(all_sounds, indent=2) + ';\n')
         handler.write('var normalize = ' + json.dumps(tts._normalize) + ';\n')
-    args.log.info('{0} written'.format(datafile))
+    args.log.info('%s written', datafile)

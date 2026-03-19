@@ -12,7 +12,7 @@ from csvw.dsv import reader
 import pyclts
 
 
-def register(parser):
+def register(parser):  # pylint: disable=C0116
     parser.add_argument(
         '--test',
         action='store_true',
@@ -21,7 +21,7 @@ def register(parser):
     )
 
 
-def run(args):
+def run(args):  # pylint: disable=C0116
     clts = args.repos
 
     for src in clts.meta:
@@ -112,8 +112,8 @@ def test_sounds(bipa, log):
             del test[None]
         try:
             _test_sounds(bipa, **{k.replace('-', '_'): v for k, v in test.items()})
-        except AssertionError as e:
-            log.warning('{0}\t{1}'.format(test['source'], e))
+        except AssertionError as e:  # pragma: no cover
+            log.warning('%s\t%s', test['source'], e)
 
 
 def test_clicks(bipa):

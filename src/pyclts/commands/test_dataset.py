@@ -4,11 +4,11 @@ Prepare transcriptiondata from the transcription sources.
 from pyclts.models import is_valid_sound
 
 
-def register(parser):
+def register(parser):  # pylint: disable=C0116
     parser.add_argument("dataset", help="the dataset")
 
 
-def run(args):
+def run(args):  # pylint: disable=C0116
     bipa = args.repos.bipa
     rows = args.repos.get_source(args.dataset)
     graphemes = {}

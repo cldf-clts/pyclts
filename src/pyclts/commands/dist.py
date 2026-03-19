@@ -9,10 +9,10 @@ Writes:
 - data/features.tsv
 - data/clts.zip
 """
-import dataclasses
 import json
 import zipfile
 import collections
+import dataclasses
 
 from csvw.dsv import UnicodeWriter
 from clldutils.clilib import PathType
@@ -20,7 +20,8 @@ from clldutils.jsonlib import load, dump
 from pycldf import Dataset
 from pycldf.markdown import metadata2markdown
 
-from pyclts.models import is_valid_sound, fieldnames
+from pyclts.models import is_valid_sound
+from pyclts.features import FEATURE_SYSTEM
 from pyclts.util import upsert_section, iter_markdown_sections
 
 METADATA = {
@@ -254,7 +255,7 @@ METADATA = {
 }
 
 
-def register(parser):
+def register(parser):  # pylint: disable=C0116
     parser.add_argument(
         "--destination",
         default=None,
@@ -277,11 +278,16 @@ class Grapheme:
     NOTE: str = ''
 
 
-def run(args):
-    args.destination = args.destination or args.repos.path('data', 'clts.zip')
+def write_table(p, rows, counts):
+    with UnicodeWriter(p, delimiter='\t') as w:
+        for i, row in enumerate(rows):
+            w.writerow(row)
+            if i > 0:
+                counts[p.name] += 1
 
-    def writer(*comps):
-        return UnicodeWriter(args.repos.path('data', *comps), delimiter='\t')
+
+def run(args):  # pylint: disable=C0116
+    args.destination = args.destination or args.repos.path('data', 'clts.zip')
 
     sounds = collections.defaultdict(dict)
     data = []
@@ -394,7 +400,7 @@ def run(args):
             except ValueError:
                 pass
             except TypeError:  # pragma: no cover
-                args.log.debug('{0}: {1}'.format(ts.id, name))
+                args.log.debug('%s: %s', ts.id, name)
 
     counts = {
         'index.tsv': len(args.repos.meta),
@@ -406,50 +412,9 @@ def run(args):
     args.log.info('writing data to file')
 
     fids = set()
-    with writer('features.tsv') as w:
-        w.writerow(['ID', 'TYPE', 'FEATURE', 'VALUE'])
-        for k, v in load(args.repos.pkg_dir / 'transcriptionsystems' / 'features.json').items():
-            for f, vals in v.items():
-                for val in vals:
-                    fids.add('_'.join([k, f, val]))
-                    w.writerow(['_'.join([k, f, val]), k, f, val])
-                    counts['features.tsv'] += 1
-
-    with writer('sounds.tsv') as w:
-        w.writerow(['ID', 'NAME', 'FEATURES', 'TYPE', 'GRAPHEME', 'UNICODE', 'GENERATED', 'NOTE'])
-        for k, v in sorted(sounds.items(), reverse=True):
-            features = []
-            sound = v['sound']
-            if sound.type in ['vowel', 'consonant', 'tone']:
-                csounds = [sound]
-            else:
-                csounds = [sound.from_sound, sound.to_sound]
-            for sound in csounds:
-                for kk, vv in sound.featuredict.items():
-                    if vv:
-                        fid = '{}_{}_{}'.format(sound.type, kk, vv)
-                        if fid in fids:
-                            features.append(fid)
-                        else:
-                            args.log.warning('illegal feature value: {}'.format(fid))
-
-            w.writerow([
-                k.replace(' ', '_'),
-                k,
-                ' '.join(features),
-                v['type'],
-                v['grapheme'],
-                v['unicode'],
-                v['generated'],
-                v['note'],
-            ])
-            counts['sounds.tsv'] += 1
-
-    with writer('graphemes.tsv') as w:
-        w.writerow(['PK'] + [f.name for f in dataclasses.fields(Grapheme)])
-        for pk, row in enumerate(data, start=1):
-            w.writerow([str(pk)] + list(dataclasses.astuple(row)))
-            counts['graphemes.tsv'] += 1
+    write_table(args.repos.path('data', 'features.tsv'), _iter_feature_rows(args, fids), counts)
+    write_table(args.repos.path('data', 'sounds.tsv'), _iter_sound_rows(args, sounds, fids), counts)
+    write_table(args.repos.path('data', 'graphemes.tsv'), _iter_grapheme_row(data), counts)
 
     for table in METADATA['tables']:
         table['dc:extent'] = counts[table['url'].split('/')[-1]]
@@ -475,3 +440,44 @@ def run(args):
         compression=zipfile.ZIP_DEFLATED
     ) as myzip:
         myzip.writestr('clts.json', json.dumps(clts_dump))
+
+
+def _iter_feature_rows(args, fids):
+    yield ['ID', 'TYPE', 'FEATURE', 'VALUE']
+    for k, v in load(args.repos.pkg_dir / 'transcriptionsystems' / 'features.json').items():
+        pyclts_system = FEATURE_SYSTEM[k].valid_values()
+        for f, vals in v.items():
+            if f != 'stress':  # stress is handled somewhat inconsistently.
+                if not set(vals).issubset(set(pyclts_system[f])):  # pragma: no cover
+                    args.log.warning('%s:%s: %s vs %s', k, v, vals, pyclts_system[f])
+            for val in vals:
+                fids.add('_'.join([k, f, val]))
+                yield ['_'.join([k, f, val]), k, f, val]
+
+
+def _iter_sound_rows(args, sounds, fids):
+    add_cols = ['TYPE', 'GRAPHEME', 'UNICODE', 'GENERATED', 'NOTE']
+    yield ['ID', 'NAME', 'FEATURES'] + add_cols
+    for k, v in sorted(sounds.items(), reverse=True):
+        features = []
+        sound = v['sound']
+        if sound.type in ['vowel', 'consonant', 'tone']:
+            csounds = [sound]
+        else:
+            csounds = [sound.from_sound, sound.to_sound]
+        for sound in csounds:
+            for kk, vv in sound.featuredict.items():
+                if vv:
+                    fid = f'{sound.type}_{kk}_{vv}'
+                    if fid in fids:
+                        features.append(fid)
+                    else:
+                        args.log.warning('illegal feature value: %s', fid)  # pragma: no cover
+
+        yield [k.replace(' ', '_'), k, ' '.join(features)] + [v[c.lower()] for c in add_cols]
+
+
+def _iter_grapheme_row(data):
+    yield ['PK'] + [f.name for f in dataclasses.fields(Grapheme)]
+    for pk, row in enumerate(data, start=1):
+        yield [str(pk)] + list(dataclasses.astuple(row))

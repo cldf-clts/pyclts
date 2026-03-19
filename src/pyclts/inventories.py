@@ -5,32 +5,43 @@ import argparse
 import statistics
 import collections
 import dataclasses
-from typing import Optional
+from typing import Optional, Union
 
 from clldutils.clilib import Table
 
 from pyclts.api import CLTS
-from pyclts.models import Sound
-from pyclts.transcriptionsystem import TranscriptionSystem
+from pyclts.models import Sound, Symbol
+from pyclts.transcriptionsystem import TranscriptionSystem, BaseSoundclassType, FeatureNameType
 from pyclts.util import jaccard
+from pyclts.features import ConsonantFeatures, VowelFeatures, ToneFeatures
 
 
-def reduce_features(sound, ts=None, features=None):
+def _iter_reduced_features(cls):
+    for f in cls.fields():
+        if f.metadata.get('reduced'):
+            yield f.name
+
+
+def reduce_features(
+        sound: Union[str, Sound],
+        ts: Optional[TranscriptionSystem] = None,
+        features: Optional[dict[BaseSoundclassType, list[FeatureNameType]]] = None,
+) -> Union[Symbol, Sound]:
+    """Extract subset of features from `sound` and return a sound having these features."""
     ts = ts or CLTS().bipa
-    features = features or {
-        "consonant": ["phonation", "place", "manner"],
-        "vowel": ["roundedness", "height", "centrality"],
-        "tone": ["start"],
-    }
+
+    if not features:  # Get the default reduced set of features from the pyclts feature system.
+        features = {
+            cls.__name__.replace('Features', '').lower():
+                list(_iter_reduced_features(cls))
+            for cls in [ConsonantFeatures, VowelFeatures, ToneFeatures]}
+
     sound_ = ts[sound] if isinstance(sound, str) else sound
     if sound_.type in ["cluster", "diphthong"]:
         return reduce_features(sound_.from_sound, ts=ts, features=features)
-    name = "{} {}".format(
-        " ".join(
-            [s for s in [sound_.featuredict.get(x) for x in features[sound_.type]] if s]
-        ),
-        sound_.type,
-    )
+
+    fs = " ".join(s for s in [sound_.featuredict.get(x) for x in features[sound_.type]] if s)
+    name = f"{fs} {sound_.type}"
     if sound_.type != "tone":
         return ts[name]
     return ts["short " + " ".join(name.split(" "))]
@@ -168,44 +179,37 @@ class Inventory:
         aspects = aspects or ["sounds"]
         scores = []
         for aspect in aspects:
-            soundsA, soundsB = (
-                {sound for sound in getattr(self, aspect)},
-                {sound for sound in getattr(other, aspect)},
-            )
-            if soundsA or soundsB:
-                scores += [jaccard(soundsA, soundsB)]
+            snds_a = {sound for sound in getattr(self, aspect)}
+            snds_b = {sound for sound in getattr(other, aspect)}
+            if snds_a or snds_b:
+                scores += [jaccard(snds_a, snds_b)]
         return statistics.mean(scores) if scores else 0
 
     def approximate_similarity(self, other, aspects=None):
         aspects = aspects or ["sounds"]
 
-        def approximate(soundsA, soundsB):
+        def approximate(snds_a, snds_b):
             matches = []
-            for soundA in soundsA:
+            for snd_a in snds_a:
                 best_match, best_sim = None, 0
-                for soundB in soundsB:
-                    current_sim = soundA.similarity(soundB)
+                for snd_b in snds_b:
+                    current_sim = snd_a.similarity(snd_b)
                     if current_sim > best_sim:
-                        best_match = soundB
+                        best_match = snd_b
                         best_sim = current_sim
                 if best_match is not None:
                     matches += [best_sim]
-                    soundsB = [s for s in soundsB if s != best_match]
-            matches += [0 for s in soundsB]
+                    snds_b = [s for s in snds_b if s != best_match]
+            matches += [0 for _ in snds_b]
             return statistics.mean(matches)
 
         scores = []
         for aspect in aspects:
-            soundsA, soundsB = (
-                getattr(self, aspect).values(),
-                getattr(other, aspect).values(),
-            )
-            if soundsA and soundsB:
-                scores += [
-                    statistics.mean(
-                        [approximate(soundsA, soundsB), approximate(soundsB, soundsA)]
-                    )
-                ]
-            elif soundsA or soundsB:
-                scores += [0]
+            snds_a = getattr(self, aspect).values()
+            snds_b = getattr(other, aspect).values()
+            if snds_a and snds_b:
+                scores.append(
+                    statistics.mean([approximate(snds_a, snds_b), approximate(snds_b, snds_a)]))
+            elif snds_a or snds_b:
+                scores.append(0)
         return statistics.mean(scores) if scores else 0

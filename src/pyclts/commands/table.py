@@ -6,7 +6,7 @@ import collections
 from clldutils.clilib import Table, add_format
 
 
-def register(parser):
+def register(parser):  # pylint: disable=C0116
     add_format(parser)
     parser.add_argument(
         '--filter',
@@ -20,7 +20,7 @@ def register(parser):
         help='sounds to display info for')
 
 
-def run(args):
+def run(args):  # pylint: disable=C0116
     tts = args.repos.transcriptionsystem(args.system)
     tts_sounds = [
         tts.get(sound if isinstance(sound, str) else sound.decode('utf8')) for sound in args.sounds]

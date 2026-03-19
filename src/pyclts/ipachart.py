@@ -72,9 +72,9 @@ def html_css(id, colorspec=None):
     for cls, (fill, outline) in colorspec.items():
         if cls:
             if fill:
-                res.append("#{2} a.{0} text, text svg|a.{0} {{fill: {1};}}".format(cls, fill, id))
+                res.append(f"#{id} a.{cls} text, text svg|a.{cls} {{fill: {fill};}}")
             if outline:
-                res.append("#{2} a.{0} {{outline: {1};}}".format(cls, outline, id))
+                res.append(f"#{id} a.{cls} {{outline: {outline};}}")
     return '\n'.join(res)
 
 
@@ -292,4 +292,4 @@ figcaption {{display: table-caption; caption-side: top; font-size: 120%;}}
 </body>
 </html>""".format(
         '\n'.join(css),
-        '\n'.join('<div>{}</div>'.format(t) for t in html)), covered
+        '\n'.join(f'<div>{t}</div>' for t in html)), covered

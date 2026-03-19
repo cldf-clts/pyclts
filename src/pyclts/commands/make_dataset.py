@@ -50,11 +50,11 @@ def process_transcription_data(rows, columns, uritemplate, bipa, args):
     return out
 
 
-def register(parser):
+def register(parser):  # pylint: disable=C0116
     parser.add_argument("dataset", help="the dataset")
 
 
-def run(args):
+def run(args):  # pylint: disable=C0116
     def writer(*comps):
         return UnicodeWriter(args.repos.path('pkg', *comps), delimiter='\t')
 

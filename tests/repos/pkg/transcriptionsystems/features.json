@@ -86,7 +86,8 @@
       "with-upstep"
     ],
     "articulation": [
-      "strong"
+      "strong",
+      "weak"
     ],
     "breathiness": [
       "breathy"
@@ -112,7 +113,10 @@
       "unreleased",
       "with-lateral-release",
       "with-mid-central-vowel-release",
-      "with-nasal-release"
+      "with-nasal-release",
+      "with-uvular-release",
+      "with-sibilant-release",
+      "with-trilled-release"
     ],
     "tongue_root": [
       "advanced-tongue-root",
@@ -204,7 +208,8 @@
       "laminal"
     ],
     "articulation": [
-      "strong"
+      "strong",
+      "weak"
     ],
     "breathiness": [
       "breathy"

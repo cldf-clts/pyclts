@@ -8,7 +8,7 @@ import itertools
 from typing import Literal, get_args, Union, Optional
 from collections.abc import Generator
 
-__all__ = ['Features', 'ConsonantFeatures', 'VowelFeatures', 'ToneFeatures']
+__all__ = ['Features', 'ConsonantFeatures', 'VowelFeatures', 'ToneFeatures', 'FEATURE_SYSTEM']
 
 # We cache some feature metadata per subclass of `Features`, using `functools.lru_cache`.
 N_SUBCLASSES = 4
@@ -52,7 +52,7 @@ class Features:
 
         Returns a single string if just one value was passed, a tuple of all values otherwise.
         """
-        assert all(val in  self.__class__.valid_values()[feature] for val in vals)
+        assert all(val in self.__class__.valid_values()[feature] for val in vals)
         return vals[0] if len(vals) == 1 else vals
 
     def __iter__(self) -> Generator[tuple[str, Optional[str]], None, None]:
@@ -145,7 +145,7 @@ class ConsonantFeatures(Features):  # pylint: disable=R0902,C0115
     ] = dataclasses.field(default=None, metadata={'post': 18})
     phonation: Literal[
         "voiced", "voiceless", "unspecified-voice"
-    ] = dataclasses.field(default=None, metadata={'post': 6})
+    ] = dataclasses.field(default=None, metadata={'post': 6, 'reduced': True})
     laminality: Literal[
         "apical", "laminal"
     ] = dataclasses.field(default=None, metadata={'post': 3, 'exclude': True})
@@ -158,7 +158,7 @@ class ConsonantFeatures(Features):  # pylint: disable=R0902,C0115
         "pharyngeal", "post-alveolar", "retroflex", "uvular", "velar", "bilabial-and-alveolar",
         "bilabial-and-velar", "alveolar-and-bilabial", "alveolar-and-velar", "velar-and-alveolar",
         "velar-and-bilabial", "velar-and-uvular", "unspecified-place"
-    ] = None
+    ] = dataclasses.field(default=None, metadata={'reduced': True})
     ejection: Literal[
         "ejective"
     ] = dataclasses.field(default=None, metadata={'post': 7, 'exclude': True})
@@ -168,7 +168,7 @@ class ConsonantFeatures(Features):  # pylint: disable=R0902,C0115
     manner: Literal[
         "affricate", "approximant", "click", "fricative", "implosive", "nasal", "nasal-click",
         "stop", "tap", "trill", "unspecified-manner"
-    ] = None
+    ] = dataclasses.field(default=None, metadata={'reduced': True})
 
 
 @dataclasses.dataclass(frozen=True)
@@ -220,16 +220,16 @@ class VowelFeatures(Features):  # pylint: disable=R0902,C0115
     ] = dataclasses.field(default=None, metadata={'post': 6})
     roundedness: Literal[
         "rounded", "unrounded"
-    ] = None
+    ] = dataclasses.field(default=None, metadata={'reduced': True})
     height: Literal[
         "close", "close-mid", "mid", "near-close", "near-open", "open", "open-mid"
-    ] = None
+    ] = dataclasses.field(default=None, metadata={'reduced': True})
     friction: Literal[
         "with-friction"
     ] = dataclasses.field(default=None, metadata={'post': 9})
     centrality: Literal[
         "back", "central", "front", "near-back", "near-front"
-    ] = dataclasses.field(default=None, metadata={'post': 3})
+    ] = dataclasses.field(default=None, metadata={'post': 3, 'reduced': True})
     tone: Literal[
         "with-downstep", "with-extra-high_tone", "with-extra-low_tone", "with-falling_tone",
         "with-global_fall", "with-global_rise", "with-high_tone", "with-low_tone", "with-mid_tone",
@@ -241,10 +241,19 @@ class VowelFeatures(Features):  # pylint: disable=R0902,C0115
 class ToneFeatures(Features):
     """Features of a tone."""
     contour: Literal[
-        "contour", "falling", "flat", "rising", "short"] = None
+        "contour", "falling", "flat", "rising", "short"
+    ] = None
     start: Literal[
-        "from-high", "from-low", "from-mid", "from-mid-high", "from-mid-low", "neutral"] = None
+        "from-high", "from-low", "from-mid", "from-mid-high", "from-mid-low", "neutral"
+    ] = dataclasses.field(default=None, metadata={'reduced': True})
     middle: Literal[
-        "via-high", "via-low", "via-mid", "via-mid-high", "via-mid-low"] = None
+        "via-high", "via-low", "via-mid", "via-mid-high", "via-mid-low"
+    ] = None
     end: Literal[
-        "to-high", "to-low", "to-mid", "to-mid-high", "to-mid-low"] = None
+        "to-high", "to-low", "to-mid", "to-mid-high", "to-mid-low"
+    ] = None
+
+
+FEATURE_SYSTEM = {
+    cls.__name__.replace('Features', '').lower(): cls
+    for cls in [ConsonantFeatures, VowelFeatures, ToneFeatures]}

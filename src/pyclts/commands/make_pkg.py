@@ -1,5 +1,5 @@
 """
-Prepare transcriptiondata from the transcription sources.
+Called as part of the CLDF creation workflow.
 """
 from uritemplate import URITemplate
 from clldutils.clilib import ParserError
@@ -18,7 +18,7 @@ except ImportError:  # pragma: no cover
 from pyclts.soundclasses import SOUNDCLASS_SYSTEMS
 
 
-def run(args):
+def run(args):  # pylint: disable=C0116
     if not LINGPY:  # pragma: no cover
         raise ParserError('lingpy must be installed to run this command!')
 

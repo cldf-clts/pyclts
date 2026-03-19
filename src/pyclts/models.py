@@ -95,7 +95,7 @@ class Sound(Symbol):
     unknown: Optional[str] = None
     stress: Optional[str] = None
 
-    features = None
+    features = Features()
 
     @classmethod
     def from_kw(cls, **kw):
@@ -336,11 +336,12 @@ class Cluster(ComplexSound):
     @staticmethod
     def match(sound1, sound2):
         if isinstance(sound1, Consonant):
-            if \
-             sound1.features.manner in sound1.features.validated(
-                 'manner', 'stop', 'implosive', 'click', 'nasal') and\
-             sound2.features.manner in sound2.features.validated(
-                 'manner', 'stop', 'implosive', 'affricate'):
+            if all((
+                sound1.features.manner in sound1.features.validated(
+                    'manner', 'stop', 'implosive', 'click', 'nasal'),
+                sound2.features.manner in sound2.features.validated(
+                    'manner', 'stop', 'implosive', 'affricate')
+            )):
                 return True
 
             if sound1.features.manner == 'click' and sound2.features.manner == 'fricative':

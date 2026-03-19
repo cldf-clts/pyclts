@@ -7,11 +7,11 @@ from csvw.dsv import reader
 from clldutils.clilib import add_format, Table
 
 
-def register(parser):
+def register(parser):  # pylint: disable=C0116
     add_format(parser, default='pipe')
 
 
-def run(args):
+def run(args):  # pylint: disable=C0116
     def read(fname):
         return reader(args.repos.path('data', fname), delimiter='\t', dicts=True)
 

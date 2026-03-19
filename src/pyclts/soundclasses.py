@@ -1,7 +1,13 @@
-from pyclts.transcriptionsystem import Symbol
+"""
+Soundclass systems categorize sounds.
+"""
+from typing import Literal, get_args
+
+from pyclts.transcriptionsystem import Symbol, COMPLEX_SOUNDS
 from pyclts.util import read_data, TranscriptionBase, SoundsType, NamesType
 
-SOUNDCLASS_SYSTEMS = ['sca', 'cv', 'art', 'dolgo', 'asjp', 'color']
+SoundclassNameType = Literal['sca', 'cv', 'art', 'dolgo', 'asjp', 'color']
+SOUNDCLASS_SYSTEMS = list(get_args(SoundclassNameType))
 
 
 class SoundClasses(TranscriptionBase):
@@ -10,21 +16,22 @@ class SoundClasses(TranscriptionBase):
     """
     __type__ = 'sc'
 
-    def __init__(self, path, system, id_):
+    def __init__(self, path, system, id_: SoundclassNameType):
         assert id_ in SOUNDCLASS_SYSTEMS
         super().__init__(path, system)
-        self._id = id_
+        self._id: SoundclassNameType = id_
         self.sounds: SoundsType
         self.names: NamesType
         _, data, self.sounds, self.names = read_data(self.path, self._id)
-        self.data = {}
-        self.classes = set()
+        self.data: dict[str, dict[str, str]] = {}
+        self.classes: set[str] = set()
         for k, v in data.items():
             self.data[k] = v[0]
             self.classes.add(v[0]['grapheme'])
 
     @property
-    def id(self):
+    def id(self) -> str:
+        """System identifier."""
         return self._id
 
     def resolve_sound(self, sound):
@@ -39,13 +46,12 @@ class SoundClasses(TranscriptionBase):
         sound = sound if isinstance(sound, Symbol) else self.system[sound]
         if sound.name in self.data:
             return self.data[sound.name]['grapheme']
-        if not sound.type == 'unknownsound':
-            if sound.type in ['diphthong', 'cluster']:
+        if sound.type != 'unknownsound':
+            if sound.type in COMPLEX_SOUNDS:
                 return self.resolve_sound(sound.from_sound)
             name = [
                 s for s in sound.name.split(' ') if
-                self.system._feature_values.get(s, '') not in
-                ['laminality', 'ejection', 'tone']]
+                s not in sound.features.feature_values_excluded_in_str()]
             while len(name) >= 4:
                 sound = self.system.get(' '.join(name))
                 if sound and sound.name in self.data:

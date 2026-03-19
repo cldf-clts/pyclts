@@ -5,11 +5,11 @@ from pyclts.models import is_valid_sound
 from clldutils.clilib import add_format, Table
 
 
-def register(parser):
+def register(parser):  # pylint: disable=C0116
     add_format(parser, default='simple')
 
 
-def run(args):
+def run(args):  # pylint: disable=C0116
     with Table(args, 'id', 'valid', 'total', 'percent') as table:
         bipa = args.repos.bipa
         for td in args.repos.iter_transcriptiondata():

@@ -217,9 +217,11 @@ class TranscriptionSystem(TranscriptionBase):  # pylint: disable=R0902
                         return cls.from_sounds(string, sound1, sound2, self)
 
                 # check for plosive plus fricative if they are the same in manner
-                if all((sound1.features.place == sound2.features.place,
-                        sound1.features.manner == sound1.features.validated('manner', 'stop'),
-                        sound2.features.manner == sound2.features.validated('manner', 'fricative'))):
+                if all((
+                    sound1.features.place == sound2.features.place,
+                    sound1.features.manner == sound1.features.validated('manner', 'stop'),
+                    sound2.features.manner == sound2.features.validated('manner', 'fricative')
+                )):
                     return self._affricate_consonant(sound1, sound2)
             # So, two matches, but no Diphthong or Cluster.
             i = 1

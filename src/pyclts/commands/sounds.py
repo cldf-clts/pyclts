@@ -4,7 +4,7 @@ Display basic info about sounds
 from clldutils.clilib import add_format, Table
 
 
-def register(parser):
+def register(parser):  # pylint: disable=C0116
     add_format(parser)
     parser.add_argument(
         'sounds',
@@ -13,7 +13,7 @@ def register(parser):
         help='sounds to display info for')
 
 
-def run(args):
+def run(args):  # pylint: disable=C0116
     tts = args.repos.transcriptionsystem(args.system)
     with Table(args, args.system.upper(), 'SOURCE', 'GENERATED', 'ALIAS', 'NAME') as data:
         for sound in args.sounds:

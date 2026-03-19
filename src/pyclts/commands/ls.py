@@ -4,7 +4,7 @@
 from clldutils.clilib import add_format, Table
 
 
-def register(parser):
+def register(parser):  # pylint: disable=C0116
     add_format(parser, default='simple')
     parser.add_argument(
         '--type',
@@ -13,7 +13,7 @@ def register(parser):
         default='ts')
 
 
-def run(args):
+def run(args):  # pylint: disable=C0116
     with Table(args, 'id', 'description', 'refs', 'type', 'uritemplate') as table:
         for src in args.repos.meta:
             if src['TYPE'] == args.type:
