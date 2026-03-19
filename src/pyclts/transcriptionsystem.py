@@ -230,19 +230,11 @@ class TranscriptionSystem(TranscriptionBase):
             if 'unknownsound' not in (sound1.type, sound2.type) and \
                     sound1.type == sound2.type and sound1.type in ['consonant', 'vowel']:
                 # diphthong creation
-                if sound1.type == 'vowel':
-                    return Diphthong.from_sounds(  # noqa: F405
-                        string, sound1, sound2, self)
-                elif sound1.type == 'consonant' and \
-                        sound1.manner in ('stop', 'implosive', 'click', 'nasal') and \
-                        sound2.manner in ('stop', 'implosive', 'affricate'):
-                    return Cluster.from_sounds(  # noqa: F405
-                        string, sound1, sound2, self)
-                elif sound1.type == 'consonant' and sound1.manner == 'click' \
-                        and sound2.manner == 'fricative':
-                    return Cluster.from_sounds(string, sound1, sound2, self)  # noqa: F405
-                # check for plosive plus fricative if they are the same in
-                # manner
+                if Diphthong.match(sound1, sound2):
+                    return Diphthong.from_sounds(string, sound1, sound2, self)
+                elif Cluster.match(sound1, sound2):
+                    return Cluster.from_sounds(string, sound1, sound2, self)
+                # check for plosive plus fricative if they are the same in manner
                 elif sound1.manner == 'stop' and sound2.manner == 'fricative' \
                         and sound1.place == sound2.place:
                     # join features

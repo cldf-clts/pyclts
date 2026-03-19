@@ -283,6 +283,10 @@ class ComplexSound(Sound):
     to_sound: Optional[str] = None
     features: Features = dataclasses.field(default_factory=Features)
 
+    @staticmethod
+    def match(sound1, sound2) -> bool:
+        raise NotImplemented
+
     def __str__(self):
         return str(self.from_sound) + str(self.to_sound)
 
@@ -341,6 +345,18 @@ class Cluster(ComplexSound):
     """
     features: Features = dataclasses.field(default_factory=Features)
 
+    @staticmethod
+    def match(sound1, sound2):
+        if isinstance(sound1, Consonant):
+            if \
+             sound1.manner in sound1.validated('manner', 'stop', 'implosive', 'click', 'nasal') and\
+             sound2.manner in sound2.validated('manner', 'stop', 'implosive', 'affricate'):
+                return True
+
+            if sound1.manner == 'click' and sound2.manner == 'fricative':
+                return True
+        return False
+
 
 @dataclasses.dataclass(repr=False, eq=False)
 class Vowel(Sound):
@@ -353,6 +369,10 @@ class Diphthong(ComplexSound):
     A dipthong consists of two vowels.
     """
     features: Features = dataclasses.field(default_factory=Features)
+
+    @staticmethod
+    def match(sound1, _):
+        return isinstance(sound1, Vowel)
 
 
 @dataclasses.dataclass(repr=False, eq=False)

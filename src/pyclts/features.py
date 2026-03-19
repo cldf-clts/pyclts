@@ -6,6 +6,23 @@ import functools
 import dataclasses
 from typing import Literal, get_args
 
+EXCLUDE_FEATURES = [  # FIXME: compute from metadata!
+    'apical',
+    'laminal',  # laminality
+    'ejective',  # ejection
+    'with-falling_tone',  # tone
+    'with-extra-low_tone',
+    'with-extra-high_tone',
+    'with-falling_tone',
+    'with-low_tone',
+    'with-global_fall',
+    'with-global_rise',
+    'with-high_tone',
+    'with-mid_tone',
+    'with-rising_tone',
+    'with-upstep'
+]
+
 
 @functools.cache
 def fields(cls):
@@ -32,6 +49,10 @@ class Features:
     @functools.lru_cache(maxsize=3)
     def valid_values(cls) -> dict[str, tuple[str]]:
         return {field.name: get_args(cls.__annotations__[field.name]) for field in cls.fields()}
+
+    def validated(self, feature, *vals):
+        assert all(val in  self.__class__.valid_values()[feature] for val in vals)
+        return vals
 
     @classmethod
     @functools.lru_cache(maxsize=3)
@@ -127,7 +148,7 @@ class ConsonantFeatures(Features):
     ] = dataclasses.field(default=None, metadata={'post': 6})
     laminality: Literal[
         "apical", "laminal"
-    ] = dataclasses.field(default=None, metadata={'post': 3})
+    ] = dataclasses.field(default=None, metadata={'post': 3, 'exclude': True})
     tongue_root: Literal[
         "advanced-tongue-root", "retracted-tongue-root"
     ] = dataclasses.field(default=None, metadata={'post': 5})
@@ -140,7 +161,7 @@ class ConsonantFeatures(Features):
     ] = None
     ejection: Literal[
         "ejective"
-    ] = dataclasses.field(default=None, metadata={'post': 7})
+    ] = dataclasses.field(default=None, metadata={'post': 7, 'exclude': True})
     airstream: Literal[
         "sibilant", "whistled-sibilant", "lateral"
     ] = None
@@ -213,7 +234,7 @@ class VowelFeatures(Features):
         "with-downstep", "with-extra-high_tone", "with-extra-low_tone", "with-falling_tone",
         "with-global_fall", "with-global_rise", "with-high_tone", "with-low_tone", "with-mid_tone",
         "with-rising_tone", "with-upstep"
-    ] = dataclasses.field(default=None, metadata={'post': 12})
+    ] = dataclasses.field(default=None, metadata={'post': 12, 'exclude': True})
 
 
 @dataclasses.dataclass(frozen=True)
