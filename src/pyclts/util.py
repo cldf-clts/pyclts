@@ -6,13 +6,10 @@ from collections.abc import Iterable, Generator
 import unicodedata
 from typing import Union, Literal
 
-from clldutils.markup import iter_markdown_sections
 from csvw import Table
 from csvw.dsv import reader
 
-__all__ = [
-    'EMPTY', 'UNKNOWN', 'norm', 'nfd', 'jaccard', 'upsert_section',
-    'itertable', 'dict_reader', 'MetadataType']
+__all__ = ['EMPTY', 'UNKNOWN', 'norm', 'nfd', 'jaccard', 'itertable', 'dict_reader', 'MetadataType']
 
 EMPTY = "◌"
 UNKNOWN = "�"
@@ -72,19 +69,3 @@ def jaccard(a: Union[set, frozenset], b: Union[set, frozenset]) -> float:
     """Compute the Jaccard distance. See https://en.wikipedia.org/wiki/Jaccard_index"""
     i, u = len(a.intersection(b)), len(a.union(b))
     return i / u if u else 0
-
-
-def upsert_section(p: pathlib.Path, in_header: str, level: int, new: str):
-    """Upsert a section in a markdown formatted file."""
-    res, found, in_section = [], False, False
-    for clevel, header, text in iter_markdown_sections(p.read_text(encoding='utf8')):
-        if in_section:
-            if clevel > level:
-                continue
-            in_section = False
-        if clevel == level and in_header in header:
-            text, found, in_section = new, True, True
-        res.extend([header, text or ''])
-    if not found:
-        res.extend([f"\n\n{level * '#'} {in_header}\n\n", new + '\n'])
-    p.write_text(''.join(t or '' for t in res), encoding='utf8')

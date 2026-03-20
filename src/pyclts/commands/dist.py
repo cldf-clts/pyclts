@@ -17,12 +17,13 @@ import dataclasses
 from csvw.dsv import UnicodeWriter
 from clldutils.clilib import PathType
 from clldutils.jsonlib import load, dump
+from clldutils.markup import iter_markdown_sections
 from pycldf import Dataset
 from pycldf.markdown import metadata2markdown
 
 from pyclts.models import is_valid_sound, Marker, Vowel, Tone, Consonant
 from pyclts.features import FEATURE_SYSTEM
-from pyclts.util import upsert_section, iter_markdown_sections
+from pyclts.cli_util import upsert_section
 
 METADATA = {
     "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],

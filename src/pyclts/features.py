@@ -1,5 +1,9 @@
+"""
+The pyclts implements a feature system.
+"""
 #
-# FIXME: We need a mechanism, a function or similar to make sure the implementation is compatible
+# FIXME:  # pylint: disable=fixme
+# We need a mechanism, a function or similar to make sure the implementation is compatible
 # with the data in the repos, namely pkg/transcriptionsystems/features.json
 #
 import functools

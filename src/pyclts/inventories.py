@@ -47,14 +47,6 @@ def reduce_features(
     return ts["short " + " ".join(name.split(" "))]
 
 
-class GetAttributeFromSound:
-    def __init__(self, attr):
-        self.attr = attr
-
-    def __get__(self, obj, objtype=None):
-        return getattr(obj.sound, self.attr, None)
-
-
 @dataclasses.dataclass
 class Phoneme:
     """
@@ -66,8 +58,13 @@ class Phoneme:
     occs: list = dataclasses.field(default_factory=list, repr=False)
     sound: Optional[Sound] = None
 
-    name = GetAttributeFromSound("name")
-    featureset = GetAttributeFromSound("featureset")
+    @property
+    def name(self):
+        return self.sound.name
+
+    @property
+    def featureset(self):
+        return self.sound.featureset
 
     def __len__(self):
         return len(self.occs)
@@ -83,61 +80,47 @@ class Phoneme:
         return 0
 
 
-class GetSubInventoryByType:
-    def __init__(self, types):
-        def select_sounds(inventory):
-            return collections.OrderedDict(
-                [(k, v) for k, v in inventory.items() if v.sound.type() in types]
-            )
-
-        self.select_sounds = select_sounds
-
-    def __get__(self, obj, objtype=None):
-        return self.select_sounds(obj.sounds)
+PhonemeDictType = dict[str, Phoneme]
 
 
-class GetSubInventoryByProperty(GetSubInventoryByType):
-    def __init__(self, types, properties):
-        GetSubInventoryByType.__init__(self, types)
-        self.properties = properties
+def _subinventory_by_type(sounds, types) -> PhonemeDictType:
+    return collections.OrderedDict(
+        [(k, v) for k, v in sounds.items() if v.sound.type() in types])
 
-    def __get__(self, obj, objtype=None):
-        out = collections.OrderedDict()
-        sounds = self.select_sounds(obj.sounds)
-        for k, v in sounds.items():
-            stripped = obj.ts.features_to_sound.get(
-                frozenset([s for s in v.featureset if s not in self.properties])
-            )
-            if str(stripped) != str(v) and str(stripped) not in sounds:
-                out[k] = v
-            elif str(stripped) == str(v):
-                out[k] = v
-        return out
+
+def _subinventory_by_ignored_features(sounds, types, features_to_sound, properties) -> PhonemeDictType:
+    out = collections.OrderedDict()
+    for k, v in _subinventory_by_type(sounds, types).items():
+        stripped = features_to_sound.get(
+            frozenset([s for s in v.featureset if s not in properties]))
+        if str(stripped) != str(v) and str(stripped) not in sounds:
+            out[k] = v
+        elif str(stripped) == str(v):
+            out[k] = v
+    return out
 
 
 @dataclasses.dataclass
 class Inventory:
-    id: Optional[str] = None
-    language: Optional[str] = None
-    sounds: dict[str, Phoneme] = dataclasses.field(default_factory=dict, repr=False)
-    ts: Optional[TranscriptionSystem] = dataclasses.field(default=None, repr=False)
+    id: Optional[str]
+    language: Optional[str]
+    ts: Optional[TranscriptionSystem] = dataclasses.field(repr=False)
 
-    consonants = GetSubInventoryByType(["consonant"])
-    consonants_by_quality = GetSubInventoryByProperty(
-        ["consonant"], ["long", "ultra-long", "mid-long", "ultra-short"]
-    )
-    consonant_sounds = GetSubInventoryByType(["consonant", "cluster"])
-    vowels = GetSubInventoryByType(["vowel"])
-    vowels_by_quality = GetSubInventoryByProperty(
-        ["vowel"], ["long", "ultra-long", "mid-long", "ultra-short"]
-    )
-    vowel_sounds = GetSubInventoryByType(["vowel", "diphthong"])
-    segments = GetSubInventoryByType(["consonant", "vowel", "cluster", "diphthong"])
-    tones = GetSubInventoryByType(["tone"])
-    markers = GetSubInventoryByType(["marker"])
-    clusters = GetSubInventoryByType(["cluster"])
-    diphthongs = GetSubInventoryByType(["diphthong"])
-    unknownsounds = GetSubInventoryByType(["unknownsound"])
+    sounds: PhonemeDictType = dataclasses.field(repr=False)
+    consonants: PhonemeDictType = dataclasses.field(repr=False)
+    # Consonants, ignoring differences just in length.
+    consonants_by_quality: PhonemeDictType = dataclasses.field(repr=False)
+    consonant_sounds: PhonemeDictType = dataclasses.field(repr=False)
+    vowels: PhonemeDictType = dataclasses.field(repr=False)
+    # Vowels, ignoring differences just in length.
+    vowels_by_quality: PhonemeDictType = dataclasses.field(repr=False)
+    vowel_sounds: PhonemeDictType = dataclasses.field(repr=False)
+    segments: PhonemeDictType = dataclasses.field(repr=False)
+    tones: PhonemeDictType = dataclasses.field(repr=False)
+    markers: PhonemeDictType = dataclasses.field(repr=False)
+    clusters: PhonemeDictType = dataclasses.field(repr=False)
+    diphthongs: PhonemeDictType = dataclasses.field(repr=False)
+    unknownsounds: PhonemeDictType = dataclasses.field(repr=False)
 
     @classmethod
     def from_list(cls, *list_of_sounds, id=None, language=None, ts=None):
@@ -154,7 +137,30 @@ class Inventory:
                     occs=[],
                     sound=sound,
                 )
-        return cls(sounds=sounds, ts=ts, language=language, id=id)
+
+        kw = dict(
+            consonants = _subinventory_by_type(sounds, ["consonant"]),
+            # Consonants, ignoring differences just in length.
+            consonants_by_quality = _subinventory_by_ignored_features(
+                sounds,
+            ["consonant"], ts.features_to_sound, ["long", "ultra-long", "mid-long", "ultra-short"]
+            ),
+            consonant_sounds = _subinventory_by_type(sounds, ["consonant", "cluster"]),
+            vowels = _subinventory_by_type(sounds, ["vowel"]),
+            # Vowels, ignoring differences just in length.
+            vowels_by_quality = _subinventory_by_ignored_features(sounds,
+                                                                  ["vowel"], ts.features_to_sound, ["long", "ultra-long", "mid-long", "ultra-short"]
+                                                                  ),
+            vowel_sounds = _subinventory_by_type(sounds, ["vowel", "diphthong"]),
+            segments = _subinventory_by_type(sounds, ["consonant", "vowel", "cluster", "diphthong"]),
+            tones = _subinventory_by_type(sounds, ["tone"]),
+            markers = _subinventory_by_type(sounds, ["marker"]),
+            clusters = _subinventory_by_type(sounds, ["cluster"]),
+            diphthongs = _subinventory_by_type(sounds, ["diphthong"]),
+            unknownsounds = _subinventory_by_type(sounds, ["unknownsound"]),
+        )
+
+        return cls(sounds=sounds, ts=ts, language=language, id=id, **kw)
 
     def __len__(self):
         return len(self.sounds)
@@ -185,6 +191,7 @@ class Inventory:
         return statistics.mean(scores) if scores else 0
 
     def approximate_similarity(self, other, aspects=None):
+        """Compute the approximate similarity between two inventories."""
         aspects = aspects or ["sounds"]
 
         def approximate(snds_a, snds_b):
@@ -208,7 +215,9 @@ class Inventory:
             snds_b = getattr(other, aspect).values()
             if snds_a and snds_b:
                 scores.append(
-                    statistics.mean([approximate(snds_a, snds_b), approximate(snds_b, snds_a)]))
+                    statistics.mean([
+                        approximate(snds_a, snds_b),
+                        approximate(snds_b, snds_a)]))  # pylint: disable=W1114
             elif snds_a or snds_b:
                 scores.append(0)
         return statistics.mean(scores) if scores else 0

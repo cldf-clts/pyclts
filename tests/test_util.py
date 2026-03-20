@@ -1,9 +1,10 @@
 import pytest
 
 from pyclts.util import *
+from pyclts.cli_util import upsert_section
+
 
 def test_jaccard():
-
     assert jaccard(set(), set()) == 0
 
 

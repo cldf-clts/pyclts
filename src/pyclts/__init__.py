@@ -1,3 +1,6 @@
+"""
+Programmatic access to CLTS data.
+"""
 from pyclts.transcriptionsystem import TranscriptionSystem  # noqa: F401
 from pyclts.transcriptiondata import TranscriptionData  # noqa: F401
 from pyclts.soundclasses import SoundClasses  # noqa: F401

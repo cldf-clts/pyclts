@@ -1,3 +1,6 @@
+"""
+Base class for "systems", i.e. systematic collections of matadata about aspects of transcriptions.
+"""
 import pathlib
 
 from .util import PathType

@@ -2,10 +2,12 @@
 Utilities used in pyclts commands.
 """
 import logging
+import pathlib
 from typing import Optional
 from collections.abc import Generator
 
 from uritemplate import URITemplate
+from clldutils.markup import iter_markdown_sections
 
 from pyclts.transcriptionsystem import TranscriptionSystem
 from pyclts.models import is_valid_sound, UnknownSound, Marker
@@ -75,3 +77,19 @@ def get_processed_transcription_data(
     found = len([o for o in out if o[0] != '<NA>'])
     log.info('... %s of %s graphemes found (%.0f%%)', found, len(out), found / len(out) * 100)
     return out
+
+
+def upsert_section(p: pathlib.Path, in_header: str, level: int, new: str):
+    """Upsert a section in a markdown formatted file."""
+    res, found, in_section = [], False, False
+    for clevel, header, text in iter_markdown_sections(p.read_text(encoding='utf8')):
+        if in_section:
+            if clevel > level:
+                continue
+            in_section = False
+        if clevel == level and in_header in header:
+            text, found, in_section = new, True, True
+        res.extend([header, text or ''])
+    if not found:
+        res.extend([f"\n\n{level * '#'} {in_header}\n\n", new + '\n'])
+    p.write_text(''.join(t or '' for t in res), encoding='utf8')
