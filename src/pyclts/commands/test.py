@@ -7,9 +7,8 @@ pkg/transcriptionsystems/features.json
 import pathlib
 import argparse
 
-from csvw.dsv import reader
-
 import pyclts
+from pyclts.util import dict_reader
 
 
 def register(parser):  # pylint: disable=C0116
@@ -102,7 +101,7 @@ def test_transcription_system_consistency(bipa, asjp, gld):  # pragma: no cover
 
 
 def read_tests(name):
-    return reader(pathlib.Path(pyclts.__file__).parent / 'data' / name, delimiter='\t', dicts=True)
+    return dict_reader(pathlib.Path(pyclts.__file__).parent / 'data' / name)
 
 
 def test_sounds(bipa, log):

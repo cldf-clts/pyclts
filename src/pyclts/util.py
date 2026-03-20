@@ -1,5 +1,6 @@
 """Auxiliary functions for pyclts."""
 import pathlib
+import functools
 import collections
 from collections.abc import Iterable, Generator
 import unicodedata
@@ -11,7 +12,7 @@ from csvw.dsv import reader
 
 __all__ = [
     'EMPTY', 'UNKNOWN', 'norm', 'nfd', 'TranscriptionBase', 'jaccard', 'upsert_section',
-    'itertable']
+    'itertable', 'dict_reader']
 
 EMPTY = "◌"
 UNKNOWN = "�"
@@ -20,6 +21,8 @@ GraphemeMapType = dict[str, dict[str, str]]
 DataType = dict[str, list[dict[str, str]]]
 SoundsType = list[str]
 NamesType = list[str]
+
+dict_reader = functools.partial(reader, delimiter='\t', dicts=True)
 
 
 class TranscriptionBase:
@@ -93,7 +96,7 @@ def read_data(
     """Read data from a TSV file."""
     grapheme_map, data, sounds, names = {}, collections.defaultdict(list), [], []
 
-    for row in reader(fname, delimiter='\t', dicts=True):
+    for row in dict_reader(fname):
         grapheme_map[nfd(row[grapheme_col])] = row['BIPA_GRAPHEME']
         grapheme = {"grapheme": row[grapheme_col]}
         for col in cols:

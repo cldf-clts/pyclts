@@ -4,17 +4,12 @@ from collections.abc import Generator
 
 from clldutils.apilib import API
 from clldutils.misc import nfilter
-from csvw.dsv import reader
 from cldfcatalog import Config
 from pybtex.database import parse_string
 
 from pyclts import TranscriptionData, TranscriptionSystem, SoundClasses
 from pyclts.soundclasses import SOUNDCLASS_SYSTEMS
-from pyclts.util import PathType
-
-
-def _rows(p):
-    return list(reader(p, delimiter='\t', dicts=True))
+from pyclts.util import PathType, dict_reader
 
 
 class CLTS(API):
@@ -33,7 +28,7 @@ class CLTS(API):
 
     @functools.cached_property
     def meta(self) -> list[dict[str, str]]:
-        res = _rows(self.repos / 'sources' / 'index.tsv')
+        res = list(dict_reader(self.repos / 'sources' / 'index.tsv'))
         for src in res:
             src['REFS'] = nfilter([s.strip() for s in src['REFS'].split(',')])
         return res
@@ -57,12 +52,12 @@ class CLTS(API):
             if (type is None) or (type == src['TYPE']):
                 graphemesp = self.repos / 'sources' / src['NAME'] / 'graphemes.tsv'
                 if graphemesp.exists():
-                    yield src, _rows(graphemesp)
+                    yield src, list(dict_reader(graphemesp))
 
     def get_source(self, name) -> Optional[list[dict[str, str]]]:
         graphemesp = self.repos / 'sources' / name / 'graphemes.tsv'
         if graphemesp.exists():
-            return _rows(graphemesp)
+            return list(dict_reader(graphemesp))
 
     def iter_transcriptiondata(self) -> Generator[TranscriptionData, None, None]:
         for td in sorted(self.transcriptiondata_dir.iterdir(), key=lambda p: p.name):

@@ -3,8 +3,9 @@
 """
 import collections
 
-from csvw.dsv import reader
 from clldutils.clilib import add_format, Table
+
+from pyclts.util import dict_reader
 
 
 def register(parser):  # pylint: disable=C0116
@@ -12,11 +13,10 @@ def register(parser):  # pylint: disable=C0116
 
 
 def run(args):  # pylint: disable=C0116
-    def read(fname):
-        return reader(args.repos.path('data', fname), delimiter='\t', dicts=True)
-
-    sounds = {row['NAME']: row for row in read('sounds.tsv')}
-    graphs = {'{GRAPHEME}-{NAME}-{DATASET}'.format(**row): row for row in read('graphemes.tsv')}
+    sounds = {row['NAME']: row for row in dict_reader(args.repos.path('data', 'sounds.tsv'))}
+    graphs = {
+        '{GRAPHEME}-{NAME}-{DATASET}'.format(**row): row
+        for row in dict_reader(args.repos.path('data', 'graphemes.tsv'))}
 
     graphdict = collections.defaultdict(list)
     for id_, row in graphs.items():
