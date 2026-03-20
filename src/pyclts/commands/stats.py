@@ -1,5 +1,5 @@
 """
-
+Compute summary stats.
 """
 import collections
 
@@ -15,11 +15,11 @@ def register(parser):  # pylint: disable=C0116
 def run(args):  # pylint: disable=C0116
     sounds = {row['NAME']: row for row in dict_reader(args.repos.path('data', 'sounds.tsv'))}
     graphs = {
-        '{GRAPHEME}-{NAME}-{DATASET}'.format(**row): row
+        '{GRAPHEME}-{NAME}-{DATASET}'.format(**row): row  # pylint: disable=C0209
         for row in dict_reader(args.repos.path('data', 'graphemes.tsv'))}
 
     graphdict = collections.defaultdict(list)
-    for id_, row in graphs.items():
+    for _, row in graphs.items():
         graphdict[row['GRAPHEME']].append(row['DATASET'])
 
     with Table(args, 'DATA', 'STATS', 'PERC') as text:

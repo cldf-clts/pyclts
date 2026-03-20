@@ -20,5 +20,5 @@ def run(args):  # pylint: disable=C0116
     src = [s for s in args.repos.meta if s['NAME'] == args.dataset][0]
     out = get_processed_transcription_data(src, rows, columns, bipa, args.log)
 
-    with writer('transcriptiondata', '{0}.tsv'.format(args.dataset)) as w:
+    with writer('transcriptiondata', f'{args.dataset}.tsv') as w:
         w.writerows(out)

@@ -5,6 +5,7 @@ from clldutils.clilib import ParserError
 from csvw.dsv import UnicodeWriter
 
 from pyclts.cli_util import get_processed_transcription_data
+from pyclts.soundclasses import SOUNDCLASS_SYSTEMS
 
 try:
     from lingpy.sequence.sound_classes import token2class
@@ -14,8 +15,6 @@ except ImportError:  # pragma: no cover
     LINGPY = False
     token2class = None
     Model = None
-
-from pyclts.soundclasses import SOUNDCLASS_SYSTEMS
 
 
 def run(args):  # pylint: disable=C0116
@@ -28,9 +27,9 @@ def run(args):  # pylint: disable=C0116
     columns = ['LATEX', 'FEATURES', 'SOUND', 'IMAGE', 'COUNT', 'NOTE']
     bipa = args.repos.bipa
     for src, rows in args.repos.iter_sources(type='td'):
-        args.log.info('TranscriptionData {0} ...'.format(src['NAME']))
+        args.log.info('TranscriptionData %s ...', src['NAME'])
         out = get_processed_transcription_data(src, rows, columns, bipa, args.log)
-        with writer('transcriptiondata', '{0}.tsv'.format(src['NAME'])) as w:
+        with writer('transcriptiondata', f"{src['NAME']}.tsv") as w:
             w.writerows(out)
 
     count = 0
