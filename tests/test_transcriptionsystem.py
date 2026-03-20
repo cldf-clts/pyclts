@@ -1,6 +1,16 @@
 import pytest
 
 from pyclts.transcriptionsystem import TranscriptionSystem
+from pyclts.systembase import TranscriptionBase
+
+
+def test_TranscriptionBase(tmpdir):
+    class TS(TranscriptionBase):
+        def resolve_sound(self, sound):
+            raise KeyError
+
+    ts = TS(str(tmpdir))
+    assert ts.get(None, 5) == 5
 
 
 def test_ts():
@@ -9,7 +19,7 @@ def test_ts():
 
 
 def test_unknown_sound(bipa):
-    assert bipa['AAː'].type == 'unknownsound'
+    assert bipa['AAː'].type() == 'unknownsound'
 
 
 def test_feature_system(asjp):

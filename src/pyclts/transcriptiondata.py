@@ -3,9 +3,9 @@ Transcription data provides metadata for graphemes/sounds.
 """
 from typing import Union
 
-from pyclts.util import (
-    read_data, TranscriptionBase, GraphemeMapType, DataType, SoundsType, NamesType)
+from pyclts.util import read_data, GraphemeMapType, DataType, SoundsType, NamesType
 from pyclts.transcriptionsystem import Sound, Symbol
+from .systembase import TranscriptionBase
 
 
 class TranscriptionData(TranscriptionBase):

@@ -4,12 +4,14 @@ Create the CLTS javascript app.
 import json
 import collections
 
+from pyclts.models import Marker
+
 
 def run(args):  # pylint: disable=C0116
     tts = args.repos.bipa
 
     def sound_to_dict(snd):
-        res = collections.OrderedDict([('name', snd.name), ('bipa', snd.s), ('type', snd.type)])
+        res = collections.OrderedDict([('name', snd.name), ('bipa', snd.s), ('type', snd.type())])
         for f, val in snd.features:
             res[f] = val
         return res
@@ -34,7 +36,7 @@ def run(args):  # pylint: disable=C0116
     for sound in tts:
         if sound not in all_sounds:
             snd = tts[sound]
-            if snd.type != 'marker':
+            if not isinstance(snd, Marker):
                 if snd.s in all_sounds:
                     all_sounds[sound] = all_sounds[snd.s]
                 else:

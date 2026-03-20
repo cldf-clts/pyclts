@@ -10,7 +10,7 @@ from typing import Optional, Union
 from clldutils.clilib import Table
 
 from pyclts.api import CLTS
-from pyclts.models import Sound, Symbol
+from pyclts.models import Sound, Symbol, COMPLEX_SOUNDS, Tone, Marker, UnknownSound
 from pyclts.transcriptionsystem import TranscriptionSystem, BaseSoundclassType, FeatureNameType
 from pyclts.util import jaccard
 from pyclts.features import ConsonantFeatures, VowelFeatures, ToneFeatures
@@ -37,12 +37,12 @@ def reduce_features(
             for cls in [ConsonantFeatures, VowelFeatures, ToneFeatures]}
 
     sound_ = ts[sound] if isinstance(sound, str) else sound
-    if sound_.type in ["cluster", "diphthong"]:
+    if sound_.type() in COMPLEX_SOUNDS:
         return reduce_features(sound_.from_sound, ts=ts, features=features)
 
-    fs = " ".join(s for s in [sound_.featuredict.get(x) for x in features[sound_.type]] if s)
-    name = f"{fs} {sound_.type}"
-    if sound_.type != "tone":
+    fs = " ".join(s for s in [sound_.featuredict.get(x) for x in features[sound_.type()]] if s)
+    name = f"{fs} {sound_.type()}"
+    if not isinstance(sound_, Tone):
         return ts[name]
     return ts["short " + " ".join(name.split(" "))]
 
@@ -66,7 +66,6 @@ class Phoneme:
     occs: list = dataclasses.field(default_factory=list, repr=False)
     sound: Optional[Sound] = None
 
-    type = GetAttributeFromSound("type")
     name = GetAttributeFromSound("name")
     featureset = GetAttributeFromSound("featureset")
 
@@ -77,7 +76,7 @@ class Phoneme:
         return self.grapheme
 
     def similarity(self, other):
-        if self.type not in ["marker", "unknownsound"]:
+        if not isinstance(self.sound, (Marker, UnknownSound)):
             return self.sound.similarity(other.sound)
         if self == other:
             return 1
@@ -88,7 +87,7 @@ class GetSubInventoryByType:
     def __init__(self, types):
         def select_sounds(inventory):
             return collections.OrderedDict(
-                [(k, v) for k, v in inventory.items() if v.type in types]
+                [(k, v) for k, v in inventory.items() if v.sound.type() in types]
             )
 
         self.select_sounds = select_sounds
@@ -165,7 +164,7 @@ class Inventory:
         table = []
         for t in types:
             for sound in getattr(self, t).values():
-                table += [[sound.grapheme, sound.type, sound.name, len(sound)]]
+                table += [[sound.grapheme, sound.sound.type(), sound.name, len(sound)]]
         with Table(
             argparse.Namespace(format=format),
             "Grapheme",

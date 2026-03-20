@@ -9,6 +9,7 @@ import argparse
 
 import pyclts
 from pyclts.util import dict_reader
+from pyclts.models import UnknownSound, Marker, Cluster
 
 
 def register(parser):  # pylint: disable=C0116
@@ -80,10 +81,10 @@ def test_transcription_system_consistency(bipa, asjp, gld):  # pragma: no cover
 
     for system in (bipa, gld, asjp):
         for sound in system:
-            if system[sound].type != 'unknownsound' and not system[sound].alias:
+            if not isinstance(system[sound], UnknownSound) and not system[sound].alias:
                 if sound != str(system[sound]):
                     raise ValueError
-            elif system[sound].type == 'unknownsound':
+            elif isinstance(system[sound], UnknownSound):
                 raise ValueError
 
     # important test for alias
@@ -112,7 +113,7 @@ def test_clicks(bipa):  # pylint: disable=C0116
 
 def _test_clicks(bipa, grapheme, gtype):
     if gtype == 'stop-cluster':
-        assert bipa[grapheme].type == 'cluster', bipa[grapheme].type
+        assert isinstance(bipa[grapheme], Cluster), bipa[grapheme].type()
 
 
 def _test_sounds(bipa, **kw):
@@ -120,7 +121,7 @@ def _test_sounds(bipa, **kw):
     kw = argparse.Namespace(**kw)
 
     sound = bipa[kw.source]
-    if sound.type not in ['unknownsound', 'marker']:
+    if not isinstance(sound, (UnknownSound, Marker)):
         if kw.nfd_normalized == '+':
             assert bipa[kw.source] != sound.source, "Sound does not resolve to itself"
         if kw.clts_normalized == "+":

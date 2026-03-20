@@ -4,7 +4,7 @@ Prepare transcriptiondata from the transcription sources.
 import logging
 from collections.abc import Generator
 
-from pyclts.models import is_valid_sound
+from pyclts.models import is_valid_sound, Marker, UnknownSound
 
 
 def register(parser):  # pylint: disable=C0116
@@ -55,9 +55,9 @@ def _test_row(
 
     if explicit and str(bipa_sound) == '<NA>':
         pass
-    elif explicit and bipa_sound.type == 'marker':
+    elif explicit and isinstance(bipa_sound, Marker):
         pass  # pragma: no cover
-    elif explicit and bipa_sound.type == 'unknownsound':
+    elif explicit and isinstance(bipa_sound, UnknownSound):
         log.error('unknown sound encountered for BIPA «%s» (Line %s)', row['BIPA'], i)
         yield (i, row['BIPA'], row['GRAPHEME'])
     elif explicit and not is_valid_sound(bipa_sound, bipa):  # pragma: no cover

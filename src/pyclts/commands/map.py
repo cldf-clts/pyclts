@@ -2,7 +2,7 @@
 Map a given sound inventory list to CLTS
 """
 
-from pyclts.models import is_valid_sound
+from pyclts.models import is_valid_sound, UnknownSound, Marker, Consonant, Cluster
 
 
 def register(parser):  # pylint: disable=C0116
@@ -28,8 +28,8 @@ def run(args, test=False):  # pylint: disable=C0116
         # second condition: we receive a value and interpret it
         elif bipa_grapheme:
             sound = bipa[bipa_grapheme]
-            if sound.type != "unknownsound":
-                if sound.type == 'marker':
+            if not isinstance(sound, UnknownSound):
+                if isinstance(sound, Marker):
                     premapped += 1
                 elif not is_valid_sound(sound, bipa):
                     row["BIPA"] = '(!)'
@@ -44,16 +44,16 @@ def run(args, test=False):  # pylint: disable=C0116
                 unmapped += 1
         else:
             sound = bipa[raw_grapheme]
-            if sound.type == "unknownsound":
+            if isinstance(sound, UnknownSound):
                 match = list(bipa._regex.finditer(raw_grapheme))
                 if len(match) == 2:
                     sound1 = bipa[raw_grapheme[:match[1].start()]]
                     sound2 = bipa[raw_grapheme[match[1].start():]]
-                    if sound1.type == "consonant" and sound2.type == "consonant":
+                    if isinstance(sound1, Consonant) and isinstance(sound2, Consonant):
                         # check for prenasalized stuff
-                        if sound1.manner == "nasal" and (
-                            sound2.place == sound2.place
-                            or sound2.manner
+                        if sound1.features.manner == "nasal" and (
+                            sound2.features.place == sound2.features.place
+                            or sound2.features.manner
                             in ["stop", "affricate", "fricative", "implosive"]
                         ):
                             row["BIPA"] = "(*)ⁿ" + str(sound2)
@@ -67,35 +67,35 @@ def run(args, test=False):  # pylint: disable=C0116
                 else:
                     row["BIPA"] = "(?)"
                     unmapped += 1
-            elif sound.type == "marker":
+            elif isinstance(sound, Marker):
                 row["BIPA"] = str(sound)
                 mapped += 1
-            elif sound.type == "cluster":
+            elif isinstance(sound, Cluster):
                 # check for prenasalized stuff
-                if sound.from_sound.manner == "nasal" and (
-                    sound.from_sound.place == sound.to_sound.place
-                    or sound.to_sound.manner
+                if sound.from_sound.features.manner == "nasal" and (
+                    sound.from_sound.features.place == sound.to_sound.features.place
+                    or sound.to_sound.features.manner
                     in ["stop", "affricate", "fricative", "implosive"]
                 ):
                     row["BIPA"] = "(*)ⁿ" + str(sound.to_sound)
                     mapped += 1
                 elif (
-                    sound.to_sound.manner == "fricative"
-                    and sound.from_sound.manner == "stop"
+                    sound.to_sound.features.manner == "fricative"
+                    and sound.from_sound.features.manner == "stop"
                 ):
                     new_sound = bipa[
                         sound.to_sound.name.replace("fricative", "affricate")
                     ]
-                    if new_sound.type == "consonant":
+                    if isinstance(new_sound, Consonant):
                         row["BIPA"] = "(*)" + str(new_sound.to_sound)
                         mapped += 1
                     else:
                         row["BIPA"] = "(?)"
                         unmapped += 1
                 elif (
-                    sound.from_sound.manner == sound.to_sound.manner
-                    and sound.from_sound.place == sound.to_sound.place
-                    and sound.from_sound.phonation == sound.to_sound.phonation
+                    sound.from_sound.features.manner == sound.to_sound.features.manner
+                    and sound.from_sound.features.place == sound.to_sound.features.place
+                    and sound.from_sound.features.phonation == sound.to_sound.features.phonation
                 ):
                     features = {
                         k: v or sound.to_sound.featuredict[k]
@@ -106,7 +106,7 @@ def run(args, test=False):  # pylint: disable=C0116
                         bipa[
                             " ".join([f for f in features.values() if f])
                             + " "
-                            + sound.from_sound.type])
+                            + sound.from_sound.type()])
                     mapped += 1
                 else:
                     row["BIPA"] = "(!)" + str(sound)
@@ -126,7 +126,7 @@ def run(args, test=False):  # pylint: disable=C0116
             else:
                 sound = bipa[row['BIPA']]
 
-            if sound.type not in ['unknownsound', 'marker']:
+            if not isinstance(sound, (Marker, UnknownSound)):
                 row['SYMBOLS'] = sound.symbols
 
         # Collect modified info

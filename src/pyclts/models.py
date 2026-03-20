@@ -4,11 +4,11 @@ OO wrappers of objects appearing in transcriptions.
 import functools
 import dataclasses
 import unicodedata
-from typing import Optional, TYPE_CHECKING, Any
+from typing import Optional, TYPE_CHECKING, Any, Literal, Union
 
 from clldutils.misc import nfilter
 
-from pyclts.util import norm, jaccard, EMPTY
+from .util import norm, jaccard, EMPTY
 from .features import ConsonantFeatures, VowelFeatures, ToneFeatures, Features
 
 if TYPE_CHECKING:
@@ -17,7 +17,8 @@ if TYPE_CHECKING:
 __all__ = [
     'is_valid_sound', 'fieldnames',
     'Symbol', 'Sound', 'Consonant', 'Vowel', 'Tone', 'Marker',
-    'Diphthong', 'Cluster', 'UnknownSound']
+    'Diphthong', 'Cluster', 'UnknownSound', 'SOUND_CLASSES', 'COMPLEX_SOUNDS']
+SoundclassNameType = Literal['consonant', 'vowel', 'tone', 'diphthong', 'cluster', 'unknownsound']
 
 
 def is_valid_sound(sound: 'Symbol', ts: 'TranscriptionSystem') -> bool:
@@ -38,9 +39,11 @@ class Symbol:
     generated: bool = False
     note: Optional[str] = None
 
-    @functools.cached_property
-    def type(self) -> str:  # pylint: disable=C0116
-        return self.__class__.__name__.lower()
+    @classmethod
+    @functools.lru_cache(maxsize=10)
+    def type(cls) -> Union[SoundclassNameType, Literal['Symbol', 'Sound', 'Marker']]:
+        """We want to have the lowercased class name handy for dict keys, etc."""
+        return cls.__name__.lower()
 
     def __str__(self) -> str:
         """A symbol is represented by its grapheme, i.e. the way it looks like in text."""
@@ -147,7 +150,7 @@ class Sound(Symbol):
     @property
     def featureset(self) -> frozenset[str]:
         """The feature values associated with a Symbol suitable as dict key."""
-        return frozenset(self._features() + [self.type])
+        return frozenset(self._features() + [self.type()])
 
     def similarity(self, other) -> float:
         """Compute the similarity of two symbols based on their features."""
@@ -157,7 +160,7 @@ class Sound(Symbol):
         for feature in features:
             if feature not in base_vals and getattr(self.features, feature, '') in self._features():
                 yield norm(
-                    self.ts.diacritics.grapheme_by_value[self.type].get(
+                    self.ts.diacritics.grapheme_by_value[self.type()].get(
                         getattr(self.features, feature, ''), '<!>'))
 
     def __str__(self) -> str:
@@ -180,7 +183,7 @@ class Sound(Symbol):
 
         # search for best base-string
         excluded = self.features.feature_values_excluded_in_str()
-        elements = [f for f in self._features() if f not in excluded] + [self.type]
+        elements = [f for f in self._features() if f not in excluded] + [self.type()]
         base_str = self.base or '<?>'
         base_graphemes = []
         while elements:
@@ -200,19 +203,19 @@ class Sound(Symbol):
 
     @property
     def name(self) -> str:
-        return ' '.join([f or '' for f in self._features()] + [self.type])
+        return ' '.join([f or '' for f in self._features()] + [self.type()])
 
     @property
     def table(self) -> list[str]:
         """Returns the tabular representation of the sound as given in our data"""
         tbl = []
-        features = [f for f, _ in self.features if f not in self.ts.columns[self.type]]
+        features = [f for f, _ in self.features if f not in self.ts.columns[self.type()]]
         # make sure to mark generated sounds
         if self.generated and self.s != self.source:
             tbl.append(str(self) + ' | ' + self.source)
         else:
             tbl.append(str(self))
-        for name in self.ts.columns[self.type][1:]:
+        for name in self.ts.columns[self.type()][1:]:
             if name not in ('extra', 'alias'):
                 tbl.append(getattr(self, name, None) or getattr(self.features, name, None) or '')
             elif name == 'alias':
@@ -251,7 +254,7 @@ class Marker(Symbol):
     @property
     def featureset(self) -> frozenset[str]:
         """The set of features suitable a dict key."""
-        return frozenset([self.grapheme, self.type])
+        return frozenset([self.grapheme, self.type()])
 
 
 @dataclasses.dataclass(eq=False, repr=False)
@@ -283,7 +286,7 @@ class ComplexSound(Sound):
     def name(self) -> str:
         n1 = ' '.join(self.from_sound.name.split(' ')[:-1])
         n2 = ' '.join(self.to_sound.name.split(' ')[:-1])
-        return 'from ' + n1 + ' to ' + n2 + ' ' + self.type
+        return 'from ' + n1 + ' to ' + n2 + ' ' + self.type()
 
     def _features(self):
         res = ['from_' + p for p in nfilter(v for _, v in self.from_sound.features)]
@@ -372,3 +375,10 @@ class Diphthong(ComplexSound):
 class Tone(Sound):
     """A tone."""
     features: ToneFeatures = dataclasses.field(default_factory=ToneFeatures)
+
+
+SOUND_CLASSES: dict[SoundclassNameType, type] = {
+    cls.__name__.lower() for cls in [Consonant, Vowel, Tone, Diphthong, Cluster, UnknownSound]}
+
+COMPLEX_SOUNDS: dict[Literal['diphthong', 'cluster'], tuple[type, type]] = {
+    cls.__name__.lower(): (cls, base) for cls, base in [(Diphthong, Vowel), (Cluster, Consonant)]}

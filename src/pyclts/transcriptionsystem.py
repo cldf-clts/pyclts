@@ -11,9 +11,11 @@ from typing import Literal, get_args, Union
 from csvw import TableGroup, Table
 
 from pyclts.models import fieldnames
-from pyclts.util import nfd, norm, EMPTY, itertable, TranscriptionBase
+from pyclts.util import nfd, norm, EMPTY, itertable
 from pyclts.models import (
-    Sound, UnknownSound, Cluster, Diphthong, Vowel, Consonant, Tone, Marker, Symbol)
+    Sound, UnknownSound, Cluster, Diphthong, Vowel, Consonant, Tone, Marker, Symbol,
+    COMPLEX_SOUNDS)
+from .systembase import TranscriptionBase
 
 SoundsByFeatures = dict[frozenset, Sound]
 BaseSoundclassType = Literal['consonant', 'vowel', 'tone']
@@ -21,9 +23,6 @@ BaseSoundclassOrMarkerType = Literal['consonant', 'vowel', 'tone', 'marker']
 BaseSoundclassMappingType = dict[BaseSoundclassType, dict[str, str]]
 FeatureValueType = str
 FeatureNameType = str
-
-COMPLEX_SOUNDS = {
-    cls.__name__.lower(): (cls, base) for cls, base in [(Diphthong, Vowel), (Cluster, Consonant)]}
 
 
 @dataclasses.dataclass(frozen=True)
@@ -211,7 +210,7 @@ class TranscriptionSystem(TranscriptionBase):  # pylint: disable=R0902
             # if we have ANY unknown sound, we mark the whole sound as unknown, if
             # we have two known sounds of the same type (vowel or consonant), we
             # either construct a diphthong or a cluster
-            if sound1.type == sound2.type and sound1.type in ['consonant', 'vowel']:
+            if sound1.type() == sound2.type() and isinstance(sound1, (Consonant, Vowel)):
                 for cls in [Diphthong, Cluster]:
                     if cls.match(sound1, sound2):
                         return cls.from_sounds(string, sound1, sound2, self)
@@ -282,7 +281,7 @@ class TranscriptionSystem(TranscriptionBase):  # pylint: disable=R0902
         sound = ''.join(sound)
 
         features['grapheme'] = sound
-        new_sound = self.sound_classes[base_sound.type].from_kw(**features)
+        new_sound = self.sound_classes[base_sound.type()].from_kw(**features)
         # check whether grapheme differs from re-generated sound
         if str(new_sound) != sound:
             new_sound.alias = True
@@ -351,9 +350,9 @@ class SymbolWithDiacritics:
         dias = [EMPTY + p for p in self.post] if what == 'post' else [p + EMPTY for p in self.pre]
         index = 1 if what == 'post' else 0
         for dia in dias:
-            feature = diacritics.value_by_grapheme[base_sound.type].get(dia, {})
+            feature = diacritics.value_by_grapheme[base_sound.type()].get(dia, {})
             if not feature:
                 raise ValueError(dia)
             yield feature
             grapheme.append(dia[index])
-            sound.append(diacritics.grapheme_by_value[base_sound.type][feature][index])
+            sound.append(diacritics.grapheme_by_value[base_sound.type()][feature][index])

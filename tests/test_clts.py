@@ -75,20 +75,20 @@ def test_parse(bipa):
     # diphthongs
     for s in ['ao', 'ea', 'ai', 'ua']:
         res = bipa[s]
-        assert res.type == 'diphthong'
+        assert res.type() == 'diphthong'
         assert res.name.endswith('diphthong')
         assert s == str(s)
 
     # clusters
     for s in ['mp']:#['tk', 'pk', 'dg', 'bdʰ']:
         res = bipa[s]
-        assert res.type == 'cluster'
+        assert res.type() == 'cluster'
         assert 'cluster' in res.name
         assert s == str(s)
 
     # go for bad diacritics in front and end of a string
-    assert bipa['*a'].type == 'unknownsound'
-    assert bipa['a*'].type == 'unknownsound'
+    assert bipa['*a'].type() == 'unknownsound'
+    assert bipa['a*'].type() == 'unknownsound'
 
     # marker
     assert isinstance(bipa['_'], Marker)

@@ -26,7 +26,7 @@ def test_Phoneme(bipa):
     phonB = Phoneme(grapheme=str(soundB), sound=soundB)
     phonC = Phoneme(grapheme=str(soundC), sound=soundC)
 
-    assert phonA.type == 'unknownsound'
+    assert phonA.sound.type() == 'unknownsound'
 
     assert phonA.similarity(phonB) == 0
     assert phonA.similarity(phonC) == 1

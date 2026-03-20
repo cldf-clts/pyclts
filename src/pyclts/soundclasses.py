@@ -3,8 +3,9 @@ Soundclass systems categorize sounds.
 """
 from typing import Literal, get_args
 
-from pyclts.transcriptionsystem import Symbol, COMPLEX_SOUNDS
-from pyclts.util import read_data, TranscriptionBase, SoundsType, NamesType
+from pyclts.models import UnknownSound, COMPLEX_SOUNDS, Symbol
+from pyclts.util import read_data, SoundsType, NamesType
+from .systembase import TranscriptionBase
 
 SoundclassNameType = Literal['sca', 'cv', 'art', 'dolgo', 'asjp', 'color']
 SOUNDCLASS_SYSTEMS = list(get_args(SoundclassNameType))
@@ -46,8 +47,8 @@ class SoundClasses(TranscriptionBase):
         sound = sound if isinstance(sound, Symbol) else self.system[sound]
         if sound.name in self.data:
             return self.data[sound.name]['grapheme']
-        if sound.type != 'unknownsound':
-            if sound.type in COMPLEX_SOUNDS:
+        if not isinstance(sound, UnknownSound):
+            if sound.type() in COMPLEX_SOUNDS:
                 return self.resolve_sound(sound.from_sound)
             name = [
                 s for s in sound.name.split(' ') if

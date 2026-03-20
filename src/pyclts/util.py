@@ -11,7 +11,7 @@ from csvw import Table
 from csvw.dsv import reader
 
 __all__ = [
-    'EMPTY', 'UNKNOWN', 'norm', 'nfd', 'TranscriptionBase', 'jaccard', 'upsert_section',
+    'EMPTY', 'UNKNOWN', 'norm', 'nfd', 'jaccard', 'upsert_section',
     'itertable', 'dict_reader', 'MetadataType']
 
 EMPTY = "◌"
@@ -24,48 +24,6 @@ NamesType = list[str]
 MetadataType = dict[Literal['NAME', 'DESCRIPTION', 'REFS', 'TYPE', 'URITEMPLATE'], str]
 
 dict_reader = functools.partial(reader, delimiter='\t', dicts=True)
-
-
-class TranscriptionBase:
-    """Functionality based on data read from files."""
-    __type__ = None
-
-    def __init__(self, path: PathType, system=None):
-        self.path = pathlib.Path(path)
-        self.system = system
-
-    @property
-    def id(self) -> str:
-        """The directory/file name identifies the transcription."""
-        return self.path.stem
-
-    def resolve_sound(self, sound):
-        """Abstract method"""
-        raise NotImplementedError  # pragma: no cover
-
-    def __getitem__(self, sound):
-        """Return a Sound instance matching the specification."""
-        return self.resolve_sound(sound)
-
-    def get(self, sound, default=None):
-        """Imitates dict.get, i.e. __getitem__ with default."""
-        try:
-            res = self[sound]
-            if getattr(res, 'type', None) == 'unknownsound' and default:
-                return default
-            return res
-        except KeyError:
-            return default
-
-    def __call__(self, sounds, default="0") -> list:
-        if isinstance(sounds, str):
-            sounds = sounds.split()
-
-        return [self.get(x, default=default) for x in sounds]
-
-    def translate(self, string: str, target_system: dict[str, str]):
-        """Translate symbols from one system to another."""
-        return ' '.join(f"{target_system.get(self[s].name or '?', '?')}" for s in string.split())
 
 
 def norm(string: str) -> str:

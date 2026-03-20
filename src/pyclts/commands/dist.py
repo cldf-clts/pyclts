@@ -20,7 +20,7 @@ from clldutils.jsonlib import load, dump
 from pycldf import Dataset
 from pycldf.markdown import metadata2markdown
 
-from pyclts.models import is_valid_sound
+from pyclts.models import is_valid_sound, Marker, Vowel, Tone, Consonant
 from pyclts.features import FEATURE_SYSTEM
 from pyclts.util import upsert_section, iter_markdown_sections
 
@@ -92,7 +92,9 @@ METADATA = {
                         "dc:description":
                             "CLTS distinguishes the basic sound types consonant, vowel, tone, "
                             "and marker. Features are defined for consonants, vowels, and tones.",
-                        "datatype": {"base": "string", "format": "consonant|vowel|tone"}
+                        "datatype": {
+                            "base": "string",
+                            "format": "|".join(c.type() for c in [Consonant, Vowel, Tone])}
                     },
                     {
                         "name": "FEATURE",
@@ -299,7 +301,7 @@ def run(args):  # pylint: disable=C0116
         bipa.sounds.items(),
         key=lambda p: (p[1].alias if p[1].alias else False, p[0], p[1].uname)
     ):
-        if sound.type not in ['marker']:
+        if not isinstance(sound, Marker):
             if sound.alias:
                 assert sound.name in sounds
                 sounds[sound.name]['aliases'].add(grapheme)
@@ -310,7 +312,7 @@ def run(args):  # pylint: disable=C0116
                     'unicode': sound.uname or '',
                     'generated': '',
                     'note': sound.note or '',
-                    'type': sound.type,
+                    'type': sound.type(),
                     'aliases': set(),
                     'normalized': '+' if sound.normalized else '',
                     'sound': sound,
@@ -342,7 +344,7 @@ def run(args):  # pylint: disable=C0116
                     'generated': '+',
                     'unicode': bipa_sound.uname or '',
                     'note': '',
-                    'type': bipa_sound.type,
+                    'type': bipa_sound.type(),
                     'alias': '+' if bipa_sound.alias else '',
                     'normalized': '+' if bipa_sound.normalized else '',
                     'sound': bipa_sound,
@@ -461,14 +463,14 @@ def _iter_sound_rows(args, sounds, fids):
     for k, v in sorted(sounds.items(), reverse=True):
         features = []
         sound = v['sound']
-        if sound.type in ['vowel', 'consonant', 'tone']:
+        if isinstance(sound, (Vowel, Consonant, Tone)):
             csounds = [sound]
         else:
             csounds = [sound.from_sound, sound.to_sound]
         for sound in csounds:
             for kk, vv in sound.featuredict.items():
                 if vv:
-                    fid = f'{sound.type}_{kk}_{vv}'
+                    fid = f'{sound.type()}_{kk}_{vv}'
                     if fid in fids:
                         features.append(fid)
                     else:
