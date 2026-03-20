@@ -56,7 +56,6 @@ def read_data(
     grapheme_map, data, sounds, names = {}, collections.defaultdict(list), [], []
 
     for row in dict_reader(fname):
-        print(row)
         grapheme_map[nfd(row[grapheme_col])] = row['BIPA_GRAPHEME']
         grapheme = {"grapheme": row[grapheme_col]}
         for col in cols:

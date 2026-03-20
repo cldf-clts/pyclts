@@ -28,17 +28,26 @@ def run(args):  # pylint: disable=C0116
         for ref in src['REFS']:
             assert ref in clts.references, f'Missing bibtex key: {ref}'
 
+    def run_test_func(func, *args):
+        print(f'{func.__name__} ...')
+        res = func(*args)
+        print('OK' if res else 'FAIL')
+
     if not args.test:  # pragma: no cover
-        test_transcriptiondata(
+        run_test_func(
+            test_transcriptiondata,
             clts.soundclass('sca'),
             clts.soundclass('dolgo'),
             clts.soundclass('asjp'),
             clts.transcriptiondata('phoible'),
-            clts.transcriptionsystem('bipa'))
-        test_transcription_system_consistency(
-            *[clts.transcriptionsystem(key) for key in ['bipa', 'asjpcode', 'gld']])
-    test_sounds(clts.bipa, args.log)
-    test_clicks(clts.bipa)
+            clts.transcriptionsystem('bipa')
+        )
+        run_test_func(
+            test_transcription_system_consistency,
+            *[clts.transcriptionsystem(key) for key in ['bipa', 'asjpcode', 'gld']]
+        )
+    run_test_func(test_sounds, clts.bipa, args.log)
+    run_test_func(test_clicks, clts.bipa)
 
 
 def test_transcriptiondata(sca, dolgo, asjpd, phoible, bipa):  # pragma: no cover
@@ -69,6 +78,7 @@ def test_transcriptiondata(sca, dolgo, asjpd, phoible, bipa):  # pragma: no cove
         raise ValueError()
     except KeyError:
         pass
+    return True
 
 
 def test_transcription_system_consistency(bipa, asjp, gld):  # pragma: no cover
@@ -89,6 +99,7 @@ def test_transcription_system_consistency(bipa, asjp, gld):  # pragma: no cover
 
     # important test for alias
     assert str(bipa['d̤ʷ']) == str(bipa['dʷʱ']) == str(bipa['dʱʷ'])
+    return True
 
 
 def read_tests(name):  # pylint: disable=C0116
@@ -104,11 +115,13 @@ def test_sounds(bipa, log):  # pylint: disable=C0116
             _test_sounds(bipa, **{k.replace('-', '_'): v for k, v in test.items()})
         except AssertionError as e:  # pragma: no cover
             log.warning('%s\t%s', test['source'], e)
+    return True
 
 
 def test_clicks(bipa):  # pylint: disable=C0116
     for test in read_tests('clicks.tsv'):
         _test_clicks(bipa, test['GRAPHEME'], test['MANNER'])
+    return True
 
 
 def _test_clicks(bipa, grapheme, gtype):

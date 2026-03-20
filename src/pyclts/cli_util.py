@@ -2,7 +2,6 @@
 Utilities used in pyclts commands.
 """
 import logging
-from math import isnan
 from typing import Optional
 from collections.abc import Generator
 

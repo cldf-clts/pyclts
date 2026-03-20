@@ -9,7 +9,7 @@ def register(parser):  # pylint: disable=C0116
     parser.add_argument("dataset", help="the file with the graphemes")
 
 
-def run(args, test=False):  # pylint: disable=C0116
+def run(args):  # pylint: disable=C0116
     # Instantiate BIPA
     bipa = args.repos.transcriptionsystem("bipa")
 

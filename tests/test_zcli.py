@@ -37,10 +37,16 @@ def test_sounds_(repos, capsys):
     assert 'kʰ' in out
 
 
-def test_map(tmp_repos, capsys, fixtures):
-    main(['--repos', str(tmp_repos), 'map', 'allenbai'])
+def test_map(tmp_repos, capsys, fixtures, caplog):
+    with caplog.at_level(logging.INFO):
+        main(['--repos', str(tmp_repos), 'map', 'maptest'])
     out, _ = capsys.readouterr()
-    assert 'BIPA' in out
+    assert '<NA>' in out
+    msgs = [rec.message for rec in caplog.records]
+    assert any('mapped 1' in msg for msg in msgs)
+    assert any('premapped 7' in msg for msg in msgs)
+    assert any('skipped 1' in msg for msg in msgs)
+    assert any('unmapped 1' in msg for msg in msgs)
 
 
 def test_make_dataset(tmp_repos, capsys, fixtures):
