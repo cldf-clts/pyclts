@@ -4,8 +4,9 @@ Module handles different aspects of inventory comparison.
 import argparse
 import statistics
 import collections
+from collections.abc import Iterable
 import dataclasses
-from typing import Optional, Union
+from typing import Optional, Union, Literal
 
 from clldutils.clilib import Table
 
@@ -60,10 +61,12 @@ class Phoneme:
 
     @property
     def name(self):
+        """Facade for the sound attribute."""
         return self.sound.name
 
     @property
     def featureset(self):
+        """Facade for the sound attribute."""
         return self.sound.featureset
 
     def __len__(self):
@@ -72,7 +75,8 @@ class Phoneme:
     def __str__(self):
         return self.grapheme
 
-    def similarity(self, other):
+    def similarity(self, other) -> float:
+        """Similarity of phonemes is largely computed as similarity of underlying sounds."""
         if not isinstance(self.sound, (Marker, UnknownSound)):
             return self.sound.similarity(other.sound)
         if self == other:
@@ -83,12 +87,17 @@ class Phoneme:
 PhonemeDictType = dict[str, Phoneme]
 
 
-def _subinventory_by_type(sounds, types) -> PhonemeDictType:
+def _subinventory_by_type(sounds: Iterable[dict[str, Sound]], types: list[str]) -> PhonemeDictType:
     return collections.OrderedDict(
         [(k, v) for k, v in sounds.items() if v.sound.type() in types])
 
 
-def _subinventory_by_ignored_features(sounds, types, features_to_sound, properties) -> PhonemeDictType:
+def _subinventory_by_ignored_features(
+        sounds: Iterable[dict[str, Sound]],
+        types: list[str],
+        features_to_sound: dict[frozenset[str], Sound],
+        properties: list[str],
+) -> PhonemeDictType:
     out = collections.OrderedDict()
     for k, v in _subinventory_by_type(sounds, types).items():
         stripped = features_to_sound.get(
@@ -100,8 +109,18 @@ def _subinventory_by_ignored_features(sounds, types, features_to_sound, properti
     return out
 
 
+# The PhonemeDictType-valued attributes of Inventory.
+AspectType = Literal[
+    'sounds',
+    'consonants', 'consonants_by_quality', 'consonant_sounds',
+    'vowels', 'vowels_by_quality', 'vowel_sounds',
+    'segments', 'tones', 'markers', 'clusters', 'diphthongs', 'unknownsounds',
+]
+
+
 @dataclasses.dataclass
-class Inventory:
+class Inventory:  # pylint: disable=too-many-instance-attributes
+    """A phoneme inventory."""
     id: Optional[str]
     language: Optional[str]
     ts: Optional[TranscriptionSystem] = dataclasses.field(repr=False)
@@ -123,7 +142,14 @@ class Inventory:
     unknownsounds: PhonemeDictType = dataclasses.field(repr=False)
 
     @classmethod
-    def from_list(cls, *list_of_sounds, id=None, language=None, ts=None):
+    def from_list(
+            cls,
+            *list_of_sounds: Union[str, Sound],
+            id: Optional[str] = None,  # pylint: disable=W0622
+            language: Optional[str] = None,
+            ts: Optional[TranscriptionSystem] = None
+    ) -> 'Inventory':
+        """Initialize an inventory from a list of sounds."""
         ts = ts or CLTS().bipa
         sounds = collections.OrderedDict()
         for itm in list_of_sounds:
@@ -137,40 +163,46 @@ class Inventory:
                     occs=[],
                     sound=sound,
                 )
-
-        kw = dict(
-            consonants = _subinventory_by_type(sounds, ["consonant"]),
+        kw = dict(  # pylint: disable=R1735
+            consonants=_subinventory_by_type(sounds, ["consonant"]),
             # Consonants, ignoring differences just in length.
-            consonants_by_quality = _subinventory_by_ignored_features(
+            consonants_by_quality=_subinventory_by_ignored_features(
                 sounds,
-            ["consonant"], ts.features_to_sound, ["long", "ultra-long", "mid-long", "ultra-short"]
-            ),
-            consonant_sounds = _subinventory_by_type(sounds, ["consonant", "cluster"]),
-            vowels = _subinventory_by_type(sounds, ["vowel"]),
+                ["consonant"],
+                ts.features_to_sound,
+                ["long", "ultra-long", "mid-long", "ultra-short"]),
+            consonant_sounds=_subinventory_by_type(sounds, ["consonant", "cluster"]),
+            vowels=_subinventory_by_type(sounds, ["vowel"]),
             # Vowels, ignoring differences just in length.
-            vowels_by_quality = _subinventory_by_ignored_features(sounds,
-                                                                  ["vowel"], ts.features_to_sound, ["long", "ultra-long", "mid-long", "ultra-short"]
-                                                                  ),
-            vowel_sounds = _subinventory_by_type(sounds, ["vowel", "diphthong"]),
-            segments = _subinventory_by_type(sounds, ["consonant", "vowel", "cluster", "diphthong"]),
-            tones = _subinventory_by_type(sounds, ["tone"]),
-            markers = _subinventory_by_type(sounds, ["marker"]),
-            clusters = _subinventory_by_type(sounds, ["cluster"]),
-            diphthongs = _subinventory_by_type(sounds, ["diphthong"]),
-            unknownsounds = _subinventory_by_type(sounds, ["unknownsound"]),
+            vowels_by_quality=_subinventory_by_ignored_features(
+                sounds,
+                ["vowel"],
+                ts.features_to_sound,
+                ["long", "ultra-long", "mid-long", "ultra-short"]),
+            vowel_sounds=_subinventory_by_type(sounds, ["vowel", "diphthong"]),
+            segments=_subinventory_by_type(
+                sounds, ["consonant", "vowel", "cluster", "diphthong"]),
+            tones=_subinventory_by_type(sounds, ["tone"]),
+            markers=_subinventory_by_type(sounds, ["marker"]),
+            clusters=_subinventory_by_type(sounds, ["cluster"]),
+            diphthongs=_subinventory_by_type(sounds, ["diphthong"]),
+            unknownsounds=_subinventory_by_type(sounds, ["unknownsound"]),
         )
-
         return cls(sounds=sounds, ts=ts, language=language, id=id, **kw)
 
     def __len__(self):
         return len(self.sounds)
 
-    def tabulate(self, format="pipe", types=None):
+    def tabulate(
+            self,
+            format: str = "pipe",  # pylint: disable=W0622
+            types: Optional[list[AspectType]] = None):
+        """Render the inventory as table of graphemes."""
         types = types or ["sounds"]
         table = []
         for t in types:
             for sound in getattr(self, t).values():
-                table += [[sound.grapheme, sound.sound.type(), sound.name, len(sound)]]
+                table.append([sound.grapheme, sound.sound.type(), sound.name, len(sound)])
         with Table(
             argparse.Namespace(format=format),
             "Grapheme",
@@ -180,21 +212,27 @@ class Inventory:
         ) as table_text:
             table_text += table
 
-    def strict_similarity(self, other, aspects=None):
-        aspects = aspects or ["sounds"]
+    def strict_similarity(
+            self,
+            other: 'Inventory',
+            aspects: Optional[list[AspectType]] = None,
+    ) -> float:
+        """Compute strict similarity between two inventories."""
         scores = []
-        for aspect in aspects:
-            snds_a = {sound for sound in getattr(self, aspect)}
-            snds_b = {sound for sound in getattr(other, aspect)}
+        for aspect in aspects or ["sounds"]:
+            snds_a = set(getattr(self, aspect))
+            snds_b = set(getattr(other, aspect))
             if snds_a or snds_b:
-                scores += [jaccard(snds_a, snds_b)]
+                scores.append(jaccard(snds_a, snds_b))
         return statistics.mean(scores) if scores else 0
 
-    def approximate_similarity(self, other, aspects=None):
+    def approximate_similarity(
+            self,
+            other: 'Inventory',
+            aspects: Optional[list[AspectType]] = None,
+    ) -> float:
         """Compute the approximate similarity between two inventories."""
-        aspects = aspects or ["sounds"]
-
-        def approximate(snds_a, snds_b):
+        def _approximate(snds_a, snds_b) -> float:
             matches = []
             for snd_a in snds_a:
                 best_match, best_sim = None, 0
@@ -204,20 +242,20 @@ class Inventory:
                         best_match = snd_b
                         best_sim = current_sim
                 if best_match is not None:
-                    matches += [best_sim]
+                    matches.append(best_sim)
                     snds_b = [s for s in snds_b if s != best_match]
-            matches += [0 for _ in snds_b]
+            matches.extend([0 for _ in snds_b])
             return statistics.mean(matches)
 
         scores = []
-        for aspect in aspects:
+        for aspect in aspects or ["sounds"]:
             snds_a = getattr(self, aspect).values()
             snds_b = getattr(other, aspect).values()
             if snds_a and snds_b:
                 scores.append(
                     statistics.mean([
-                        approximate(snds_a, snds_b),
-                        approximate(snds_b, snds_a)]))  # pylint: disable=W1114
+                        _approximate(snds_a, snds_b),
+                        _approximate(snds_b, snds_a)]))  # pylint: disable=W1114
             elif snds_a or snds_b:
                 scores.append(0)
         return statistics.mean(scores) if scores else 0
