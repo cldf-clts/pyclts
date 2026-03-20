@@ -9,7 +9,7 @@ from pybtex.database import parse_string
 
 from pyclts import TranscriptionData, TranscriptionSystem, SoundClasses
 from pyclts.soundclasses import SOUNDCLASS_SYSTEMS
-from pyclts.util import PathType, dict_reader
+from pyclts.util import PathType, dict_reader, MetadataType
 
 
 class CLTS(API):
@@ -27,7 +27,7 @@ class CLTS(API):
         return self.transcriptionsystem('bipa')
 
     @functools.cached_property
-    def meta(self) -> list[dict[str, str]]:
+    def meta(self) -> list[MetadataType]:
         res = list(dict_reader(self.repos / 'sources' / 'index.tsv'))
         for src in res:
             src['REFS'] = nfilter([s.strip() for s in src['REFS'].split(',')])
@@ -38,7 +38,7 @@ class CLTS(API):
         return parse_string(
             self.path('data', 'references.bib').read_text(encoding='utf8'), 'bibtex').entries
 
-    def get_meta(self, obj) -> Optional[dict[str, str]]:
+    def get_meta(self, obj) -> Optional[MetadataType]:
         for src in self.meta:
             if obj.__type__ == src['TYPE'] and obj.id == src['NAME']:
                 return src

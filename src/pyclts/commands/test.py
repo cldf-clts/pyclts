@@ -25,7 +25,7 @@ def run(args):  # pylint: disable=C0116
 
     for src in clts.meta:
         for ref in src['REFS']:
-            assert ref in clts.references, 'Missing bibtex key: {}'.format(ref)
+            assert ref in clts.references, f'Missing bibtex key: {ref}'
 
     if not args.test:  # pragma: no cover
         test_transcriptiondata(
@@ -41,6 +41,7 @@ def run(args):  # pylint: disable=C0116
 
 
 def test_transcriptiondata(sca, dolgo, asjpd, phoible, bipa):  # pragma: no cover
+    """Test samples of transcription data"""
     seq = 'tʰ ɔ x ˈth ə r A ˈI ʲ'
     seq2 = 'th o ?/x a'
     seq3 = 'th o ?/ a'
@@ -70,41 +71,30 @@ def test_transcriptiondata(sca, dolgo, asjpd, phoible, bipa):  # pragma: no cove
 
 
 def test_transcription_system_consistency(bipa, asjp, gld):  # pragma: no cover
+    """Test all sounds in transcription systems."""
     # bipa should always be able to be translated to
-    for sound in asjp:
-        if sound not in bipa:
-            assert '<?>' not in str(bipa[asjp[sound].name])
-    for sound in gld:
-        if sound not in bipa:
-            assert '<?>' not in str(bipa[gld[sound].name])
-    for sound in bipa:
-        if bipa[sound].type != 'unknownsound' and not bipa[sound].alias:
-            if sound != str(bipa[sound]):
+    for system in (asjp, gld):
+        for sound in system:
+            if sound not in bipa:
+                assert '<?>' not in str(bipa[system[sound].name])
+
+    for system in (bipa, gld, asjp):
+        for sound in system:
+            if system[sound].type != 'unknownsound' and not system[sound].alias:
+                if sound != str(system[sound]):
+                    raise ValueError
+            elif system[sound].type == 'unknownsound':
                 raise ValueError
-        elif bipa[sound].type == 'unknownsound':
-            raise ValueError
-    for sound in gld:
-        if gld[sound].type != 'unknownsound' and not gld[sound].alias:
-            if sound != str(gld[sound]):
-                raise ValueError
-        elif gld[sound].type == 'unknownsound':
-            raise ValueError
-    for sound in asjp:
-        if asjp[sound].type != 'unknownsound' and not asjp[sound].alias:
-            if sound != str(asjp[sound]):
-                raise ValueError
-        elif asjp[sound].type == 'unknownsound':
-            raise ValueError
 
     # important test for alias
     assert str(bipa['d̤ʷ']) == str(bipa['dʷʱ']) == str(bipa['dʱʷ'])
 
 
-def read_tests(name):
+def read_tests(name):  # pylint: disable=C0116
     return dict_reader(pathlib.Path(pyclts.__file__).parent / 'data' / name)
 
 
-def test_sounds(bipa, log):
+def test_sounds(bipa, log):  # pylint: disable=C0116
     for test in read_tests('test_data.tsv'):
         del test['bipa']
         if None in test:
@@ -115,7 +105,7 @@ def test_sounds(bipa, log):
             log.warning('%s\t%s', test['source'], e)
 
 
-def test_clicks(bipa):
+def test_clicks(bipa):  # pylint: disable=C0116
     for test in read_tests('clicks.tsv'):
         _test_clicks(bipa, test['GRAPHEME'], test['MANNER'])
 

@@ -1,10 +1,10 @@
 """
 Called as part of the CLDF creation workflow.
 """
-from uritemplate import URITemplate
 from clldutils.clilib import ParserError
 from csvw.dsv import UnicodeWriter
-from pyclts.commands.make_dataset import process_transcription_data
+
+from pyclts.cli_util import get_processed_transcription_data
 
 try:
     from lingpy.sequence.sound_classes import token2class
@@ -29,11 +29,7 @@ def run(args):  # pylint: disable=C0116
     bipa = args.repos.bipa
     for src, rows in args.repos.iter_sources(type='td'):
         args.log.info('TranscriptionData {0} ...'.format(src['NAME']))
-        uritemplate = URITemplate(src['URITEMPLATE']) if src['URITEMPLATE'] else None
-        out = process_transcription_data(rows, columns, uritemplate, bipa, args)
-        found = len([o for o in out if o[0] != '<NA>'])
-        args.log.info('... {0} of {1} graphemes found ({2:.0f}%)'.format(
-            found, len(out), found / len(out) * 100))
+        out = get_processed_transcription_data(src, rows, columns, bipa, args.log)
         with writer('transcriptiondata', '{0}.tsv'.format(src['NAME'])) as w:
             w.writerows(out)
 

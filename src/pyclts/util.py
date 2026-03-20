@@ -4,7 +4,7 @@ import functools
 import collections
 from collections.abc import Iterable, Generator
 import unicodedata
-from typing import Union
+from typing import Union, Literal
 
 from clldutils.markup import iter_markdown_sections
 from csvw import Table
@@ -12,7 +12,7 @@ from csvw.dsv import reader
 
 __all__ = [
     'EMPTY', 'UNKNOWN', 'norm', 'nfd', 'TranscriptionBase', 'jaccard', 'upsert_section',
-    'itertable', 'dict_reader']
+    'itertable', 'dict_reader', 'MetadataType']
 
 EMPTY = "◌"
 UNKNOWN = "�"
@@ -21,6 +21,7 @@ GraphemeMapType = dict[str, dict[str, str]]
 DataType = dict[str, list[dict[str, str]]]
 SoundsType = list[str]
 NamesType = list[str]
+MetadataType = dict[Literal['NAME', 'DESCRIPTION', 'REFS', 'TYPE', 'URITEMPLATE'], str]
 
 dict_reader = functools.partial(reader, delimiter='\t', dicts=True)
 
@@ -97,6 +98,7 @@ def read_data(
     grapheme_map, data, sounds, names = {}, collections.defaultdict(list), [], []
 
     for row in dict_reader(fname):
+        print(row)
         grapheme_map[nfd(row[grapheme_col])] = row['BIPA_GRAPHEME']
         grapheme = {"grapheme": row[grapheme_col]}
         for col in cols:

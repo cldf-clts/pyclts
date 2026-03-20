@@ -3,14 +3,12 @@ Display basic info about sounds
 """
 from clldutils.clilib import add_format, Table
 
+from pyclts.cli_util import add_sounds
+
 
 def register(parser):  # pylint: disable=C0116
     add_format(parser)
-    parser.add_argument(
-        'sounds',
-        metavar='SOUNDS',
-        nargs='+',
-        help='sounds to display info for')
+    add_sounds(parser)
 
 
 def run(args):  # pylint: disable=C0116

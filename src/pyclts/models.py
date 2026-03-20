@@ -199,7 +199,7 @@ class Sound(Symbol):
         return ''.join(out)
 
     @property
-    def name(self):
+    def name(self) -> str:
         return ' '.join([f or '' for f in self._features()] + [self.type])
 
     @property

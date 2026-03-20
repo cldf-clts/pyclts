@@ -5,19 +5,17 @@ import collections
 
 from clldutils.clilib import Table, add_format
 
+from pyclts.cli_util import add_sounds
+
 
 def register(parser):  # pylint: disable=C0116
     add_format(parser)
+    add_sounds(parser)
     parser.add_argument(
         '--filter',
         choices=['generated', 'unknown', 'known'],
         help='',
         default=None)
-    parser.add_argument(
-        'sounds',
-        metavar='SOUNDS',
-        nargs='+',
-        help='sounds to display info for')
 
 
 def run(args):  # pylint: disable=C0116
