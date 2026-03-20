@@ -1,5 +1,5 @@
 """
-
+List the elements of the feature system.
 """
 from clldutils.clilib import add_format, Table
 

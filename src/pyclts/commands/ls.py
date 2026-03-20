@@ -1,5 +1,5 @@
 """
-
+List systems of a pyrticular type.
 """
 from clldutils.clilib import add_format, Table
 

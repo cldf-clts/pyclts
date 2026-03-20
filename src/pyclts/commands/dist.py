@@ -289,47 +289,45 @@ def write_table(p, rows, counts):
                 counts[p.name] += 1
 
 
-def run(args):  # pylint: disable=C0116
-    args.destination = args.destination or args.repos.path('data', 'clts.zip')
+@dataclasses.dataclass
+class Acc:
+    sounds: dict[str, dict[str, str]] = dataclasses.field(
+        default_factory=lambda: collections.defaultdict(dict))
+    data: list[Grapheme] = dataclasses.field(default_factory=list)
+    clts_dump: dict[str, tuple[str, str]] = dataclasses.field(
+        default_factory=collections.OrderedDict)
 
-    sounds = collections.defaultdict(dict)
-    data = []
-    clts_dump = collections.OrderedDict()
-    bipa = args.repos.bipa
-    # start from assembling bipa-sounds
-    args.log.info('adding bipa data')
-    for grapheme, sound in sorted(
-        bipa.sounds.items(),
-        key=lambda p: (p[1].alias if p[1].alias else False, p[0], p[1].uname)
-    ):
-        if not isinstance(sound, Marker):
-            if sound.alias:
-                assert sound.name in sounds
-                sounds[sound.name]['aliases'].add(grapheme)
-            else:
-                assert sound.name not in sounds
-                sounds[sound.name] = {
-                    'grapheme': grapheme,
-                    'unicode': sound.uname or '',
-                    'generated': '',
-                    'note': sound.note or '',
-                    'type': sound.type(),
-                    'aliases': set(),
-                    'normalized': '+' if sound.normalized else '',
-                    'sound': sound,
-                }
-            data.append(Grapheme(
-                GRAPHEME=grapheme,
-                NAME=sound.name,
-                EXPLICIT='+',
-                DATASET='bipa',
-                NOTE=sound.note or ''))
-            if grapheme not in clts_dump:
-                clts_dump[grapheme] = [str(sound), sound.name]
+    def add_bipa_sounds(self, bipa):
+        for grapheme, sound in sorted(
+            bipa.sounds.items(),
+            key=lambda p: (p[1].alias if p[1].alias else False, p[0], p[1].uname)
+        ):
+            if not isinstance(sound, Marker):
+                if sound.alias:
+                    assert sound.name in self.sounds
+                    self.sounds[sound.name]['aliases'].add(grapheme)
+                else:
+                    assert sound.name not in self.sounds
+                    self.sounds[sound.name] = {
+                        'grapheme': grapheme,
+                        'unicode': sound.uname or '',
+                        'generated': '',
+                        'note': sound.note or '',
+                        'type': sound.type(),
+                        'aliases': set(),
+                        'normalized': '+' if sound.normalized else '',
+                        'sound': sound,
+                    }
+                self.data.append(Grapheme(
+                    GRAPHEME=grapheme,
+                    NAME=sound.name,
+                    EXPLICIT='+',
+                    DATASET='bipa',
+                    NOTE=sound.note or ''))
+                if grapheme not in self.clts_dump:
+                    self.clts_dump[grapheme] = (str(sound), sound.name)
 
-    # add sounds systematically by their alias
-    args.log.info('adding transcription data')
-    for td in args.repos.iter_transcriptiondata():
+    def add_transcriptiondata(self, td, bipa):
         for name in td.names:
             bipa_sound = bipa[name]
 
@@ -337,9 +335,9 @@ def run(args):  # pylint: disable=C0116
             if not is_valid_sound(bipa_sound, bipa):
                 continue
 
-            sound = sounds.get(name)
+            sound = self.sounds.get(name)
             if not sound:
-                sound = sounds[name] = {
+                sound = self.sounds[name] = {
                     'grapheme': bipa_sound.s,
                     'aliases': {bipa_sound.s},
                     'generated': '+',
@@ -354,7 +352,7 @@ def run(args):  # pylint: disable=C0116
             for item in sorted(td.data[name], key=lambda d: (d['bipa_grapheme'], d['grapheme'])):
                 sound['aliases'].add(item['grapheme'])
                 # add the values here
-                data.append(Grapheme(
+                self.data.append(Grapheme(
                     GRAPHEME=item['grapheme'],
                     NAME=name,
                     EXPLICIT=item['explicit'],
@@ -365,45 +363,67 @@ def run(args):  # pylint: disable=C0116
                     IMAGE=item.get('image', ''),
                     SOUND=item.get('sound', ''),
                 ))
-                if item['grapheme'] not in clts_dump:
-                    clts_dump[item['grapheme']] = [sound['grapheme'], name]
+                if item['grapheme'] not in self.clts_dump:
+                    self.clts_dump[item['grapheme']] = (sound['grapheme'], name)
 
-    # sound classes have a generative component, so we need to treat them separately
-    args.log.info('adding sound classes')
-    for sc in args.repos.iter_soundclass():
-        for name in sorted(sounds):
+    def add_soundclass(self, sc, log):
+        for name in sorted(self.sounds):
             try:
                 grapheme = sc[name]
-                data.append(Grapheme(
+                self.data.append(Grapheme(
                     GRAPHEME=grapheme,
                     NAME=name,
                     EXPLICIT='+' if name in sc.data else '',
                     DATASET=sc.id,
                 ))
             except KeyError:  # pragma: no cover
-                args.log.debug(name, sounds[name]['grapheme'])
+                log.debug(name, self.sounds[name]['grapheme'])
+
+    def add_transcriptionsystem(self, ts, log):
+        for name in sorted(self.sounds):
+            try:
+                ts_sound = ts[name]
+                if is_valid_sound(ts_sound, ts):
+                    self.sounds[name]['aliases'].add(ts_sound.s)
+                    self.data.append(Grapheme(
+                        GRAPHEME=ts_sound.s,
+                        NAME=name,
+                        EXPLICIT='' if self.sounds[name]['generated'] else '+',
+                        DATASET=ts.id,
+                    ))
+                    if ts_sound.s not in self.clts_dump:
+                        self.clts_dump[ts_sound.s] = (self.sounds[name]['grapheme'], name)
+            except ValueError:
+                pass
+            except TypeError:  # pragma: no cover
+                log.debug('%s: %s', ts.id, name)
+
+
+def run(args):  # pylint: disable=C0116
+    args.destination = args.destination or args.repos.path('data', 'clts.zip')
+
+    acc = Acc()
+
+    bipa = args.repos.bipa
+    # start from assembling bipa-sounds
+    args.log.info('adding bipa data')
+    acc.add_bipa_sounds(bipa)
+
+    # add sounds systematically by their alias
+    args.log.info('adding transcription data')
+    for td in args.repos.iter_transcriptiondata():
+        acc.add_transcriptiondata(td, bipa)
+
+    # sound classes have a generative component, so we need to treat them separately
+    args.log.info('adding sound classes')
+    for sc in args.repos.iter_soundclass():
+        acc.add_soundclass(sc, args.log)
 
     # last run, check again for each of the remaining transcription systems,
     # whether we can translate the sound
     args.log.info('adding remaining transcription systems')
     for ts in args.repos.iter_transcriptionsystem(exclude=['bipa']):
-        for name in sorted(sounds):
-            try:
-                ts_sound = ts[name]
-                if is_valid_sound(ts_sound, ts):
-                    sounds[name]['aliases'].add(ts_sound.s)
-                    data.append(Grapheme(
-                        GRAPHEME=ts_sound.s,
-                        NAME=name,
-                        EXPLICIT='' if sounds[name]['generated'] else '+',
-                        DATASET=ts.id,
-                    ))
-                    if ts_sound.s not in clts_dump:
-                        clts_dump[ts_sound.s] = [sounds[name]['grapheme'], name]
-            except ValueError:
-                pass
-            except TypeError:  # pragma: no cover
-                args.log.debug('%s: %s', ts.id, name)
+        acc.add_transcriptionsystem(ts, args.log)
 
     counts = {
         'index.tsv': len(args.repos.meta),
@@ -415,9 +435,12 @@ def run(args):  # pylint: disable=C0116
     args.log.info('writing data to file')
 
     fids = set()
-    write_table(args.repos.path('data', 'features.tsv'), _iter_feature_rows(args, fids), counts)
-    write_table(args.repos.path('data', 'sounds.tsv'), _iter_sound_rows(args, sounds, fids), counts)
-    write_table(args.repos.path('data', 'graphemes.tsv'), _iter_grapheme_row(data), counts)
+    write_table(
+        args.repos.path('data', 'features.tsv'), _iter_feature_rows(args, fids), counts)
+    write_table(
+        args.repos.path('data', 'sounds.tsv'), _iter_sound_rows(args, acc.sounds, fids), counts)
+    write_table(
+        args.repos.path('data', 'graphemes.tsv'), _iter_grapheme_row(acc.data), counts)
 
     for table in METADATA['tables']:
         table['dc:extent'] = counts[table['url'].split('/')[-1]]
@@ -442,7 +465,7 @@ def run(args):  # pylint: disable=C0116
         mode='w',
         compression=zipfile.ZIP_DEFLATED
     ) as myzip:
-        myzip.writestr('clts.json', json.dumps(clts_dump))
+        myzip.writestr('clts.json', json.dumps(acc.clts_dump))
 
 
 def _iter_feature_rows(args, fids):
