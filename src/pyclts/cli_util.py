@@ -9,8 +9,8 @@ from collections.abc import Generator
 from uritemplate import URITemplate
 from clldutils.markup import iter_markdown_sections
 
-from pyclts.transcriptionsystem import TranscriptionSystem
-from pyclts.models import is_valid_sound, UnknownSound, Marker
+from pyclts.datatypes import TranscriptionSystem
+from pyclts.models import UnknownSound, Marker
 from pyclts.util import MetadataType
 
 __all__ = ['add_sounds', 'get_processed_transcription_data']
@@ -39,7 +39,7 @@ def _iter_transcription_data(
         explicit = '+' if row['BIPA'] else ''
         generated = '+' if bipa_sound.generated else ''
         if not explicit:
-            if is_valid_sound(bipa_sound, bipa):
+            if bipa.is_valid(bipa_sound):
                 bipa_grapheme = bipa_sound.s
                 bipa_name = bipa_sound.name
                 bipa_symbols = bipa_sound.symbols
@@ -51,7 +51,7 @@ def _iter_transcription_data(
             elif isinstance(bipa_sound, UnknownSound):
                 raise ValueError(
                     f"wrong BIPA sound «{row['BIPA']}» in mapping")  # pragma: no cover
-            elif not isinstance(bipa_sound, Marker) and not is_valid_sound(bipa_sound, bipa):
+            elif not isinstance(bipa_sound, Marker) and not bipa.is_valid(bipa_sound):
                 raise ValueError(
                     f"invalid BIPA sound «{row['BIPA']}» in mapping")  # pragma: no cover
             elif isinstance(bipa_sound, Marker):

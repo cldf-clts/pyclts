@@ -10,10 +10,8 @@ from clldutils.misc import nfilter
 from cldfcatalog import Config
 from pybtex.database import parse_string
 
-from pyclts.transcriptiondata import TranscriptionData
-from pyclts.transcriptionsystem import TranscriptionSystem
-from pyclts.soundclasses import SoundClasses
-from pyclts.soundclasses import SOUNDCLASS_SYSTEMS
+from pyclts.datatypes import TranscriptionData, TranscriptionSystem, SoundClasses
+from pyclts.datatypes import SOUNDCLASS_SYSTEMS
 from pyclts.util import PathType, dict_reader, MetadataType
 
 
@@ -46,7 +44,7 @@ class CLTS(API):
 
     def get_meta(self, obj) -> Optional[MetadataType]:  # pylint: disable=C0116
         for src in self.meta:
-            if obj.__type__ == src['TYPE'] and obj.id == src['NAME']:
+            if obj.type() == src['TYPE'] and obj.id == src['NAME']:
                 return src
         return None
 

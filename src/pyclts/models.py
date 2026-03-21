@@ -12,22 +12,16 @@ from .util import norm, jaccard, EMPTY
 from .features import ConsonantFeatures, VowelFeatures, ToneFeatures, Features
 
 if TYPE_CHECKING:
-    from pyclts.transcriptionsystem import TranscriptionSystem
+    from pyclts.datatypes import TranscriptionSystem
 
 __all__ = [
-    'is_valid_sound', 'fieldnames',
+    'fieldnames',
     'Symbol', 'Sound', 'Consonant', 'Vowel', 'Tone', 'Marker',
     'Diphthong', 'Cluster', 'UnknownSound', 'SOUND_CLASSES', 'COMPLEX_SOUNDS']
 SoundclassNameType = Literal['consonant', 'vowel', 'tone', 'diphthong', 'cluster', 'unknownsound']
-
-
-def is_valid_sound(sound: 'Symbol', ts: 'TranscriptionSystem') -> bool:
-    """Check the consistency of a given transcription system conversion"""
-    if isinstance(sound, (Marker, UnknownSound)):
-        return False
-    s1 = ts[sound.name]
-    s2 = ts[sound.s]
-    return s1.name == s2.name and s1.s == s2.s
+BaseSoundclassType = Literal['consonant', 'vowel', 'tone']
+BaseSoundclassOrMarkerType = Literal['consonant', 'vowel', 'tone', 'marker']
+BaseSoundclassMappingType = dict[BaseSoundclassType, dict[str, str]]
 
 
 @dataclasses.dataclass

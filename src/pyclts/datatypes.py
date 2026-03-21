@@ -1,56 +1,123 @@
 """
-Transcription System module for consistent IPA handling.
-========================================================
-
+CLTS groups transcription information into three categories:
+Transcription systems (`ts`), transcription data (`td`) and soundclass systems (`sc`).
 """
 import re
-import dataclasses
-from collections.abc import Generator
 from typing import Literal, get_args, Union
 
-from csvw import TableGroup, Table
+from csvw import TableGroup
 
-from pyclts.models import fieldnames
-from pyclts.util import nfd, norm, EMPTY, itertable
 from pyclts.models import (
     Sound, UnknownSound, Cluster, Diphthong, Vowel, Consonant, Tone, Marker, Symbol,
-    COMPLEX_SOUNDS)
-from .systembase import TranscriptionBase
+    COMPLEX_SOUNDS, BaseSoundclassOrMarkerType, fieldnames)
+from pyclts.util import read_data, SoundsType, NamesType, GraphemeMapType, DataType, nfd, norm, itertable
+from .datatypes_util import TranscriptionBase, Diacritics, SymbolWithDiacritics
 
 SoundsByFeatures = dict[frozenset, Sound]
-BaseSoundclassType = Literal['consonant', 'vowel', 'tone']
-BaseSoundclassOrMarkerType = Literal['consonant', 'vowel', 'tone', 'marker']
-BaseSoundclassMappingType = dict[BaseSoundclassType, dict[str, str]]
 FeatureValueType = str
 FeatureNameType = str
 
+DatatypeNameType = Literal['sc', 'td', 'ts']
+SoundclassNameType = Literal['sca', 'cv', 'art', 'dolgo', 'asjp', 'color']
+SOUNDCLASS_SYSTEMS = list(get_args(SoundclassNameType))
 
-@dataclasses.dataclass(frozen=True)
-class Diacritics:
-    """Lookup tables for a system's diacritics."""
-    grapheme_by_value: BaseSoundclassMappingType = dataclasses.field(
-        default_factory=lambda: {sc: {} for sc in get_args(BaseSoundclassType)})
-    value_by_grapheme: BaseSoundclassMappingType = dataclasses.field(
-        default_factory=lambda: {sc: {} for sc in get_args(BaseSoundclassType)})
 
-    @classmethod
-    def from_table(cls, table: Table, feature_values):
-        """Initialize the lookup tables from the data in the system's diacritics file."""
-        res = cls()
-        for dia in itertable(table):
-            if not dia['alias'] and not dia['typography']:
-                res.grapheme_by_value[dia['type']][dia['value']] = dia['grapheme']
-            # assign feature values to the dictionary
-            feature_values[dia['value']] = dia['feature']
-            res.value_by_grapheme[dia['type']][dia['grapheme']] = dia['value']
-        return res
+class SoundClasses(TranscriptionBase):
+    """
+    Class for handling sound class models.
+    """
+    def __init__(self, path, system, id_: SoundclassNameType):
+        assert id_ in SOUNDCLASS_SYSTEMS
+        super().__init__(path, system)
+        self._id: SoundclassNameType = id_
+        self.sounds: SoundsType
+        self.names: NamesType
+        _, data, self.sounds, self.names = read_data(self.path, self._id)
+        self.data: dict[str, dict[str, str]] = {}
+        self.classes: set[str] = set()
+        for k, v in data.items():
+            self.data[k] = v[0]
+            self.classes.add(v[0]['grapheme'])
+
+    @property
+    def id(self) -> SoundclassNameType:
+        """System identifier."""
+        return self._id
+
+    def resolve_sound(self, sound):
+        """Function tries to identify a sound in the data.
+
+        Notes
+        -----
+        The function tries to resolve sounds to take a sound with less complex
+        features in order to yield the next approximate sound class, if the
+        transcription data are sound classes.
+        """
+        sound = sound if isinstance(sound, Symbol) else self.system[sound]
+        if sound.name in self.data:
+            return self.data[sound.name]['grapheme']
+        if not isinstance(sound, UnknownSound):
+            if sound.type() in COMPLEX_SOUNDS:
+                return self.resolve_sound(sound.from_sound)
+            name = [
+                s for s in sound.name.split(' ') if
+                s not in sound.features.feature_values_excluded_in_str()]
+            while len(name) >= 4:
+                sound = self.system.get(' '.join(name))
+                if sound and sound.name in self.data:
+                    return self.resolve_sound(sound)
+                name.pop(0)
+        raise KeyError(":sc:resolve_sound: No sound could be found.")
+
+
+class TranscriptionData(TranscriptionBase):
+    """
+    Class for handling transcription data.
+    """
+    def __init__(self, path, system):
+        super().__init__(path, system)
+        self.grapheme_map: GraphemeMapType
+        self.data: DataType
+        self.sounds: SoundsType
+        self.names: NamesType
+        self.grapheme_map, self.data, self.sounds, self.names = read_data(
+            self.path,
+            'GRAPHEME',
+            'URL',
+            'BIPA_GRAPHEME',
+            'GENERATED',
+            'URL',
+            'LATEX',
+            'FEATURES',
+            'SOUND',
+            'IMAGE',
+            'COUNT',
+            'NOTE',
+            'EXPLICIT'
+        )
+
+    def resolve_sound(self, sound: Union[str, Sound]) -> str:
+        """Function tries to identify a sound in the data.
+
+        Notes
+        -----
+        The function tries to resolve sounds to take a sound with less complex
+        features in order to yield the next approximate sound class, if the
+        transcription data are sound classes.
+        """
+        if not isinstance(sound, Sound):
+            sound = self.system[sound]
+        if sound.name in self.data:
+            return '//'.join([x['grapheme'] for x in self.data[sound.name]])
+        raise KeyError(":td:resolve_sound: No sound could be found.")
+
+    def resolve_grapheme(self, grapheme: str) -> Union[Sound, Symbol]:
+        """Resolve a grapheme to a sound."""
+        return self.system[self.grapheme_map[grapheme]]
 
 
 class TranscriptionSystem(TranscriptionBase):  # pylint: disable=R0902
-    """
-    A transcription System."""
-    __type__ = 'ts'
-
+    """A transcription System."""
     def __init__(self, path, metadata):
         """
         :param system: The name of a transcription system or a directory containing one.
@@ -217,9 +284,9 @@ class TranscriptionSystem(TranscriptionBase):  # pylint: disable=R0902
 
                 # check for plosive plus fricative if they are the same in manner
                 if all((
-                    sound1.features.place == sound2.features.place,
-                    sound1.features.manner == sound1.features.validated('manner', 'stop'),
-                    sound2.features.manner == sound2.features.validated('manner', 'fricative')
+                        sound1.features.place == sound2.features.place,
+                        sound1.features.manner == sound1.features.validated('manner', 'stop'),
+                        sound2.features.manner == sound2.features.validated('manner', 'fricative')
                 )):
                     return self._affricate_consonant(sound1, sound2)
             # So, two matches, but no Diphthong or Cluster.
@@ -301,6 +368,14 @@ class TranscriptionSystem(TranscriptionBase):  # pylint: disable=R0902
         sound = nfd(sound)
         return self._from_symbol(sound)
 
+    def is_valid(self, sound: Symbol) -> bool:
+        """Check the consistency of a given transcription system conversion"""
+        if isinstance(sound, (Marker, UnknownSound)):
+            return False
+        s1 = self[sound.name]
+        s2 = self[sound.s]
+        return s1.name == s2.name and s1.s == s2.s
+
     @property
     def feature_system(self) -> dict[FeatureValueType, FeatureNameType]:
         """The feature values used in the system mapped to feature names."""
@@ -313,46 +388,3 @@ class TranscriptionSystem(TranscriptionBase):  # pylint: disable=R0902
 
     def __iter__(self):
         return iter(self.sounds)
-
-
-@dataclasses.dataclass
-class SymbolWithDiacritics:
-    """
-    Components of a symbol decorated with left- and right-attaching diacritics for easier
-    processing.
-    """
-    pre: str = ''
-    base: str = ''
-    post: str = ''
-
-    def iter_add_pre(
-            self,
-            diacritics: Diacritics,
-            base_sound: Sound,
-            grapheme: list[str],
-            sound: list[str],
-    ) -> Generator[str, None, None]:
-        """Add left-attaching diacritics to sound and grapheme, yielding new features."""
-        yield from self._add('pre', diacritics, base_sound, grapheme, sound)
-
-    def iter_add_post(
-            self,
-            diacritics: Diacritics,
-            base_sound: Sound,
-            grapheme: list[str],
-            sound: list[str],
-    ) -> Generator[str, None, None]:
-        """Add right-attaching diacritics to sound and grapheme, yielding new features."""
-        yield from self._add('post', diacritics, base_sound, grapheme, sound)
-
-    def _add(  # pylint: disable=R0913,R0917
-            self, what: Literal['pre', 'post'], diacritics, base_sound, grapheme, sound):
-        dias = [EMPTY + p for p in self.post] if what == 'post' else [p + EMPTY for p in self.pre]
-        index = 1 if what == 'post' else 0
-        for dia in dias:
-            feature = diacritics.value_by_grapheme[base_sound.type()].get(dia, {})
-            if not feature:
-                raise ValueError(dia)
-            yield feature
-            grapheme.append(dia[index])
-            sound.append(diacritics.grapheme_by_value[base_sound.type()][feature][index])

@@ -5,7 +5,7 @@ from clldutils.clilib import ParserError
 from csvw.dsv import UnicodeWriter
 
 from pyclts.cli_util import get_processed_transcription_data
-from pyclts.soundclasses import SOUNDCLASS_SYSTEMS
+from pyclts.datatypes import SOUNDCLASS_SYSTEMS
 
 try:
     from lingpy.sequence.sound_classes import token2class

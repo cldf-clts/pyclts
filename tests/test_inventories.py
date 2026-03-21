@@ -1,6 +1,6 @@
 import pytest
 from pyclts.inventories import reduce_features, Inventory, Phoneme
-from pyclts.transcriptionsystem import TranscriptionSystem
+from pyclts.datatypes import TranscriptionSystem
 
 
 @pytest.fixture

@@ -1,7 +1,7 @@
 import pytest
 
-from pyclts.transcriptionsystem import TranscriptionSystem
-from pyclts.systembase import TranscriptionBase
+from pyclts.datatypes import TranscriptionSystem
+from pyclts.datatypes_util import TranscriptionBase
 
 
 def test_TranscriptionBase(tmpdir):

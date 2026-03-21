@@ -21,7 +21,7 @@ from clldutils.markup import iter_markdown_sections
 from pycldf import Dataset
 from pycldf.markdown import metadata2markdown
 
-from pyclts.models import is_valid_sound, Marker, Vowel, Tone, Consonant
+from pyclts.models import Marker, Vowel, Tone, Consonant
 from pyclts.features import FEATURE_SYSTEM
 from pyclts.cli_util import upsert_section
 
@@ -332,7 +332,7 @@ class Acc:
             bipa_sound = bipa[name]
 
             # check for consistency of mapping here
-            if not is_valid_sound(bipa_sound, bipa):
+            if not bipa.is_valid(bipa_sound):
                 continue
 
             sound = self.sounds.get(name)
@@ -383,7 +383,7 @@ class Acc:
         for name in sorted(self.sounds):
             try:
                 ts_sound = ts[name]
-                if is_valid_sound(ts_sound, ts):
+                if ts.is_valid(ts_sound):
                     self.sounds[name]['aliases'].add(ts_sound.s)
                     self.data.append(Grapheme(
                         GRAPHEME=ts_sound.s,
@@ -404,15 +404,14 @@ def run(args):  # pylint: disable=C0116
 
     acc = Acc()
 
-    bipa = args.repos.bipa
     # start from assembling bipa-sounds
     args.log.info('adding bipa data')
-    acc.add_bipa_sounds(bipa)
+    acc.add_bipa_sounds(args.repos.bipa)
 
     # add sounds systematically by their alias
     args.log.info('adding transcription data')
     for td in args.repos.iter_transcriptiondata():
-        acc.add_transcriptiondata(td, bipa)
+        acc.add_transcriptiondata(td, args.repos.bipa)
 
     # sound classes have a generative component, so we need to treat them separately
     args.log.info('adding sound classes')
@@ -443,8 +442,9 @@ def run(args):  # pylint: disable=C0116
         args.repos.path('data', 'graphemes.tsv'), _iter_grapheme_row(acc.data), counts)
 
     for table in METADATA['tables']:
-        table['dc:extent'] = counts[table['url'].split('/')[-1]]
+        table['dc:extent'] = counts[table['url'].rsplit('/', maxsplit=1)[-1]]
 
+    # FIXME: This only updates the common props at root level.
     METADATA.update(load(args.repos.repos / 'metadata.json'))
     md_path = args.repos.repos / 'cldf-metadata.json'
     dump(METADATA, md_path, indent=4)

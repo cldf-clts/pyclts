@@ -1,6 +1,6 @@
 import pytest
 
-from pyclts.models import Marker, UnknownSound, is_valid_sound, Symbol, Sound
+from pyclts.models import Marker, UnknownSound, Symbol, Sound
 
 
 def test_TranscriptionBase_translate(bipa, asjp):
@@ -9,8 +9,8 @@ def test_TranscriptionBase_translate(bipa, asjp):
 
 
 def test_is_valid_sound(bipa):
-    assert not is_valid_sound(bipa['_'], bipa)
-    assert is_valid_sound(bipa['ä'], bipa)
+    assert not bipa.is_valid(bipa['_'])
+    assert bipa.is_valid(bipa['ä'])
 
 
 def test_getitem(bipa):

@@ -5,8 +5,8 @@ import dataclasses
 import logging
 from typing import Optional
 
-from pyclts.models import is_valid_sound, UnknownSound, Marker, Consonant, Cluster
-from pyclts.transcriptionsystem import TranscriptionSystem
+from pyclts.models import UnknownSound, Marker, Consonant, Cluster
+from pyclts.datatypes import TranscriptionSystem
 
 
 def register(parser):  # pylint: disable=C0116
@@ -39,7 +39,7 @@ def _map_bipa_grapheme(
     if not isinstance(sound, UnknownSound):
         if isinstance(sound, Marker):
             report.premapped += 1
-        elif not is_valid_sound(sound, bipa):
+        elif not bipa.is_valid(sound):
             report.unmapped += 1
             return '(!)'
         elif sound.s != bipa_grapheme:
@@ -114,7 +114,7 @@ def _map_sound(raw_grapheme, bipa, report) -> str:
         return str(sound)
     if isinstance(sound, Cluster):
         return _map_cluster(sound, bipa, report)
-    if is_valid_sound(sound, bipa):
+    if bipa.is_valid(sound):
         report.mapped += 1
         return sound.s
     report.unmapped += 1
