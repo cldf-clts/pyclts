@@ -25,7 +25,7 @@ def run(args):  # pylint: disable=C0116
     clts = args.repos
 
     for src in clts.meta:
-        for ref in src['REFS']:
+        for ref in src.REFS:
             assert ref in clts.references, f'Missing bibtex key: {ref}'
 
     def run_test_func(func, *args):

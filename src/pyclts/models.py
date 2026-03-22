@@ -8,14 +8,13 @@ from typing import Optional, TYPE_CHECKING, Any, Literal, Union
 
 from clldutils.misc import nfilter
 
-from .util import norm, jaccard, EMPTY
+from .util import norm, jaccard, EMPTY, fieldnames
 from .features import ConsonantFeatures, VowelFeatures, ToneFeatures, Features
 
 if TYPE_CHECKING:
     from pyclts.datatypes import TranscriptionSystem
 
 __all__ = [
-    'fieldnames',
     'Symbol', 'Sound', 'Consonant', 'Vowel', 'Tone', 'Marker',
     'Diphthong', 'Cluster', 'UnknownSound', 'SOUND_CLASSES', 'COMPLEX_SOUNDS']
 SoundclassNameType = Literal['consonant', 'vowel', 'tone', 'diphthong', 'cluster', 'unknownsound']
@@ -73,12 +72,6 @@ class Symbol:
 @dataclasses.dataclass
 class UnknownSound(Symbol):
     """Marker for unknown stuff passed to systems for identification."""
-
-
-@functools.cache
-def fieldnames(cls) -> list[str]:
-    """Fieldnames of a dataclass. Cached for performance."""
-    return [f.name for f in dataclasses.fields(cls)]
 
 
 @dataclasses.dataclass(eq=False, repr=False)

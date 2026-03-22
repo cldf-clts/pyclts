@@ -27,9 +27,9 @@ def run(args):  # pylint: disable=C0116
     columns = ['LATEX', 'FEATURES', 'SOUND', 'IMAGE', 'COUNT', 'NOTE']
     bipa = args.repos.bipa
     for src, rows in args.repos.iter_sources(type='td'):
-        args.log.info('TranscriptionData %s ...', src['NAME'])
+        args.log.info('TranscriptionData %s ...', src.NAME)
         out = get_processed_transcription_data(src, rows, columns, bipa, args.log)
-        with writer('transcriptiondata', f"{src['NAME']}.tsv") as w:
+        with writer('transcriptiondata', f"{src.NAME}.tsv") as w:
             w.writerows(out)
 
     count = 0

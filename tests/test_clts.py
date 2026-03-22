@@ -3,6 +3,16 @@ import pytest
 from pyclts.models import Marker, UnknownSound, Symbol, Sound
 
 
+def test_bug():
+    """
+    before:
+    77340   u*i     from long unrounded open back to unrounded close front diphthong                asjpcode        0
+
+    now:
+    77337   u*i     from long rounded close back to unrounded close front diphthong         asjpcode        0
+    """
+
+
 def test_TranscriptionBase_translate(bipa, asjp):
     assert bipa.translate('ts a', asjp) == 'c E'
     assert asjp.translate('c a', bipa) == 'ts ɐ'

@@ -1,5 +1,7 @@
 import logging
 
+from pycldf import Dataset
+
 from pyclts.__main__ import main as main_
 
 
@@ -105,3 +107,10 @@ def test_dist(tmp_repos, tmp_path):
     main(['--repos', str(tmp_repos), 'dist', '--destination', str(p)])
     assert tmp_repos.joinpath('data', 'graphemes.tsv').exists()
     assert p.exists()
+    ds = Dataset.from_metadata(tmp_repos / 'cldf-metadata.json')
+    for g in ds['data/graphemes.tsv']:
+        if r'\textsuperscript' in g['GRAPHEME']:
+            assert r'\\text' not in g['GRAPHEME'], "Backslash in data doubled!"
+            break
+    else:
+        assert False, "LaTeX encoding did not survive CLDF creation!"  # pragma: no cover

@@ -1,5 +1,5 @@
 """
-Base class for "systems", i.e. systematic collections of matadata about aspects of transcriptions.
+Base class for "systems", i.e. systematic collections of data about aspects of transcriptions.
 """
 import pathlib
 import functools
@@ -22,7 +22,7 @@ class TranscriptionBase:
         self.system = system
 
     @classmethod
-    @functools.lru_cache(maxsize=10)
+    @functools.lru_cache(maxsize=5)
     def type(cls) -> str:
         """We want to have the lowercased class name handy for dict keys, etc."""
         return ''.join(c.lower() for c in cls.__name__ if c.isupper())

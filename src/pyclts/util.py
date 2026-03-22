@@ -1,15 +1,18 @@
 """Auxiliary functions for pyclts."""
+import re
 import pathlib
 import functools
 import collections
 from collections.abc import Iterable, Generator
+import dataclasses
 import unicodedata
-from typing import Union, Literal
+from typing import Union, Literal, get_args, Optional, Any
 
 from csvw import Table
 from csvw.dsv import reader
 
-__all__ = ['EMPTY', 'UNKNOWN', 'norm', 'nfd', 'jaccard', 'itertable', 'dict_reader', 'MetadataType']
+__all__ = [
+    'EMPTY', 'UNKNOWN', 'norm', 'nfd', 'jaccard', 'itertable', 'dict_reader', 'fieldnames']
 
 EMPTY = "◌"
 UNKNOWN = "�"
@@ -21,6 +24,95 @@ NamesType = list[str]
 MetadataType = dict[Literal['NAME', 'DESCRIPTION', 'REFS', 'TYPE', 'URITEMPLATE'], str]
 
 dict_reader = functools.partial(reader, delimiter='\t', dicts=True)
+
+
+@functools.cache
+def fieldnames(cls) -> list[str]:
+    """Fieldnames of a dataclass. Cached for performance."""
+    return [f.name for f in dataclasses.fields(cls)]
+
+
+def normalize_whitespace(s):
+    return re.sub(r'\s+', ' ', s.strip().replace('\n', ' '))
+
+
+@dataclasses.dataclass(frozen=True)
+class CLDFTable:
+    """
+    A base class for data objects which are to be serialized as rows in tables of the CLDF dataset.
+
+    The specification of the columns (i.e. the dataclass fields) are also used to create a CLDF
+    specification of the table metadata.
+    """
+    __dialect__ = {"commentPrefix": None, "delimiter": "\t", "trim": True}
+
+    @classmethod
+    def primary_key(cls) -> Optional[str]:
+        """Primary keys in CLDF tables are typically marked as CLDF id property."""
+        for f in dataclasses.fields(cls):
+            if f.metadata.get('propertyUrl') == 'http://cldf.clld.org/v1.0/terms.rdf#id':
+                return f.name
+
+    @classmethod
+    def cldf_table_spec(cls) -> dict[str, Any]:
+        """CLDF metadata suitable for serialization as JSON."""
+        res = {
+            "url": cls.rel_path(),
+            "dc:description": normalize_whitespace(cls.__doc__) if cls.__doc__ else '',
+            "tableSchema": {
+                "columns": [cls.cldf_column_spec(field) for field in dataclasses.fields(cls)],
+            }
+        }
+        pk = cls.primary_key()
+        if pk:
+            res["tableSchema"]["primaryKey"] = [pk]
+        fks = {f.name: f.metadata['fk'] for f in dataclasses.fields(cls) if f.metadata.get('fk')}
+        if fks:
+            res["tableSchema"]["foreignKeys"] = [
+                {
+                    "columnReference": [colref],
+                    "reference": {"columnReference": [fk.primary_key()], "resource": fk.rel_path()}
+                } for colref, fk in fks.items()]
+        return res
+
+    @classmethod
+    def cldf_column_spec(cls, field) -> dict[str, Any]:
+        """CLDF metadata suitable for serialization as JSON."""
+        res = {"name": field.name}
+        res['datatype'] = {"base": "string"}
+        annotation = cls.__annotations__[field.name]
+        if annotation == int:
+            res['datatype'] = {"base": "integer"}
+        if type(annotation) is type(Literal['']):
+            res['datatype'] = {
+                "base": "string",
+                "format": "|".join(re.escape(arg) for arg in get_args(annotation))}
+        res.update({k: v for k, v in field.metadata.items() if k != 'fk'})
+        return res
+
+    @classmethod
+    def rel_path(cls) -> str:
+        """The path of the table's TSV file relative to the metadata location."""
+        return NotImplemented  # pragma: no cover
+
+    @classmethod
+    def path_in_repos(cls, api):
+        return api.repos / cls.rel_path()
+
+    @classmethod
+    def iter_rows(cls, api, *args, **kw):
+        """Called from write method."""
+        yield None  # pragma: no cover
+
+    @classmethod
+    def write(cls, api, *args, **kw):
+        """Write the table data using the CLDF metadata."""
+        spec = cls.cldf_table_spec()
+        spec['dialect'] = cls.__dialect__
+        table = Table.fromvalue(spec)
+        rows = list(cls.iter_rows(api, *args, **kw))
+        table.write(rows, cls.path_in_repos(api))
+        return len(rows)
 
 
 def norm(string: str) -> str:

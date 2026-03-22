@@ -6,13 +6,13 @@ from typing import Optional
 from collections.abc import Generator
 
 from clldutils.apilib import API
-from clldutils.misc import nfilter
 from cldfcatalog import Config
 from pybtex.database import parse_string
 
-from pyclts.datatypes import TranscriptionData, TranscriptionSystem, SoundClasses
-from pyclts.datatypes import SOUNDCLASS_SYSTEMS
-from pyclts.util import PathType, dict_reader, MetadataType
+from pyclts.datatypes import (
+    TranscriptionData, TranscriptionSystem, SoundClasses, SOUNDCLASS_SYSTEMS)
+from pyclts.util import PathType, dict_reader
+from pyclts.metadata import Source
 
 
 class CLTS(API):
@@ -31,30 +31,28 @@ class CLTS(API):
         return self.transcriptionsystem('bipa')
 
     @functools.cached_property
-    def meta(self) -> list[MetadataType]:  # pylint: disable=C0116
-        res = list(dict_reader(self.repos / 'sources' / 'index.tsv'))
-        for src in res:
-            src['REFS'] = nfilter([s.strip() for s in src['REFS'].split(',')])
-        return res
+    def meta(self) -> list[Source]:  # pylint: disable=C0116
+        return Source.sources_from_repos(self)
+
+    def get_meta(self, obj) -> Optional[Source]:
+        """Get the metadata for a data object."""
+        for src in self.meta:
+            if obj.type() == src.TYPE and obj.id == src.NAME:
+                return src
+        return None
 
     @functools.cached_property
     def references(self):  # pylint: disable=C0116
         return parse_string(
             self.path('data', 'references.bib').read_text(encoding='utf8'), 'bibtex').entries
 
-    def get_meta(self, obj) -> Optional[MetadataType]:  # pylint: disable=C0116
-        for src in self.meta:
-            if obj.type() == src['TYPE'] and obj.id == src['NAME']:
-                return src
-        return None
-
     def iter_sources(  # pylint: disable=C0116
             self,
             type=None,  # pylint: disable=W0622
-    ) -> Generator[tuple[dict[str, str], list[dict[str, str]]], None, None]:
+    ) -> Generator[tuple[Source, list[dict[str, str]]], None, None]:
         for src in self.meta:
-            if (type is None) or (type == src['TYPE']):
-                graphemesp = self.repos / 'sources' / src['NAME'] / 'graphemes.tsv'
+            if (type is None) or (type == src.TYPE):
+                graphemesp = self.repos / 'sources' / src.NAME / 'graphemes.tsv'
                 if graphemesp.exists():
                     yield src, list(dict_reader(graphemesp))
 

@@ -17,7 +17,7 @@ def run(args):  # pylint: disable=C0116
     columns = ['LATEX', 'FEATURES', 'SOUND', 'IMAGE', 'COUNT', 'NOTE']
     bipa = args.repos.bipa
     rows = args.repos.get_source(args.dataset)
-    src = [s for s in args.repos.meta if s['NAME'] == args.dataset][0]
+    src = [s for s in args.repos.meta if s.NAME == args.dataset][0]
     out = get_processed_transcription_data(src, rows, columns, bipa, args.log)
 
     with writer('transcriptiondata', f'{args.dataset}.tsv') as w:

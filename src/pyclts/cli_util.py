@@ -11,7 +11,7 @@ from clldutils.markup import iter_markdown_sections
 
 from pyclts.datatypes import TranscriptionSystem
 from pyclts.models import UnknownSound, Marker
-from pyclts.util import MetadataType
+from pyclts.metadata import Source
 
 __all__ = ['add_sounds', 'get_processed_transcription_data']
 
@@ -65,15 +65,14 @@ def _iter_transcription_data(
 
 
 def get_processed_transcription_data(
-        src: MetadataType,
+        src: Source,
         rows: list[dict[str, str]],
         columns: list[str],
         bipa: TranscriptionSystem,
         log: logging.Logger,
 ):
     """Process transcription data and return it as table rows."""
-    uritemplate = URITemplate(src['URITEMPLATE']) if src['URITEMPLATE'] else None
-    out = list(_iter_transcription_data(rows, columns, uritemplate, bipa, log))
+    out = list(_iter_transcription_data(rows, columns, src.URITEMPLATE, bipa, log))
     found = len([o for o in out if o[0] != '<NA>'])
     log.info('... %s of %s graphemes found (%.0f%%)', found, len(out), found / len(out) * 100)
     return out

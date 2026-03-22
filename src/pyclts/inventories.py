@@ -11,7 +11,8 @@ from typing import Optional, Union, Literal
 from clldutils.clilib import Table
 
 from pyclts.api import CLTS
-from pyclts.models import Sound, Symbol, COMPLEX_SOUNDS, Tone, Marker, UnknownSound, BaseSoundclassType
+from pyclts.models import (
+    Sound, Symbol, COMPLEX_SOUNDS, Tone, Marker, UnknownSound, BaseSoundclassType)
 from pyclts.datatypes import TranscriptionSystem, FeatureNameType
 from pyclts.util import jaccard
 from pyclts.features import ConsonantFeatures, VowelFeatures, ToneFeatures

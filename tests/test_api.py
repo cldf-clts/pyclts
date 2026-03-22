@@ -16,7 +16,7 @@ def test_iter_sources(sources, tmp_path):
     api = CLTS(repos=tmp_path)
     srcs = list(api.iter_sources(type='td'))
     assert len(srcs[0][1]) == 0
-    assert srcs[0][0]['NAME'] == 'test'
+    assert srcs[0][0].NAME == 'test'
 
 
 def test_transcriptionsystem_custom(repos, api):

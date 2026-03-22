@@ -9,8 +9,9 @@ from csvw import TableGroup
 
 from pyclts.models import (
     Sound, UnknownSound, Cluster, Diphthong, Vowel, Consonant, Tone, Marker, Symbol,
-    COMPLEX_SOUNDS, BaseSoundclassOrMarkerType, fieldnames)
-from pyclts.util import read_data, SoundsType, NamesType, GraphemeMapType, DataType, nfd, norm, itertable
+    COMPLEX_SOUNDS, BaseSoundclassOrMarkerType)
+from pyclts.util import (
+    read_data, SoundsType, NamesType, GraphemeMapType, DataType, nfd, norm, itertable, fieldnames)
 from .datatypes_util import TranscriptionBase, Diacritics, SymbolWithDiacritics
 
 SoundsByFeatures = dict[frozenset, Sound]
