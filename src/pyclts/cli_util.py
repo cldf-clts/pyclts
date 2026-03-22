@@ -31,7 +31,7 @@ def _iter_transcription_data(
     yield 'BIPA_GRAPHEME CLTS_NAME GENERATED EXPLICIT GRAPHEME SYMBOLS URL'.split() + columns
     graphemes = set()
     for row in rows:
-        if row['GRAPHEME'] in graphemes:
+        if row['GRAPHEME'] in graphemes:  # pragma: no cover
             log.warning('skipping duplicate grapheme: %s', row['GRAPHEME'])
             continue
         graphemes.add(row['GRAPHEME'])
@@ -43,7 +43,7 @@ def _iter_transcription_data(
                 bipa_grapheme = bipa_sound.s
                 bipa_name = bipa_sound.name
                 bipa_symbols = bipa_sound.symbols
-            else:
+            else:  # pragma: no cover - we expect BIPA sounds to be valid.
                 bipa_grapheme, bipa_name, bipa_symbols = 3 * ['<NA>']
         else:
             if row['BIPA'] == '<NA>':

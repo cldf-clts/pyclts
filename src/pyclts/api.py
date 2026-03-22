@@ -39,7 +39,7 @@ class CLTS(API):
         for src in self.meta:
             if obj.type() == src.TYPE and obj.id == src.NAME:
                 return src
-        return None
+        return None  # pragma: no cover
 
     @functools.cached_property
     def references(self):  # pylint: disable=C0116

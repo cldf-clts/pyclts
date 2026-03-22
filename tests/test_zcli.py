@@ -45,10 +45,11 @@ def test_map(tmp_repos, capsys, fixtures, caplog):
     out, _ = capsys.readouterr()
     assert '<NA>' in out
     msgs = [rec.message for rec in caplog.records]
-    assert any('mapped 1' in msg for msg in msgs)
-    assert any('premapped 7' in msg for msg in msgs)
+    assert any('mapped 5' in msg for msg in msgs)
+    assert any('premapped 8' in msg for msg in msgs)
     assert any('skipped 1' in msg for msg in msgs)
-    assert any('unmapped 1' in msg for msg in msgs)
+    assert any('unmapped 2' in msg for msg in msgs)
+    assert any('modified 1' in msg for msg in msgs)
 
 
 def test_make_dataset(tmp_repos, capsys, fixtures):

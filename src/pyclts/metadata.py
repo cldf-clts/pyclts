@@ -5,7 +5,7 @@ import dataclasses
 from typing import Optional
 
 from uritemplate import URITemplate
-from pycldf.sources import Source
+from pycldf.sources import Source as CldfSource
 from clldutils.misc import nfilter
 
 from pyclts import datatypes
@@ -19,16 +19,16 @@ class Source(CLDFTable):
     sounds from many sources, such as phoneme inventory databases like PHOIBLE or
     relevant typological surveys.
     """
-    NAME: str = dataclasses.field(
+    NAME: str = dataclasses.field(  # pylint: disable=C0103
         metadata={"propertyUrl": "http://cldf.clld.org/v1.0/terms.rdf#id"})
-    DESCRIPTION: str = dataclasses.field(
+    DESCRIPTION: str = dataclasses.field(  # pylint: disable=C0103
         metadata={"propertyUrl": "http://cldf.clld.org/v1.0/terms.rdf#description"})
-    REFS: list[str] = dataclasses.field(
+    REFS: list[str] = dataclasses.field(  # pylint: disable=C0103
         metadata={"propertyUrl": "http://cldf.clld.org/v1.0/terms.rdf#source", "separator": ", "})
-    TYPE: datatypes.DatatypeNameType = dataclasses.field(
+    TYPE: datatypes.DatatypeNameType = dataclasses.field(  # pylint: disable=C0103
         metadata={"dc:description": normalize_whitespace(datatypes.__doc__)}
     )
-    URITEMPLATE: Optional[URITemplate] = dataclasses.field(
+    URITEMPLATE: Optional[URITemplate] = dataclasses.field(  # pylint: disable=C0103
         metadata={
             "dc:description":
                 "Several CLTS sources provide an online catalog of the graphemes they "
@@ -37,18 +37,21 @@ class Source(CLDFTable):
     )
 
     @classmethod
-    def rel_path(cls):
+    def rel_path(cls) -> str:  # pylint: disable=C0116
         return 'sources/index.tsv'
 
     @classmethod
     def from_row(cls, row):
+        """Instantiate a Source from a row in the index table."""
         row['REFS'] = nfilter([s.strip() for s in row['REFS'].split(',')])
         row['URITEMPLATE'] = URITemplate(row['URITEMPLATE']) if row['URITEMPLATE'] else None
         return cls(**row)
 
     @classmethod
     def sources_from_repos(cls, api):
+        """Instantiate Source objects with the data from the index in the repos."""
         return [cls.from_row(r) for r in dict_reader(cls.path_in_repos(api))]
 
-    def get_references(self, api) -> dict[str, Source]:
-        return {key: Source.from_entry(key, api.references[key]) for key in self.REFS}
+    def get_references(self, api) -> dict[str, CldfSource]:
+        """Retrieve the bib entries for the reference keys."""
+        return {key: CldfSource.from_entry(key, api.references[key]) for key in self.REFS}

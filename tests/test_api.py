@@ -19,12 +19,19 @@ def test_iter_sources(sources, tmp_path):
     assert srcs[0][0].NAME == 'test'
 
 
+def test_get_references(tmp_repos):
+    api = CLTS(repos=tmp_repos)
+    for src in api.meta:
+        if src.NAME == "easterday":
+            assert src.get_references(api)
+
+
 def test_transcriptionsystem_custom(repos, api):
     assert api.transcriptionsystem(repos / 'pkg' / 'transcriptionsystems' / 'asjpcode')
 
 
 def test_get_source(api):
-    assert len(api.get_source('allenbai')) == 6
+    assert len(api.get_source('allenbai')) == 8
 
 
 def test_diphthong(api):

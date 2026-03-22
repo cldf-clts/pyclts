@@ -1,8 +1,9 @@
 """
 Map a given sound inventory list to CLTS
 """
-import dataclasses
 import logging
+import functools
+import dataclasses
 from typing import Optional
 
 from pyclts.models import UnknownSound, Marker, Consonant, Cluster
@@ -11,6 +12,17 @@ from pyclts.datatypes import TranscriptionSystem
 
 def register(parser):  # pylint: disable=C0116
     parser.add_argument("dataset", help="the file with the graphemes")
+
+
+def note(c: str, modifier=None) -> str:
+    """A note"""
+    assert len(c) == 1
+    return f'({c}){modifier or ""}'
+
+
+warning = functools.partial(note, '!')
+question = functools.partial(note, '?')
+modification = functools.partial(note, '*')
 
 
 @dataclasses.dataclass
@@ -24,7 +36,7 @@ class Report:
 
     def printout(self, nrows: int, log: logging.Logger):
         """Print the results."""
-        for attr in ['mapped', 'premapped', 'skipped', 'unmapped']:
+        for attr in ['mapped', 'premapped', 'skipped', 'unmapped', 'modified']:
             log.info(
                 '%s %s items (%.2f) in %s rows',
                 attr, getattr(self, attr), getattr(self, attr) / nrows, nrows)
@@ -39,17 +51,17 @@ def _map_bipa_grapheme(
     if not isinstance(sound, UnknownSound):
         if isinstance(sound, Marker):
             report.premapped += 1
-        elif not bipa.is_valid(sound):
+        elif not bipa.is_valid(sound):  # pragma: no cover - we assume BIPA sounds to be valid!
             report.unmapped += 1
-            return '(!)'
+            return warning()
         elif sound.s != bipa_grapheme:
             report.modified += 1
-            return '(?)' + sound.s
+            return question() + sound.s
         else:
             report.premapped += 1
     else:
         report.unmapped += 1
-        return '(?)'
+        return question()
     return None
 
 
@@ -66,9 +78,9 @@ def _map_unknown(raw_grapheme: str, bipa: TranscriptionSystem, report: Report) -
                     in ["stop", "affricate", "fricative", "implosive"]
             ):
                 report.mapped += 1
-                return "(*)ⁿ" + str(sound2)
+                return modification("ⁿ") + str(sound2)
     report.unmapped += 1
-    return "(?)"
+    return question()
 
 
 def _map_cluster(sound: Cluster, bipa: TranscriptionSystem, report: Report) -> str:
@@ -79,15 +91,15 @@ def _map_cluster(sound: Cluster, bipa: TranscriptionSystem, report: Report) -> s
             in ["stop", "affricate", "fricative", "implosive"]
     ):
         report.mapped += 1
-        return "(*)ⁿ" + str(sound.to_sound)
+        return modification("ⁿ") + str(sound.to_sound)
 
     if sound.to_sound.features.manner == "fricative" and sound.from_sound.features.manner == "stop":
         new_sound = bipa[sound.to_sound.name.replace("fricative", "affricate")]
         if isinstance(new_sound, Consonant):
             report.mapped += 1
-            return "(*)" + str(new_sound.to_sound)
+            return modification() + str(new_sound.to_sound)
         report.unmapped += 1
-        return "(?)"
+        return question()
 
     if (
             sound.from_sound.features.manner == sound.to_sound.features.manner
@@ -98,11 +110,11 @@ def _map_cluster(sound: Cluster, bipa: TranscriptionSystem, report: Report) -> s
             k: v or sound.to_sound.featuredict[k] for k, v in sound.from_sound.featuredict.items()}
         features["duration"] = "long"
         report.mapped += 1
-        return '(*)' + str(
+        return modification() + str(
             bipa[" ".join([f for f in features.values() if f]) + " " + sound.from_sound.type()])
 
     report.mapped += 1
-    return "(!)" + str(sound)
+    return warning() + str(sound)
 
 
 def _map_sound(raw_grapheme, bipa, report) -> str:
@@ -117,8 +129,10 @@ def _map_sound(raw_grapheme, bipa, report) -> str:
     if bipa.is_valid(sound):
         report.mapped += 1
         return sound.s
-    report.unmapped += 1
-    return '(!)'
+    # Considering what bipa.resolve_sound does, we cannot really get here, since any string will be
+    # interpreted at least as UnknownSound and all bipa sounds should be valid.
+    report.unmapped += 1  # pragma: no cover
+    return warning()  # pragma: no cover
 
 
 def run(args):  # pylint: disable=C0116
@@ -145,9 +159,7 @@ def run(args):  # pylint: disable=C0116
             row['BIPA'] = _map_sound(raw_grapheme, bipa, report)
 
         if row['BIPA']:
-            if row['BIPA'].startswith('*'):
-                sound = bipa[row['BIPA'][1:]]
-            elif row['BIPA'].startswith('('):
+            if row['BIPA'].startswith('('):  # Strip off the note.
                 sound = bipa[row['BIPA'][3:]]
             else:
                 sound = bipa[row['BIPA']]

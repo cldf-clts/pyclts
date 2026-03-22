@@ -22,7 +22,7 @@ from pycldf import Dataset
 from pycldf.markdown import metadata2markdown
 
 from pyclts.models import Marker
-from pyclts.datatypes import TranscriptionSystem
+from pyclts.datatypes import TranscriptionSystem, TranscriptionData, SoundClasses
 from pyclts.cldf import FeatureTable, SoundTable, GraphemeTable
 from pyclts.metadata import Source
 from pyclts.cli_util import upsert_section
@@ -58,17 +58,17 @@ class Acc:
     bipa: TranscriptionSystem
     feature_ids: set[str]
     log: logging.Logger
-    sounds: dict[str, SoundTable] = dataclasses.field(
-        default_factory=lambda: collections.defaultdict(dict))
+    sounds: dict[str, SoundTable] = dataclasses.field(default_factory=collections.OrderedDict)
     graphemes: list[GraphemeTable] = dataclasses.field(default_factory=list)
     clts_dump: dict[str, tuple[str, str]] = dataclasses.field(
         default_factory=collections.OrderedDict)
 
-    def add_grapheme(self, **d):
+    def _add_grapheme(self, **d):
         pk = len(self.graphemes) + 1
         self.graphemes.append(GraphemeTable(PK=str(pk), **d))
 
     def add_bipa_sounds(self):
+        """Add the sounds from the BIPA transcription system."""
         for grapheme, sound in sorted(
             self.bipa.sounds.items(),
             key=lambda p: (p[1].alias if p[1].alias else False, p[0], p[1].uname)
@@ -80,7 +80,7 @@ class Acc:
                     assert sound.name not in self.sounds
                     self.sounds[sound.name] = SoundTable.from_grapheme_and_sound(
                         grapheme, sound, self.feature_ids, self.log)
-                self.add_grapheme(
+                self._add_grapheme(
                     GRAPHEME=grapheme,
                     NAME=sound.name,
                     EXPLICIT='+',
@@ -89,7 +89,27 @@ class Acc:
                 if grapheme not in self.clts_dump:
                     self.clts_dump[grapheme] = (str(sound), sound.name)
 
-    def add_transcriptiondata(self, td):
+    def add_transcriptionsystem(self, ts: TranscriptionSystem):
+        """Add the graphemes defined for BIPA sounds in other transcription systems."""
+        for name, sound in self.sounds.items():
+            try:
+                ts_sound = ts[name]
+                if ts.is_valid(ts_sound):
+                    self._add_grapheme(
+                        GRAPHEME=ts_sound.s,
+                        NAME=name,
+                        EXPLICIT='' if sound.GENERATED else '+',
+                        DATASET=ts.id,
+                    )
+                    if ts_sound.s not in self.clts_dump:
+                        self.clts_dump[ts_sound.s] = (sound.GRAPHEME, name)
+            except ValueError:
+                pass
+            except TypeError:  # pragma: no cover
+                self.log.debug('%s: %s', ts.id, name)
+
+    def add_transcriptiondata(self, td: TranscriptionData):
+        """Add sounds and graphemes from transcrption data."""
         for name in td.names:
             bipa_sound = self.bipa[name]
 
@@ -104,7 +124,7 @@ class Acc:
 
             for item in sorted(td.data[name], key=lambda d: (d['bipa_grapheme'], d['grapheme'])):
                 # add the values here
-                self.add_grapheme(
+                self._add_grapheme(
                     GRAPHEME=item['grapheme'],
                     NAME=name,
                     EXPLICIT=item['explicit'],
@@ -118,11 +138,12 @@ class Acc:
                 if item['grapheme'] not in self.clts_dump:
                     self.clts_dump[item['grapheme']] = (sound.GRAPHEME, name)
 
-    def add_soundclass(self, sc):
+    def add_soundclass(self, sc: SoundClasses):
+        """Add graphemes described in a soundclass system."""
         for name in sorted(self.sounds):
             try:
                 grapheme = sc[name]
-                self.add_grapheme(
+                self._add_grapheme(
                     GRAPHEME=grapheme,
                     NAME=name,
                     EXPLICIT='+' if name in sc.data else '',
@@ -131,39 +152,16 @@ class Acc:
             except KeyError:  # pragma: no cover
                 self.log.debug(name, self.sounds[name].GRAPHEME)
 
-    def add_transcriptionsystem(self, ts):
-        for name in sorted(self.sounds):
-            try:
-                ts_sound = ts[name]
-                if ts.is_valid(ts_sound):
-                    self.add_grapheme(
-                        GRAPHEME=ts_sound.s,
-                        NAME=name,
-                        EXPLICIT='' if self.sounds[name]['generated'] else '+',
-                        DATASET=ts.id,
-                    )
-                    if ts_sound.s not in self.clts_dump:
-                        self.clts_dump[ts_sound.s] = (self.sounds[name]['grapheme'], name)
-            except ValueError:
-                pass
-            except TypeError:  # pragma: no cover
-                self.log.debug('%s: %s', ts.id, name)
-
 
 def run(args):  # pylint: disable=C0116
     args.destination = args.destination or args.repos.path('data', 'clts.zip')
 
     # Write the feature system to a file and keep the set of feature IDs for reference.
-    fids = set()
-    FeatureTable.write(args.repos, fids)
-
-    counts = {
-        Source.rel_path(): len(args.repos.meta),
-        FeatureTable.rel_path(): len(fids),
-    }
+    FeatureTable.write(args.repos)
+    fids = FeatureTable.row_ids()
 
     # Instantitate the accumulator for the distribution data.
-    acc = Acc(bipa=args.repos.bipa, feature_ids=fids, log=args.log)
+    acc = Acc(bipa=args.repos.bipa, feature_ids=set(fids), log=args.log)
 
     # start with assembling bipa-sounds
     args.log.info('adding bipa data')
@@ -187,10 +185,13 @@ def run(args):  # pylint: disable=C0116
 
     args.log.info('writing data to file')
 
-    counts[SoundTable.rel_path()] = SoundTable.write(
-        args.repos, [acc.sounds[k] for k in sorted(acc.sounds, reverse=True)])
-    counts[GraphemeTable.rel_path()] = GraphemeTable.write(args.repos, acc.graphemes)
-
+    counts = {
+        Source.rel_path(): len(args.repos.meta),
+        FeatureTable.rel_path(): len(fids),
+        SoundTable.rel_path(): SoundTable.write(
+            args.repos, [acc.sounds[k] for k in sorted(acc.sounds, reverse=True)]),
+        GraphemeTable.rel_path(): GraphemeTable.write(args.repos, acc.graphemes),
+    }
     for table in METADATA['tables']:
         table['dc:extent'] = counts[table['url']]
 

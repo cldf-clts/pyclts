@@ -6,10 +6,13 @@ import collections
 from collections.abc import Iterable, Generator
 import dataclasses
 import unicodedata
-from typing import Union, Literal, get_args, Optional, Any
+from typing import Union, Literal, get_args, Optional, Any, TYPE_CHECKING
 
 from csvw import Table
 from csvw.dsv import reader
+
+if TYPE_CHECKING:
+    from pyclts.api import CLTS
 
 __all__ = [
     'EMPTY', 'UNKNOWN', 'norm', 'nfd', 'jaccard', 'itertable', 'dict_reader', 'fieldnames']
@@ -32,7 +35,8 @@ def fieldnames(cls) -> list[str]:
     return [f.name for f in dataclasses.fields(cls)]
 
 
-def normalize_whitespace(s):
+def normalize_whitespace(s: str) -> str:
+    """Replace clusters of whitespace with a single space."""
     return re.sub(r'\s+', ' ', s.strip().replace('\n', ' '))
 
 
@@ -45,6 +49,7 @@ class CLDFTable:
     specification of the table metadata.
     """
     __dialect__ = {"commentPrefix": None, "delimiter": "\t", "trim": True}
+    _row_ids = []
 
     @classmethod
     def primary_key(cls) -> Optional[str]:
@@ -52,6 +57,7 @@ class CLDFTable:
         for f in dataclasses.fields(cls):
             if f.metadata.get('propertyUrl') == 'http://cldf.clld.org/v1.0/terms.rdf#id':
                 return f.name
+        return None  # pragma: no cover
 
     @classmethod
     def cldf_table_spec(cls) -> dict[str, Any]:
@@ -96,23 +102,36 @@ class CLDFTable:
         return NotImplemented  # pragma: no cover
 
     @classmethod
-    def path_in_repos(cls, api):
+    def path_in_repos(cls, api: 'CLTS') -> pathlib.Path:
+        """The table's path in the repository."""
         return api.repos / cls.rel_path()
 
     @classmethod
-    def iter_rows(cls, api, *args, **kw):
+    def iter_rows(
+            cls, api: 'CLTS', _  # pylint: disable=W0613
+    ) -> Generator[list[str], None, None]:
         """Called from write method."""
-        yield None  # pragma: no cover
+        yield []  # pragma: no cover
 
     @classmethod
-    def write(cls, api, *args, **kw):
+    def write(cls, api: 'CLTS', objs=None):
         """Write the table data using the CLDF metadata."""
         spec = cls.cldf_table_spec()
         spec['dialect'] = cls.__dialect__
         table = Table.fromvalue(spec)
-        rows = list(cls.iter_rows(api, *args, **kw))
+        pk = cls.primary_key()
+        rows = list(cls.iter_rows(api, objs))
+        if pk:
+            pk = fieldnames(cls).index(pk)
+            for row in rows:
+                cls._row_ids.append(row[pk])
         table.write(rows, cls.path_in_repos(api))
         return len(rows)
+
+    @classmethod
+    def row_ids(cls) -> list[str]:
+        """After the table has been written, the primary keys of the rows can be accessed."""
+        return cls._row_ids
 
 
 def norm(string: str) -> str:
