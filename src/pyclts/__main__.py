@@ -12,8 +12,8 @@ from clldutils.loglib import Logging
 from pyclts import CLTS
 
 
-def main(args=None, catch_all=False, parsed_args=None, log=None):
-    import pyclts.commands
+def main(args=None, catch_all=False, parsed_args=None, log=None):  # pylint: disable=C0116
+    import pyclts.commands  # pylint: disable=C0415
 
     try:
         repos = Config.from_file().get_clone('clts')
@@ -50,14 +50,14 @@ def main(args=None, catch_all=False, parsed_args=None, log=None):
             # use of a Catalog as context manager:
             stack.enter_context(Catalog(args.repos, tag=args.repos_version))
         args.repos = CLTS(args.repos)
-        args.log.info('cldf-clts/clts at {0}'.format(args.repos.repos))
+        args.log.info('cldf-clts/clts at %s', args.repos.repos)
         try:
             return args.main(args) or 0
         except KeyboardInterrupt:  # pragma: no cover
             return 0
         except ParserError as e:  # pragma: no cover
             print(e)
-            return main([args._command, '-h'])
+            return main([args._command, '-h'])  # pylint: disable=W0212
         except Exception as e:  # pragma: no cover
             if catch_all:
                 print(e)

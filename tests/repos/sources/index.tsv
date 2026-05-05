@@ -25,4 +25,5 @@ bipa	Broad version of IPA, understood as a reference for the other systems.	IPA1
 gld	Transcription system of the Global Lexicostatistical Database project.	Starostin2011	ts	
 asjpcode	Transcription system of the ASJP project.	Wichmann2016	ts	
 napa	A tentative reconstruction of what is known as the North-American Phonetic Alphabet. Our description is a compromise between different sources, especially Pullum and Ladusaw (1996), but also the information available in Wikipedia (https://en.wikipedia.org/wiki/Americanist_phonetic_notation).	Pullum1996	ts	
-upa	A transcription system is used predominantly for the transcription and reconstruction of Uralic languages.	ISON2419, Setala1901	ts	
+upa	A transcription system is used predominantly for the transcription and reconstruction of Uralic languages.	ISON2419, Setala1901	ts
+easterday	This dataset consists in the sound inventory part of [Easterday's (2019)](:bib:Easterday2019) study of complex syllable structures.	Easterday2019	td

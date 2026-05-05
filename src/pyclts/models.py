@@ -1,64 +1,46 @@
+"""
+OO wrappers of objects appearing in transcriptions.
+"""
 import functools
+import dataclasses
 import unicodedata
+from typing import Optional, TYPE_CHECKING, Any, Literal, Union
 
-import attr
 from clldutils.misc import nfilter
 
-from pyclts.util import norm, jaccard
+from .util import norm, jaccard, EMPTY, fieldnames
+from .features import ConsonantFeatures, VowelFeatures, ToneFeatures, Features
+from ._compat import get_annotations
+
+if TYPE_CHECKING:
+    from pyclts.datatypes import TranscriptionSystem
 
 __all__ = [
-    'is_valid_sound',
-    'Symbol',
-    'Sound',
-    'Consonant',
-    'Vowel',
-    'Tone',
-    'Marker',
-    'Diphthong',
-    'Cluster',
-    'UnknownSound']
-EXCLUDE_FEATURES = [
-    'apical',
-    'laminal',
-    'ejective',
-    'with-falling_tone',
-    'with-extra-low_tone',
-    'with-extra-high_tone',
-    'with-falling_tone',
-    'with-low_tone',
-    'with-global_fall',
-    'with-global_rise',
-    'with-high_tone',
-    'with-mid_tone',
-    'with-rising_tone',
-    'with-upstep'
-]
-# Disable cmp in a backwards and forwards compatible way:
-cmp_off = {"eq" if getattr(attr, "__version_info__", (0,)) >= (19, 2) else "cmp": False}
+    'Symbol', 'Sound', 'Consonant', 'Vowel', 'Tone', 'Marker',
+    'Diphthong', 'Cluster', 'UnknownSound', 'SOUND_CLASSES', 'COMPLEX_SOUNDS']
+SoundclassNameType = Literal['consonant', 'vowel', 'tone', 'diphthong', 'cluster', 'unknownsound']
+BaseSoundclassType = Literal['consonant', 'vowel', 'tone']
+BaseSoundclassOrMarkerType = Literal['consonant', 'vowel', 'tone', 'marker']
+BaseSoundclassMappingType = dict[BaseSoundclassType, dict[str, str]]
 
 
-def is_valid_sound(sound, ts):
-    """Check the consistency of a given transcription system conversino"""
-    if isinstance(sound, (Marker, UnknownSound)):
-        return False
-    s1 = ts[sound.name]
-    s2 = ts[sound.s]
-    return s1.name == s2.name and s1.s == s2.s
+@dataclasses.dataclass
+class Symbol:
+    """Any atomic part of text."""
+    ts: 'TranscriptionSystem'
+    grapheme: str
+    source: Optional[str] = None
+    generated: bool = False
+    note: Optional[str] = None
 
+    @classmethod
+    @functools.lru_cache(maxsize=10)
+    def type(cls) -> Union[SoundclassNameType, Literal['Symbol', 'Sound', 'Marker']]:
+        """We want to have the lowercased class name handy for dict keys, etc."""
+        return cls.__name__.lower()
 
-@attr.s(**cmp_off)
-class Symbol(object):
-    ts = attr.ib()
-    grapheme = attr.ib()
-    source = attr.ib(default=None)
-    generated = attr.ib(default=False, validator=attr.validators.instance_of(bool))
-    note = attr.ib(default=None)
-
-    @functools.cached_property
-    def type(self):
-        return self.__class__.__name__.lower()
-
-    def __str__(self):
+    def __str__(self) -> str:
+        """A symbol is represented by its grapheme, i.e. the way it looks like in text."""
         return self.grapheme
 
     def __eq__(self, other):
@@ -69,11 +51,11 @@ class Symbol(object):
         return self.ts.id == other.ts.id and self.grapheme == other.grapheme
 
     @property
-    def name(self):
+    def name(self) -> None:  # pylint: disable=C0116
         return None
 
     @property
-    def uname(self):
+    def uname(self) -> str:
         "Return unicode name(s) for a character set."
         try:
             return ' / '.join(unicodedata.name(ss) for ss in str(self))
@@ -83,29 +65,46 @@ class Symbol(object):
             return '?'
 
     @property
-    def codepoints(self):
+    def codepoints(self) -> str:
         "Return unicode codepoint(s) for a grapheme."
         return ' '.join('U+' + ('000' + hex(ord(x))[2:])[-4:] for x in str(self))
 
 
-@attr.s(**cmp_off)
+@dataclasses.dataclass
 class UnknownSound(Symbol):
-    pass
+    """Marker for unknown stuff passed to systems for identification."""
 
 
-@attr.s(repr=False, **cmp_off)
+@dataclasses.dataclass(eq=False, repr=False)
 class Sound(Symbol):
     """
     Sound object stores basic features of the individual sound objects.
     """
-    base = attr.ib(default=None)
-    alias = attr.ib(default=None)
-    normalized = attr.ib(default=None)
-    unknown = attr.ib(default=None)
-    stress = attr.ib(default=None)
+    base: Optional[str] = None
+    alias: Optional[str] = None
+    normalized: Optional[bool] = None
+    unknown: Optional[str] = None
+    stress: Optional[str] = None
 
-    _name_order = []
-    _write_order = dict(pre=[], post=[])
+    features = Features()
+
+    @classmethod
+    def from_kw(cls, **kw):
+        """Instantiate a sound from a dict, partitioning feature data as appropriate."""
+        fkw = {}
+        fnames = fieldnames(get_annotations(cls, is_instance=False)['features'])
+        for name in list(kw.keys()):
+            if name in fnames:
+                fkw[name] = kw.pop(name)
+        kw['features'] = get_annotations(cls, is_instance=False)['features'](**fkw)
+        return cls(**kw)
+
+    def asdict(self) -> dict[str, Any]:
+        """dataclasses.asdict is very slow, so we provide a simplistic alternative."""
+        res = {f: getattr(self, f) for f in fieldnames(self.__class__)}
+        res.update(
+            {f: getattr(self.features, f) for f in fieldnames(get_annotations(self)['features'])})
+        return res
 
     def __eq__(self, other):
         if isinstance(other, Sound):
@@ -113,34 +112,46 @@ class Sound(Symbol):
         return False
 
     def __repr__(self):
-        return '<{0}.{1}: {2}>'.format(
-            self.__module__, self.__class__.__name__, self.name)
+        return f'<{self.__module__}.{self.__class__.__name__}: {self.name}>'
 
-    def __add__(self, other):
+    def __add__(self, other) -> str:
+        """Concatenate graphemes."""
         return str(self) + str(other)
 
     def __hash__(self):
+        """We want to use sounds as dict keys or in sets."""
         return hash(self.name)
 
     @property
-    def s(self):
+    def s(self) -> str:
+        """Shortcut."""
         return str(self)
 
-    def _features(self):
-        return nfilter(getattr(self, p, None) for p in self._name_order)
+    def _features(self) -> list[str]:
+        return nfilter(v for _, v in self.features)
 
     @property
-    def featuredict(self):
-        return {f: getattr(self, f, None) for f in self._name_order}
+    def featuredict(self) -> dict[str, Optional[str]]:
+        """The feature values associated with a Symbol."""
+        return dict(self.features)
 
     @property
-    def featureset(self):
-        return frozenset(self._features() + [self.type])
+    def featureset(self) -> frozenset[str]:
+        """The feature values associated with a Symbol suitable as dict key."""
+        return frozenset(self._features() + [self.type()])
 
-    def similarity(self, other):
+    def similarity(self, other) -> float:
+        """Compute the similarity of two symbols based on their features."""
         return jaccard(self.featureset, other.featureset)
 
-    def __str__(self):
+    def _iter_normed_feature_values(self, features: list[str], base_vals):
+        for feature in features:
+            if feature not in base_vals and getattr(self.features, feature, '') in self._features():
+                yield norm(
+                    self.ts.diacritics.grapheme_by_value[self.type()].get(
+                        getattr(self.features, feature, ''), '<!>'))
+
+    def __str__(self) -> str:
         """
         Return the reference representation of the sound.
 
@@ -153,215 +164,136 @@ class Sound(Symbol):
         if not self.generated:
             if not self.alias and self.grapheme in self.ts.sounds:
                 return self.grapheme
-            elif self.alias and self.featureset in self.ts.features:
-                return str(self.ts.features[self.featureset])
+            if self.alias and self.featureset in self.ts.features_to_sound:
+                return str(self.ts.features_to_sound[self.featureset])
             # this can usually not happen, as we catch these errors when loading a ts!
-            raise ValueError(
-                'Orphaned alias {0}'.format(self.grapheme))  # pragma: no cover
+            raise ValueError(f'Orphaned alias {self.grapheme}')  # pragma: no cover
 
         # search for best base-string
-        elements = [f for f in self._features() if f not in EXCLUDE_FEATURES] + [self.type]
+        excluded = self.features.feature_values_excluded_in_str()
+        elements = [f for f in self._features() if f not in excluded] + [self.type()]
         base_str = self.base or '<?>'
         base_graphemes = []
         while elements:
-            base = self.ts.features.get(frozenset(elements))
+            base = self.ts.features_to_sound.get(frozenset(elements))
             if base:
                 base_graphemes.append(base.grapheme)
             elements.pop(0)
         base_str = base_graphemes[-1] if base_graphemes else base_str or '<?>'
         base_vals = {
             self.ts._feature_values[elm] for elm in
-            self.ts.sounds[base_str].name.split(' ')[:-1]} if \
-            base_str != '<?>' else {}
-        out = []
-        for p in self._write_order['pre']:
-            if p not in base_vals and getattr(self, p, '') in self._features():
-                out.append(
-                    norm(self.ts.features[self.type].get(getattr(self, p, ''), '<!>')))
+            self.ts.sounds[base_str].name.split(' ')[:-1]} if base_str != '<?>' else {}
+        out: list[str] = []
+        out.extend(self._iter_normed_feature_values(self.features.pre_order(), base_vals))
         out.append(base_str)
-        for p in self._write_order['post']:
-            if p not in base_vals and getattr(self, p, '') in self._features():
-                out.append(
-                    norm(self.ts.features[self.type].get(getattr(self, p, ''), '<!>')))
+        out.extend(self._iter_normed_feature_values(self.features.post_order(), base_vals))
         return ''.join(out)
 
     @property
-    def name(self):
-        return ' '.join([f or '' for f in self._features()] + [self.type])
+    def name(self) -> str:
+        return ' '.join([f or '' for f in self._features()] + [self.type()])
 
     @property
-    def table(self):
-        """Returns the tabular representation of the sound as given in our data
-        """
+    def table(self) -> list[str]:
+        """Returns the tabular representation of the sound as given in our data"""
         tbl = []
-        features = [
-            f for f in self._name_order if f not in self.ts.columns[self.type]]
+        features = [f for f, _ in self.features if f not in self.ts.columns[self.type()]]
         # make sure to mark generated sounds
         if self.generated and self.s != self.source:
-            tbl += [str(self) + ' | ' + self.source]
+            tbl.append(str(self) + ' | ' + self.source)
         else:
-            tbl += [str(self)]
-        for name in self.ts.columns[self.type][1:]:
-            if name != 'extra' and name != 'alias':
-                tbl += [getattr(self, name) or '']
+            tbl.append(str(self))
+        for name in self.ts.columns[self.type()][1:]:
+            if name not in ('extra', 'alias'):
+                tbl.append(getattr(self, name, None) or getattr(self.features, name, None) or '')
             elif name == 'alias':
-                tbl += ['+' if getattr(self, name) else '']
+                tbl.append('+' if self.alias else '')
             else:
-                bundle = []
-                for f in features:
-                    val = getattr(self, f)
-                    if val:
-                        bundle += ['{0}:{1}'.format(f, val)]
-                tbl += [','.join(bundle)]
+                tbl.append(','.join(
+                    f'{f}:{getattr(self.features, f)}'
+                    for f in features if getattr(self.features, f)))
         return tbl
 
     @property
     def symbols(self):
-        """Returns all unicode sounds separated by the empty sound marker.
-        """
-        return ' '.join(['◌' + s for s in self.s])
+        """Returns all unicode sounds separated by the empty sound marker."""
+        return ' '.join([EMPTY + s for s in self.s])
 
 
-@attr.s(**cmp_off)
+@dataclasses.dataclass(eq=False)
 class Marker(Symbol):
-    alias = attr.ib(default=None)
-    feature = attr.ib(default=None)
-    value = attr.ib(default=None)
-    unknown = attr.ib(default=None)
+    """Some sort of known type of transcription which isn't a sound."""
+    alias: Optional[str] = None
+    feature: Optional[str] = None
+    value: Optional[str] = None
+    unknown: Optional[str] = None
+    features: Features = dataclasses.field(default_factory=Features)
+
+    @classmethod
+    def from_kw(cls, **kw) -> 'Marker':
+        """Instantiate a Marker."""
+        return cls(**kw)
 
     @property
-    def name(self):
+    def name(self) -> str:
+        """The name of a marker is just it's written representation."""
         return self.grapheme
 
     @property
-    def featureset(self):
-        return frozenset([self.grapheme, self.type])
+    def featureset(self) -> frozenset[str]:
+        """The set of features suitable a dict key."""
+        return frozenset([self.grapheme, self.type()])
 
 
-@attr.s(repr=False, **cmp_off)
+@dataclasses.dataclass(eq=False, repr=False)
 class Consonant(Sound):
-
-    # features follow basic information about IPA from various sources, they
-    # are potentially not yet exhaustive and should be updated at some point
-    manner = attr.ib(default=None)
-    place = attr.ib(default=None)
-    aspiration = attr.ib(default=None)
-    labialization = attr.ib(default=None)
-    palatalization = attr.ib(default=None)
-    preceding = attr.ib(default=None)
-    velarization = attr.ib(default=None)
-    duration = attr.ib(default=None)
-    phonation = attr.ib(default=None)
-    release = attr.ib(default=None)
-    syllabicity = attr.ib(default=None)
-    nasalization = attr.ib(default=None)
-    glottalization = attr.ib(default=None)
-    pharyngealization = attr.ib(default=None)
-    ejection = attr.ib(default=None)
-    voicing = attr.ib(default=None)
-    breathiness = attr.ib(default=None)
-    creakiness = attr.ib(default=None)
-    airstream = attr.ib(default=None)
-    laminality = attr.ib(default=None)
-    articulation = attr.ib(default=None)
-    raising = attr.ib(default=None)
-    relative_articulation = attr.ib(default=None)
-    friction = attr.ib(default=None)
-    tongue_root = attr.ib(default=None)
-
-    # write order determines how consonants are written according to their
-    # features, so this normalizes the order of diacritics preceding and
-    # following the base part of the consonant
-    _write_order = dict(
-        pre=['preceding'],
-        post=[
-            'raising',
-            'relative_articulation',
-            'laminality',
-            'creakiness',
-            'tongue_root',
-            'phonation',
-            'ejection',
-            'syllabicity',
-            'voicing',
-            'articulation',
-            'nasalization',
-            'release',
-            'palatalization',
-            'labialization',
-            'velarization',
-            'pharyngealization',
-            'glottalization',
-            'breathiness',
-            'aspiration',
-            'friction',
-            'duration',
-        ],
-    )
-
-    _name_order = [
-        'raising',
-        'relative_articulation',
-        'friction',
-        'articulation',
-        'preceding',
-        'syllabicity',
-        'nasalization',
-        'palatalization',
-        'labialization',
-        'velarization',
-        'pharyngealization',
-        'glottalization',
-        'aspiration',
-        'duration',
-        'release',
-        'voicing',
-        'creakiness',
-        'breathiness',
-        'phonation',
-        'laminality',
-        'tongue_root',
-        'place',
-        'ejection',
-        'airstream',
-        'manner',
-    ]
+    """A consonant."""
+    features: ConsonantFeatures = dataclasses.field(default_factory=ConsonantFeatures)
 
 
-@attr.s(repr=False, **cmp_off)
+@dataclasses.dataclass(repr=False, eq=False)
 class ComplexSound(Sound):
-    from_sound = attr.ib(default=None)
-    to_sound = attr.ib(default=None)
+    """Complex sounds have two consituent basic sounds."""
+    __from_sound_cls__ = None
+    from_sound: Optional[str] = None
+    to_sound: Optional[str] = None
+    features: Features = dataclasses.field(default_factory=Features)
+
+    @staticmethod
+    def match(sound1, sound2) -> bool:  # pylint: disable=W0613
+        """
+        Subclasses should implement this method, returning True if the passed sounds can be used
+        to create an instance of the subclass.
+        """
+        return False  # pragma: no cover
 
     def __str__(self):
         return str(self.from_sound) + str(self.to_sound)
 
     @property
-    def name(self):
+    def name(self) -> str:
         n1 = ' '.join(self.from_sound.name.split(' ')[:-1])
         n2 = ' '.join(self.to_sound.name.split(' ')[:-1])
-        return 'from ' + n1 + ' to ' + n2 + ' ' + self.type
+        return 'from ' + n1 + ' to ' + n2 + ' ' + self.type()
 
     def _features(self):
-        res = ['from_' + p for p in nfilter(
-            getattr(self.from_sound, p, None) for p in self.from_sound._name_order)]
-        res.extend([
-            'to_' + p for p in nfilter(
-                getattr(self.to_sound, p, None) for p in self.to_sound._name_order)])
-        if self.from_sound.type == "vowel":
-            res.append("diphthong")
-        if self.from_sound.type == "consonant":
-            res.append("cluster")
+        res = ['from_' + p for p in nfilter(v for _, v in self.from_sound.features)]
+        res.extend(['to_' + p for p in nfilter(v for _, v in self.to_sound.features)])
+        for cls in ComplexSound.__subclasses__():
+            if isinstance(self.from_sound, cls.__from_sound_cls__):
+                res.append(cls.__name__.lower())
+                break
         return res
 
     @property
     def featuredict(self):
-        res = {'from_' + p: getattr(self.from_sound, p, None) for p in self.from_sound._name_order}
-        res.update({'to_' + p: getattr(self.to_sound, p, None) for p in self.to_sound._name_order})
+        res = {'from_' + f: v for f, v in self.from_sound.features}
+        res.update({'to_' + f: v for f, v in self.to_sound.features})
         return res
 
     @classmethod
     def from_sounds(cls, source, sound1, sound2, ts):
+        """Instantiate a complex sound from two consitutent sounds."""
         return cls(
             source=source,
             grapheme=sound1.grapheme + sound2.grapheme,
@@ -378,7 +310,7 @@ class ComplexSound(Sound):
         return [self.grapheme, self.from_sound.name, self.to_sound.name]
 
 
-@attr.s(repr=False, **cmp_off)
+@dataclasses.dataclass(repr=False, eq=False)
 class Cluster(ComplexSound):
     """
     A cluster of two consonants whose manner is either plosive or implosive.
@@ -389,76 +321,52 @@ class Cluster(ComplexSound):
     invalid sound clusters, we restrict the ```manner``` attribute of the two
     sounds to ```plosive``` and ```implosive```.
     """
+    __from_sound_cls__ = Consonant
+    features: Features = dataclasses.field(default_factory=Features)
+
+    @staticmethod
+    def match(sound1, sound2):
+        if isinstance(sound1, Consonant):
+            if all((
+                sound1.features.manner in sound1.features.validated(
+                    'manner', 'stop', 'implosive', 'click', 'nasal'),
+                sound2.features.manner in sound2.features.validated(
+                    'manner', 'stop', 'implosive', 'affricate')
+            )):
+                return True
+
+            if sound1.features.manner == 'click' and sound2.features.manner == 'fricative':
+                return True
+        return False
 
 
-@attr.s(repr=False, **cmp_off)
+@dataclasses.dataclass(repr=False, eq=False)
 class Vowel(Sound):
-    roundedness = attr.ib(default=None)
-    height = attr.ib(default=None)
-    nasalization = attr.ib(default=None)
-    friction = attr.ib(default=None)
-    duration = attr.ib(default=None)
-    voicing = attr.ib(default=None)
-    breathiness = attr.ib(default=None)
-    creakiness = attr.ib(default=None)
-    release = attr.ib(default=None)
-    syllabicity = attr.ib(default=None)
-    pharyngealization = attr.ib(default=None)
-    rhotacization = attr.ib(default=None)
-    centrality = attr.ib(default=None)
-    glottalization = attr.ib(default=None)
-    velarization = attr.ib(default=None)
-    relative_articulation = attr.ib(default=None)
-    tone = attr.ib(default=None)
-    raising = attr.ib(default=None)
-    rounding = attr.ib(default=None)
-    tongue_root = attr.ib(default=None)
-    articulation = attr.ib(default=None)  # compare
-    # https://en.wikipedia.org/wiki/Faucalized_voice
-
-    _write_order = dict(
-        pre=[],
-        post=[
-            'tongue_root',
-            'raising',
-            'centrality',
-            'rounding',
-            'voicing',
-            'breathiness',
-            'creakiness',
-            'syllabicity',
-            'friction',
-            'relative_articulation',
-            'nasalization',
-            'tone',
-            'articulation',
-            'rhotacization',
-            'pharyngealization',
-            'glottalization',
-            'velarization',
-            'duration'])
-    _name_order = [
-        'duration', 'rhotacization', 'pharyngealization',
-        'glottalization', 'velarization', 'syllabicity',
-        'relative_articulation',
-        'tongue_root', 'raising', 'rounding',
-        'articulation', 'nasalization', 'voicing', 'creakiness',
-        'breathiness', 'roundedness', 'height', 'friction', 'centrality',
-        'tone']
+    """A Vowel."""
+    features: VowelFeatures = dataclasses.field(default_factory=VowelFeatures)
 
 
-@attr.s(repr=False, **cmp_off)
+@dataclasses.dataclass(repr=False, eq=False)
 class Diphthong(ComplexSound):
     """
     A dipthong consists of two vowels.
     """
+    __from_sound_cls__ = Vowel
+    features: Features = dataclasses.field(default_factory=Features)
+
+    @staticmethod
+    def match(sound1, _):
+        return isinstance(sound1, Vowel)
 
 
-@attr.s(repr=False, **cmp_off)
+@dataclasses.dataclass(repr=False, eq=False)
 class Tone(Sound):
-    contour = attr.ib(default=None)
-    start = attr.ib(default=None)
-    middle = attr.ib(default=None)
-    end = attr.ib(default=None)
+    """A tone."""
+    features: ToneFeatures = dataclasses.field(default_factory=ToneFeatures)
 
-    _name_order = ['contour', 'start', 'middle', 'end']
+
+SOUND_CLASSES: dict[SoundclassNameType, type] = {
+    cls.__name__.lower() for cls in [Consonant, Vowel, Tone, Diphthong, Cluster, UnknownSound]}
+
+COMPLEX_SOUNDS: dict[Literal['diphthong', 'cluster'], tuple[type, type]] = {
+    cls.__name__.lower(): (cls, base) for cls, base in [(Diphthong, Vowel), (Cluster, Consonant)]}

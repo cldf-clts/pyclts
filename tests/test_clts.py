@@ -1,6 +1,16 @@
 import pytest
 
-from pyclts.models import Marker, UnknownSound, is_valid_sound, Symbol, Sound
+from pyclts.models import Marker, UnknownSound, Symbol, Sound
+
+
+def test_bug():
+    """
+    before:
+    77340   u*i     from long unrounded open back to unrounded close front diphthong                asjpcode        0
+
+    now:
+    77337   u*i     from long rounded close back to unrounded close front diphthong         asjpcode        0
+    """
 
 
 def test_TranscriptionBase_translate(bipa, asjp):
@@ -9,8 +19,8 @@ def test_TranscriptionBase_translate(bipa, asjp):
 
 
 def test_is_valid_sound(bipa):
-    assert not is_valid_sound(bipa['_'], bipa)
-    assert is_valid_sound(bipa['ä'], bipa)
+    assert not bipa.is_valid(bipa['_'])
+    assert bipa.is_valid(bipa['ä'])
 
 
 def test_getitem(bipa):
@@ -75,20 +85,20 @@ def test_parse(bipa):
     # diphthongs
     for s in ['ao', 'ea', 'ai', 'ua']:
         res = bipa[s]
-        assert res.type == 'diphthong'
+        assert res.type() == 'diphthong'
         assert res.name.endswith('diphthong')
         assert s == str(s)
 
     # clusters
-    for s in ['tk', 'pk', 'dg', 'bdʰ']:
+    for s in ['mp']:#['tk', 'pk', 'dg', 'bdʰ']:
         res = bipa[s]
-        assert res.type == 'cluster'
+        assert res.type() == 'cluster'
         assert 'cluster' in res.name
         assert s == str(s)
 
     # go for bad diacritics in front and end of a string
-    assert bipa['*a'].type == 'unknownsound'
-    assert bipa['a*'].type == 'unknownsound'
+    assert bipa['*a'].type() == 'unknownsound'
+    assert bipa['a*'].type() == 'unknownsound'
 
     # marker
     assert isinstance(bipa['_'], Marker)

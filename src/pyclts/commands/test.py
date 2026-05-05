@@ -1,15 +1,18 @@
 """
 Check repository data for consistency
+
+FIXME: must also check implementation in pyclts/features.py for compatibility with
+pkg/transcriptionsystems/features.json
 """
 import pathlib
 import argparse
 
-from csvw.dsv import reader
-
 import pyclts
+from pyclts.util import dict_reader
+from pyclts.models import UnknownSound, Marker, Cluster
 
 
-def register(parser):
+def register(parser):  # pylint: disable=C0116
     parser.add_argument(
         '--test',
         action='store_true',
@@ -18,27 +21,37 @@ def register(parser):
     )
 
 
-def run(args):
+def run(args):  # pylint: disable=C0116
     clts = args.repos
 
     for src in clts.meta:
-        for ref in src['REFS']:
-            assert ref in clts.references, 'Missing bibtex key: {}'.format(ref)
+        for ref in src.REFS:
+            assert ref in clts.references, f'Missing bibtex key: {ref}'
+
+    def run_test_func(func, *args):
+        print(f'{func.__name__} ...')
+        res = func(*args)
+        print('OK' if res else 'FAIL')
 
     if not args.test:  # pragma: no cover
-        test_transcriptiondata(
+        run_test_func(
+            test_transcriptiondata,
             clts.soundclass('sca'),
             clts.soundclass('dolgo'),
             clts.soundclass('asjp'),
             clts.transcriptiondata('phoible'),
-            clts.transcriptionsystem('bipa'))
-        test_transcription_system_consistency(
-            *[clts.transcriptionsystem(key) for key in ['bipa', 'asjpcode', 'gld']])
-    test_sounds(clts.bipa, args.log)
-    test_clicks(clts.bipa)
+            clts.transcriptionsystem('bipa')
+        )
+        run_test_func(
+            test_transcription_system_consistency,
+            *[clts.transcriptionsystem(key) for key in ['bipa', 'asjpcode', 'gld']]
+        )
+    run_test_func(test_sounds, clts.bipa, args.log)
+    run_test_func(test_clicks, clts.bipa)
 
 
 def test_transcriptiondata(sca, dolgo, asjpd, phoible, bipa):  # pragma: no cover
+    """Test samples of transcription data"""
     seq = 'tʰ ɔ x ˈth ə r A ˈI ʲ'
     seq2 = 'th o ?/x a'
     seq3 = 'th o ?/ a'
@@ -65,62 +78,55 @@ def test_transcriptiondata(sca, dolgo, asjpd, phoible, bipa):  # pragma: no cove
         raise ValueError()
     except KeyError:
         pass
+    return True
 
 
 def test_transcription_system_consistency(bipa, asjp, gld):  # pragma: no cover
+    """Test all sounds in transcription systems."""
     # bipa should always be able to be translated to
-    for sound in asjp:
-        if sound not in bipa:
-            assert '<?>' not in str(bipa[asjp[sound].name])
-    for sound in gld:
-        if sound not in bipa:
-            assert '<?>' not in str(bipa[gld[sound].name])
-    for sound in bipa:
-        if bipa[sound].type != 'unknownsound' and not bipa[sound].alias:
-            if sound != str(bipa[sound]):
+    for system in (asjp, gld):
+        for sound in system:
+            if sound not in bipa:
+                assert '<?>' not in str(bipa[system[sound].name])
+
+    for system in (bipa, gld, asjp):
+        for sound in system:
+            if not isinstance(system[sound], UnknownSound) and not system[sound].alias:
+                if sound != str(system[sound]):
+                    raise ValueError
+            elif isinstance(system[sound], UnknownSound):
                 raise ValueError
-        elif bipa[sound].type == 'unknownsound':
-            raise ValueError
-    for sound in gld:
-        if gld[sound].type != 'unknownsound' and not gld[sound].alias:
-            if sound != str(gld[sound]):
-                raise ValueError
-        elif gld[sound].type == 'unknownsound':
-            raise ValueError
-    for sound in asjp:
-        if asjp[sound].type != 'unknownsound' and not asjp[sound].alias:
-            if sound != str(asjp[sound]):
-                raise ValueError
-        elif asjp[sound].type == 'unknownsound':
-            raise ValueError
 
     # important test for alias
     assert str(bipa['d̤ʷ']) == str(bipa['dʷʱ']) == str(bipa['dʱʷ'])
+    return True
 
 
-def read_tests(name):
-    return reader(pathlib.Path(pyclts.__file__).parent / 'data' / name, delimiter='\t', dicts=True)
+def read_tests(name):  # pylint: disable=C0116
+    return dict_reader(pathlib.Path(pyclts.__file__).parent / 'data' / name)
 
 
-def test_sounds(bipa, log):
+def test_sounds(bipa, log):  # pylint: disable=C0116
     for test in read_tests('test_data.tsv'):
         del test['bipa']
         if None in test:
             del test[None]
         try:
             _test_sounds(bipa, **{k.replace('-', '_'): v for k, v in test.items()})
-        except AssertionError as e:
-            log.warning('{0}\t{1}'.format(test['source'], e))
+        except AssertionError as e:  # pragma: no cover
+            log.warning('%s\t%s', test['source'], e)
+    return True
 
 
-def test_clicks(bipa):
+def test_clicks(bipa):  # pylint: disable=C0116
     for test in read_tests('clicks.tsv'):
         _test_clicks(bipa, test['GRAPHEME'], test['MANNER'])
+    return True
 
 
 def _test_clicks(bipa, grapheme, gtype):
     if gtype == 'stop-cluster':
-        assert bipa[grapheme].type == 'cluster'
+        assert isinstance(bipa[grapheme], Cluster), bipa[grapheme].type()
 
 
 def _test_sounds(bipa, **kw):
@@ -128,7 +134,7 @@ def _test_sounds(bipa, **kw):
     kw = argparse.Namespace(**kw)
 
     sound = bipa[kw.source]
-    if sound.type not in ['unknownsound', 'marker']:
+    if not isinstance(sound, (UnknownSound, Marker)):
         if kw.nfd_normalized == '+':
             assert bipa[kw.source] != sound.source, "Sound does not resolve to itself"
         if kw.clts_normalized == "+":

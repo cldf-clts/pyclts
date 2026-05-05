@@ -6,42 +6,54 @@ See also https://en.wikipedia.org/wiki/International_Phonetic_Alphabet_chart
 import io
 import copy
 import pathlib
+from typing import TYPE_CHECKING, Literal, Union, Optional
 import functools
+from collections.abc import Iterable, Generator
+import dataclasses
 from xml.etree import ElementTree as et
 
-import attr
+if TYPE_CHECKING:
+    from pyclts.models import Sound
+
 
 __all__ = ['Segment', 'VowelTrapezoid', 'PulmonicConsonants', 'ipa_charts']
+# Map class names to pairs (fill, outline):
+ColorSpecType = dict[Union[str, None], tuple[str, str]]
 
 
-@attr.s
+@dataclasses.dataclass
 class Segment:
     """
     Bag of attributes controlling display of a segment in an IPA chart.
     """
-    sound_bipa = attr.ib(validator=attr.validators.instance_of(str))
-    sound_name = attr.ib(validator=attr.validators.instance_of(str))
-    label = attr.ib(default=None)
-    href = attr.ib(default=None)
-    css_class = attr.ib(default=None)
-    title = attr.ib(default=None)
+    sound_bipa: str
+    sound_name: str
+    label: str = None
+    href: str = None
+    css_class: str = None
+    title: str = None
 
-    def __attrs_post_init__(self):
+    def __post_init__(self):
+        assert isinstance(self.sound_bipa, str)
+        assert isinstance(self.sound_name, str)
         if not self.label:
             self.label = self.sound_bipa
         if not self.title:
             self.title = self.sound_name
 
     @classmethod
-    def from_sound(cls, sound, **kw):
+    def from_sound(cls, sound: 'Sound', **kw) -> 'Segment':
+        """Create a segment from a sound."""
         return cls(sound_bipa=str(sound), sound_name=sound.name, **kw)  # pragma: no cover
 
     @functools.cached_property
-    def features(self):
+    def features(self) -> set[str]:
+        """Set of features of the associated sound."""
         return set(s.replace('-', '') for s in self.sound_name.split())
 
     @property
-    def link_attrib(self):
+    def link_attrib(self) -> dict[Literal['href', 'class'], str]:
+        """Extract link attributes from the segment data."""
         res = {}
         if self.href:
             res['href'] = self.href
@@ -50,64 +62,37 @@ class Segment:
         return res
 
     @property
-    def html_link_attrib(self):
+    def html_link_attrib(self) -> dict[Literal['href', 'class', 'title'], str]:
+        """HTML links also should have a title."""
         res = self.link_attrib
         res.update(title=self.title)
         return res
 
 
-def html_css(id, colorspec=None):
-    colorspec = colorspec or {None: ('black', 'solid 1px white')}
-    res = ["""\
-#{0} a {{text-decoration: none; font-size: smaller;}}
-#{0} a {{color: {1};}}
-#{0} a {{outline: solid 1px {2};}}
-""".format(
-        id,
-        colorspec.get(None, ('black', None))[0],
-        colorspec.get(None, (None, 'solid 1px white'))[1],
-    )]
-    for cls, (fill, outline) in colorspec.items():
-        if cls:
-            if fill:
-                res.append("#{2} a.{0} text, text svg|a.{0} {{fill: {1};}}".format(cls, fill, id))
-            if outline:
-                res.append("#{2} a.{0} {{outline: {1};}}".format(cls, outline, id))
-    return '\n'.join(res)
-
-
-def svg_css(colorspec=None):
+def svg_css(colorspec: Optional[ColorSpecType] = None) -> Generator[str, None, None]:
     """
     :param colorspec:
     :return:
     """
     colorspec = colorspec or {None: ('black', 'solid 1px white')}
-    res = ["""\
-@namespace svg url(http://www.w3.org/2000/svg);
-svg|a:link, svg|a:visited {{cursor: pointer;}}
-svg|a text, text svg|a {{fill: {};}}
-svg|a {{outline: solid 1px {};}}
-svg|a:hover, svg|a:active {{outline: dotted 1px blue;}}
-""".format(
-        colorspec.get(None, ('black', None))[0],
-        colorspec.get(None, (None, 'white'))[1],
-    )]
+    yield "@namespace svg url(http://www.w3.org/2000/svg);"
+    yield "svg|a:link, svg|a:visited {cursor: pointer;}"
+    yield f"svg|a text, text svg|a {{fill: {colorspec.get(None, ('black', None))[0]};}}"
+    yield f"svg|a {{outline: solid 1px {colorspec.get(None, (None, 'white'))[1]};}}"
+    yield "svg|a:hover, svg|a:active {outline: dotted 1px blue;}"
+
     for cls, (fill, outline) in colorspec.items():
         if cls:
             if fill:
-                res.append("svg|a.{0} text, text svg|a.{0} {{fill: {1};}}".format(cls, fill))
+                yield f"svg|a.{cls} text, text svg|a.{cls} {{fill: {fill};}}"
             if outline:
-                res.append("svg|a.{0} {{outline: {1};}}".format(cls, outline))
+                yield f"svg|a.{cls} {{outline: {outline};}}"
                 # Unfortunately, there is no outline property in the SVG spec, see
                 # https://stackoverflow.com/q/13387851
                 # So as a fallback, we add a text-decoration:
-                res.append("svg|a.{0} {{text-decoration: underline;}}".format(cls))
-                res.append(
-                    "svg|a.{0} {{text-decoration-style: {1};}}".format(cls, outline.split()[0]))
-                res.append(
-                    "svg|a.{0} {{text-decoration-color: {1};}}".format(cls, outline.split()[-1]))
-
-    return '\n'.join(res)
+                yield f"svg|a.{cls} {{text-decoration: underline;}}"
+                yield f"svg|a.{cls} {{text-decoration-style: {outline.split()[0]};}}"
+                yield f"svg|a.{cls} {{text-decoration-color: {outline.split()[-1]};}}"
 
 
 class Diagram:
@@ -130,14 +115,14 @@ class Diagram:
         """
         self._id = id_
         self.tree = et.parse(str(pathlib.Path(__file__).parent / self.__fname__))
-        self.slots = {}
+        self.slots: dict[frozenset[str], tuple[et.Element, list[Segment]]] = {}
         self.exclusive = set()
 
     @property
-    def id(self):
+    def id(self):  # pylint: disable=C0116
         return self._id or self.__id__
 
-    def iter_slots(self):
+    def iter_slots(self) -> Generator[tuple[Iterable[str], et.Element]]:
         """
         Diagrams must provide a generator of the slots they provide as pairs (features, element),
         where `features` is a set of CLTS features (with NON<feature> specifying absence of a
@@ -146,14 +131,14 @@ class Diagram:
         """
         raise NotImplementedError()  # pragma: no cover
 
-    def fill_slots(self, inventory):
+    def fill_slots(self, inventory: Iterable[Segment]) -> set[int]:
         """
         Assign matching segments to diagram slots.
 
         :param inventory: `list` of `Segment` instances.
         :return: `set` of inventory indices which have been assigned to slots.
         """
-        self.slots = {}
+        self.slots: dict[frozenset[str], tuple[et.Element, list[Segment]]] = {}
         for features, element in self.iter_slots():
             features = set(features)
             if self.__extend_features__:
@@ -165,23 +150,33 @@ class Diagram:
             for ex in self.exclusive:
                 if ex not in segment.features:
                     features.add('NON' + ex)
-            for f in self.slots:
+            for f, (_, segments) in self.slots.items():
                 if f.issubset(features):
                     covered.add(i)
-                    self.slots[f][1].append(segment)
+                    segments.append(segment)
                     break
         return covered
 
-    def format_segment(self, element, segment, is_last, is_first):
+    def format_segment(
+            self,
+            element: et.Element,
+            segment: Segment,
+            is_last: bool,
+            is_first: bool):
         """
         Diagrams must provide a method to format segments as ElementTree elements.
         """
         raise NotImplementedError()  # pragma: no cover
 
-    def css(self, colorspec):
-        return ''  # pragma: no cover
+    def css(self, colorspec: ColorSpecType) -> Generator[str, None, None]:  # pylint: disable=C0116
+        assert not colorspec or isinstance(colorspec, dict)  # pragma: no cover
+        yield ''  # pragma: no cover
 
-    def render(self, colorspec=None):
+    def render(
+            self,
+            colorspec: Optional[ColorSpecType] = None
+    ) -> tuple[str, Generator[str, None, None]]:
+        """Render the diagram to HTML."""
         for e, segments in self.slots.values():
             for i, segment in enumerate(segments, start=1):
                 self.format_segment(e, segment, i == len(segments), i == 0)
@@ -193,11 +188,12 @@ class Diagram:
 
 
 class PulmonicConsonants(Diagram):
+    """The consonants table."""
     __id__ = 'pulmonic-consonants'
     __fname__ = 'consonants.html'
     __extend_features__ = frozenset({'consonant'})
 
-    def iter_slots(self):
+    def iter_slots(self):  # pylint: disable=C0116
         for e in self.tree.findall('.//td'):
             if 'class' in e.attrib:
                 for attrs in e.attrib['class'].split():
@@ -207,55 +203,67 @@ class PulmonicConsonants(Diagram):
                             self.exclusive.add(att[3:])
                     yield attrs, e
 
-    def format_segment(self, e, segment, is_last, is_first):
-        ee = et.SubElement(e, 'a', attrib=segment.html_link_attrib)
+    def format_segment(self, element, segment, is_last, is_first):  # pylint: disable=C0116
+        ee = et.SubElement(element, 'a', attrib=segment.html_link_attrib)
         ee.text = segment.label
         if not is_last:
             ee.tail = '\xa0'  # pragma: no cover
 
-    def css(self, colorspec):
-        return html_css(self.id, colorspec)
+    def css(self, colorspec: ColorSpecType) -> Generator[str, None, None]:  # pylint: disable=C0116
+        colorspec = colorspec or {None: ('black', 'solid 1px white')}
+        yield f"#{self.id} a {{text-decoration: none; font-size: smaller;}}"
+        yield f"#{self.id} a {{color: {colorspec.get(None, ('black', None))[0]};}}"
+        yield (f"#{self.id} a "
+               f"{{outline: solid 1px {colorspec.get(None, (None, 'solid 1px white'))[1]};}}")
+        for cls, (fill, outline) in colorspec.items():
+            if cls:
+                if fill:
+                    yield f"#{self.id} a.{cls} text, text svg|a.{cls} {{fill: {fill};}}"
+                if outline:
+                    yield f"#{self.id} a.{cls} {{outline: {outline};}}"
 
 
 class VowelTrapezoid(Diagram):
+    """The IPA vowel trapezoid."""
     __id__ = 'vowel-trapezoid'
     __fname__ = 'vowels.svg'
     __extend_features__ = frozenset({'vowel'})
 
-    def iter_slots(self):
+    def iter_slots(self):  # pylint: disable=C0116
         ns = {'svg': "http://www.w3.org/2000/svg"}
         et.register_namespace('', ns['svg'])
         for e in self.tree.findall('.//svg:text', ns):
             if 'id' in e.attrib:
                 yield e.attrib['id'].split('-'), e
 
-    def format_segment(self, e, segment, is_last, is_first):
-        ee = et.SubElement(e, '{http://www.w3.org/2000/svg}a', attrib=segment.link_attrib)
+    def format_segment(self, element, segment, is_last, is_first):  # pylint: disable=C0116
+        ee = et.SubElement(element, '{http://www.w3.org/2000/svg}a', attrib=segment.link_attrib)
         title = et.SubElement(ee, '{http://www.w3.org/2000/svg}title')
         title.text = segment.title
         ee.text = segment.label
         if not is_last:
             ee.tail = ' '  # pragma: no cover
 
-    def css(self, colorspec):
-        return """\
-#{0} {{height: 300px; width: 100%; min-width: 800px;}}
-#{0} .label {{font-size: 150%;}}
-#{0} .glyph {{font-size: 170%;}}
-""".format(self.id)
+    def css(self, colorspec: ColorSpecType) -> Generator[str, None, None]:  # pylint: disable=C0116
+        yield f"#{self.id} {{height: 300px; width: 100%; min-width: 800px;}}"
+        yield f"#{self.id} .label {{font-size: 150%;}}"
+        yield f"#{self.id} .glyph {{font-size: 170%;}}"
 
-    def render(self, colorspec=None):
+    def render(  # pylint: disable=C0116
+            self,
+            colorspec: Optional[ColorSpecType] = None,
+    ) -> tuple[str, Generator[str, None, None]]:
         r = self.tree.getroot()
         del r.attrib['width']
         del r.attrib['height']
         style = et.SubElement(r, '{http://www.w3.org/2000/svg}style')
-        style.text = svg_css(colorspec)
+        style.text = "\n".join(svg_css(colorspec)) + "\n"
         res, css = Diagram.render(self)
-        return '<figure>{}<figcaption>Vowels</figcaption></figure>'.format(
-            res.replace('#666666', '#dddddd')), css
+        res = res.replace('#666666', '#dddddd')
+        return f'<figure>{res}<figcaption>Vowels</figcaption></figure>', css
 
 
-def ipa_charts(inventory, colorspec=None):
+def ipa_charts(inventory: Iterable[Segment], colorspec: Optional[ColorSpecType] = None):
     """
     Slots matching segments into a set of predefined diagrams.
 
@@ -272,7 +280,7 @@ def ipa_charts(inventory, colorspec=None):
         covered = covered.union(diagram.fill_slots(inventory))
         html_, css_ = diagram.render(colorspec)
         html.append(html_)
-        css.append(css_)
+        css.extend(list(css_))
 
     return """\
 <html>
@@ -290,4 +298,4 @@ figcaption {{display: table-caption; caption-side: top; font-size: 120%;}}
 </body>
 </html>""".format(
         '\n'.join(css),
-        '\n'.join('<div>{}</div>'.format(t) for t in html)), covered
+        '\n'.join(f'<div>{t}</div>' for t in html)), covered

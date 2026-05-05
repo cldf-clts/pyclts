@@ -1,25 +1,25 @@
 """
-
+Compute summary stats.
 """
 import collections
 
-from csvw.dsv import reader
 from clldutils.clilib import add_format, Table
 
+from pyclts.util import dict_reader
 
-def register(parser):
+
+def register(parser):  # pylint: disable=C0116
     add_format(parser, default='pipe')
 
 
-def run(args):
-    def read(fname):
-        return reader(args.repos.path('data', fname), delimiter='\t', dicts=True)
-
-    sounds = {row['NAME']: row for row in read('sounds.tsv')}
-    graphs = {'{GRAPHEME}-{NAME}-{DATASET}'.format(**row): row for row in read('graphemes.tsv')}
+def run(args):  # pylint: disable=C0116
+    sounds = {row['NAME']: row for row in dict_reader(args.repos.path('data', 'sounds.tsv'))}
+    graphs = {
+        '{GRAPHEME}-{NAME}-{DATASET}'.format(**row): row  # pylint: disable=C0209
+        for row in dict_reader(args.repos.path('data', 'graphemes.tsv'))}
 
     graphdict = collections.defaultdict(list)
-    for id_, row in graphs.items():
+    for _, row in graphs.items():
         graphdict[row['GRAPHEME']].append(row['DATASET'])
 
     with Table(args, 'DATA', 'STATS', 'PERC') as text:

@@ -1,6 +1,6 @@
 import pytest
 from pyclts.inventories import reduce_features, Inventory, Phoneme
-from pyclts.transcriptionsystem import TranscriptionSystem
+from pyclts.datatypes import TranscriptionSystem
 
 
 @pytest.fixture
@@ -8,7 +8,6 @@ def bipa(repos):
     return TranscriptionSystem(
         repos / "pkg" / "transcriptionsystems" / "bipa",
         repos / "pkg" / "transcriptionsystems" / "transcription-system-metadata.json",
-        repos / "pkg" / "transcriptionsystems" / "features.json",
     )
 
 
@@ -27,7 +26,7 @@ def test_Phoneme(bipa):
     phonB = Phoneme(grapheme=str(soundB), sound=soundB)
     phonC = Phoneme(grapheme=str(soundC), sound=soundC)
 
-    assert phonA.type == 'unknownsound'
+    assert phonA.sound.type() == 'unknownsound'
 
     assert phonA.similarity(phonB) == 0
     assert phonA.similarity(phonC) == 1

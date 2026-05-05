@@ -73,20 +73,21 @@
       "retracted-tongue-root"
     ],
     "tone": [
-      "with_downstep",
-      "with_extra-high_tone",
-      "with_extra-low_tone",
-      "with_falling_tone",
-      "with_global_fall",
-      "with_global_rise",
-      "with_high_tone",
-      "with_low_tone",
-      "with_mid_tone",
-      "with_rising_tone",
-      "with_upstep"
+      "with-downstep",
+      "with-extra-high_tone",
+      "with-extra-low_tone",
+      "with-falling_tone",
+      "with-global_fall",
+      "with-global_rise",
+      "with-high_tone",
+      "with-low_tone",
+      "with-mid_tone",
+      "with-rising_tone",
+      "with-upstep"
     ],
     "articulation": [
-      "strong"
+      "strong",
+      "weak"
     ],
     "breathiness": [
       "breathy"
@@ -102,8 +103,17 @@
         "advanced",
         "retracted"
     ],
+    "tongue_root": [
+      "advanced-tongue-root",
+      "retracted-tongue-root"
+    ],
     "aspiration": [
       "aspirated"
+    ],
+    "airstream": [
+      "sibilant",
+      "whistled-sibilant",
+      "lateral"
     ],
     "creakiness": [
       "creaky"
@@ -112,11 +122,10 @@
       "unreleased",
       "with-lateral-release",
       "with-mid-central-vowel-release",
-      "with-nasal-release"
-    ],
-    "tongue_root": [
-      "advanced-tongue-root",
-      "retracted-tongue-root"
+      "with-nasal-release",
+      "with-uvular-release",
+      "with-sibilant-release",
+      "with-trilled-release"
     ],
     "ejection": [
       "ejective"
@@ -139,10 +148,21 @@
       "post-alveolar",
       "retroflex",
       "uvular",
-      "velar"
+      "velar",
+      "bilabial-and-alveolar",
+      "bilabial-and-velar",
+      "alveolar-and-bilabial",
+      "alveolar-and-velar",
+      "velar-and-alveolar",
+      "velar-and-bilabial",
+      "velar-and-uvular",
+      "unspecified-place"
     ],
     "pharyngealization": [
       "pharyngealized"
+    ],
+    "friction": [
+      "with-friction"
     ],
     "voicing": [
       "devoiced",
@@ -153,10 +173,12 @@
     ],
     "preceding": [
       "pre-aspirated",
+      "pre-breathy-aspirated",
       "pre-glottalized",
       "pre-labialized",
       "pre-nasalized",
-      "pre-palatalized"
+      "pre-palatalized",
+      "pre-glottalized-and-nasalized"
     ],
     "labialization": [
       "labialized"
@@ -170,19 +192,17 @@
     ],
     "phonation": [
       "voiced",
-      "voiceless"
+      "voiceless",
+      "unspecified-voice"
     ],
     "duration": [
       "long",
+      "ultra-long",
       "mid-long"
     ],
     "stress": [
       "primary-stress",
       "secondary-stress"
-    ],
-    "airstream": [
-      "lateral",
-      "sibilant"
     ],
     "velarization": [
       "velarized"
@@ -197,14 +217,16 @@
       "nasal-click",
       "stop",
       "tap",
-      "trill"
+      "trill",
+      "unspecified-manner"
     ],
     "laminality": [
       "apical",
       "laminal"
     ],
     "articulation": [
-      "strong"
+      "strong",
+      "weak"
     ],
     "breathiness": [
       "breathy"

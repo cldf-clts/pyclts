@@ -1,149 +1,180 @@
 """
 Map a given sound inventory list to CLTS
 """
+import logging
+import functools
+import dataclasses
+from typing import Optional
 
-from pyclts.models import is_valid_sound
+from pyclts.models import UnknownSound, Marker, Consonant, Cluster
+from pyclts.datatypes import TranscriptionSystem
 
 
-def register(parser):
+def register(parser):  # pylint: disable=C0116
     parser.add_argument("dataset", help="the file with the graphemes")
 
 
-def run(args, test=False):
+def note(c: str, modifier=None) -> str:
+    """A note"""
+    assert len(c) == 1
+    return f'({c}){modifier or ""}'
+
+
+warning = functools.partial(note, '!')
+question = functools.partial(note, '?')
+modification = functools.partial(note, '*')
+
+
+@dataclasses.dataclass
+class Report:
+    """Keep stats of the mapping process."""
+    unmapped: int = 0
+    premapped: int = 0
+    skipped: int = 0
+    modified: int = 0
+    mapped: int = 0
+
+    def printout(self, nrows: int, log: logging.Logger):
+        """Print the results."""
+        for attr in ['mapped', 'premapped', 'skipped', 'unmapped', 'modified']:
+            log.info(
+                '%s %s items (%.2f) in %s rows',
+                attr, getattr(self, attr), getattr(self, attr) / nrows, nrows)
+
+
+def _map_bipa_grapheme(
+        bipa_grapheme: str,
+        bipa: TranscriptionSystem,
+        report: Report
+) -> Optional[str]:
+    sound = bipa[bipa_grapheme]
+    if not isinstance(sound, UnknownSound):
+        if isinstance(sound, Marker):
+            report.premapped += 1
+        elif not bipa.is_valid(sound):  # pragma: no cover - we assume BIPA sounds to be valid!
+            report.unmapped += 1
+            return warning()
+        elif sound.s != bipa_grapheme:
+            report.modified += 1
+            return question() + sound.s
+        else:
+            report.premapped += 1
+    else:
+        report.unmapped += 1
+        return question()
+    return None
+
+
+def _map_unknown(raw_grapheme: str, bipa: TranscriptionSystem, report: Report) -> str:
+    match = list(bipa._regex.finditer(raw_grapheme))  # pylint: disable=W0212
+    if len(match) == 2:
+        sound1 = bipa[raw_grapheme[:match[1].start()]]
+        sound2 = bipa[raw_grapheme[match[1].start():]]
+        if isinstance(sound1, Consonant) and isinstance(sound2, Consonant):
+            # check for prenasalized stuff
+            if sound1.features.manner == "nasal" and (
+                    sound2.features.place == sound2.features.place
+                    or sound2.features.manner
+                    in ["stop", "affricate", "fricative", "implosive"]
+            ):
+                report.mapped += 1
+                return modification("ⁿ") + str(sound2)
+    report.unmapped += 1
+    return question()
+
+
+def _map_cluster(sound: Cluster, bipa: TranscriptionSystem, report: Report) -> str:
+    # check for prenasalized stuff
+    if sound.from_sound.features.manner == "nasal" and (
+            sound.from_sound.features.place == sound.to_sound.features.place
+            or sound.to_sound.features.manner
+            in ["stop", "affricate", "fricative", "implosive"]
+    ):
+        report.mapped += 1
+        return modification("ⁿ") + str(sound.to_sound)
+
+    if sound.to_sound.features.manner == "fricative" and sound.from_sound.features.manner == "stop":
+        new_sound = bipa[sound.to_sound.name.replace("fricative", "affricate")]
+        if isinstance(new_sound, Consonant):
+            report.mapped += 1
+            return modification() + str(new_sound.to_sound)
+        report.unmapped += 1
+        return question()
+
+    if (
+            sound.from_sound.features.manner == sound.to_sound.features.manner
+            and sound.from_sound.features.place == sound.to_sound.features.place
+            and sound.from_sound.features.phonation == sound.to_sound.features.phonation
+    ):
+        features = {
+            k: v or sound.to_sound.featuredict[k] for k, v in sound.from_sound.featuredict.items()}
+        features["duration"] = "long"
+        report.mapped += 1
+        return modification() + str(
+            bipa[" ".join([f for f in features.values() if f]) + " " + sound.from_sound.type()])
+
+    report.mapped += 1
+    return warning() + str(sound)
+
+
+def _map_sound(raw_grapheme, bipa, report) -> str:
+    sound = bipa[raw_grapheme]
+    if isinstance(sound, UnknownSound):
+        return _map_unknown(raw_grapheme, bipa, report)
+    if isinstance(sound, Marker):
+        report.mapped += 1
+        return str(sound)
+    if isinstance(sound, Cluster):
+        return _map_cluster(sound, bipa, report)
+    if bipa.is_valid(sound):
+        report.mapped += 1
+        return sound.s
+    # Considering what bipa.resolve_sound does, we cannot really get here, since any string will be
+    # interpreted at least as UnknownSound and all bipa sounds should be valid.
+    report.unmapped += 1  # pragma: no cover
+    return warning()  # pragma: no cover
+
+
+def run(args):  # pylint: disable=C0116
     # Instantiate BIPA
     bipa = args.repos.transcriptionsystem("bipa")
 
     # Iterave over graphemes and collect them
-    new_rows, header = [], []
-    unmapped, premapped, skipped, modified, mapped = 0, 0, 0, 0, 0
-    rows = args.repos.get_source(args.dataset)
-    for row in rows:
+    new_rows, header, row = [], [], {}
+    report = Report()
+    for row in args.repos.get_source(args.dataset):
         row.setdefault("SYMBOLS", '')
         bipa_grapheme = row["BIPA"].strip()
         raw_grapheme = row["GRAPHEME"].strip()
 
         # basic condition: do not touch <NA>
         if bipa_grapheme == "<NA>":
-            skipped += 1
+            report.skipped += 1
         # second condition: we receive a value and interpret it
         elif bipa_grapheme:
-            sound = bipa[bipa_grapheme]
-            if sound.type != "unknownsound":
-                if sound.type == 'marker':
-                    premapped += 1
-                elif not is_valid_sound(sound, bipa):
-                    row["BIPA"] = '(!)'
-                    unmapped += 1
-                elif sound.s != bipa_grapheme:
-                    row["BIPA"] = '(?)' + sound.s
-                    modified += 1
-                else:
-                    premapped += 1
-            else:
-                row["BIPA"] = '(?)'
-                unmapped += 1
+            res = _map_bipa_grapheme(bipa_grapheme, bipa, report)
+            if res:
+                row['BIPA'] = res
         else:
-            sound = bipa[raw_grapheme]
-            if sound.type == "unknownsound":
-                match = list(bipa._regex.finditer(raw_grapheme))
-                if len(match) == 2:
-                    sound1 = bipa[raw_grapheme[:match[1].start()]]
-                    sound2 = bipa[raw_grapheme[match[1].start():]]
-                    if sound1.type == "consonant" and sound2.type == "consonant":
-                        # check for prenasalized stuff
-                        if sound1.manner == "nasal" and (
-                            sound2.place == sound2.place
-                            or sound2.manner
-                            in ["stop", "affricate", "fricative", "implosive"]
-                        ):
-                            row["BIPA"] = "(*)ⁿ" + str(sound2)
-                            mapped += 1
-                        else:
-                            row["BIPA"] = "(?)"
-                            unmapped += 1
-                    else:
-                        row["BIPA"] = "(?)"
-                        unmapped += 1
-                else:
-                    row["BIPA"] = "(?)"
-                    unmapped += 1
-            elif sound.type == "marker":
-                row["BIPA"] = str(sound)
-                mapped += 1
-            elif sound.type == "cluster":
-                # check for prenasalized stuff
-                if sound.from_sound.manner == "nasal" and (
-                    sound.from_sound.place == sound.to_sound.place
-                    or sound.to_sound.manner
-                    in ["stop", "affricate", "fricative", "implosive"]
-                ):
-                    row["BIPA"] = "(*)ⁿ" + str(sound.to_sound)
-                    mapped += 1
-                elif (
-                    sound.to_sound.manner == "fricative"
-                    and sound.from_sound.manner == "stop"
-                ):
-                    new_sound = bipa[
-                        sound.to_sound.name.replace("fricative", "affricate")
-                    ]
-                    if new_sound.type == "consonant":
-                        row["BIPA"] = "(*)" + str(new_sound.to_sound)
-                        mapped += 1
-                    else:
-                        row["BIPA"] = "(?)"
-                        unmapped += 1
-                elif (
-                    sound.from_sound.manner == sound.to_sound.manner
-                    and sound.from_sound.place == sound.to_sound.place
-                    and sound.from_sound.phonation == sound.to_sound.phonation
-                ):
-                    features = {
-                        k: v or sound.to_sound.featuredict[k]
-                        for k, v in sound.from_sound.featuredict.items()
-                    }
-                    features["duration"] = "long"
-                    row["BIPA"] = '(*)' + str(
-                        bipa[
-                            " ".join([f for f in features.values() if f])
-                            + " "
-                            + sound.from_sound.type])
-                    mapped += 1
-                else:
-                    row["BIPA"] = "(!)" + str(sound)
-                    mapped += 1
-            else:
-                if is_valid_sound(sound, bipa):
-                    row["BIPA"] = sound.s
-                    mapped += 1
-                else:
-                    row["BIPA"] = '(!)'
-                    unmapped += 1
+            row['BIPA'] = _map_sound(raw_grapheme, bipa, report)
+
         if row['BIPA']:
-            if row['BIPA'].startswith('*'):
-                sound = bipa[row['BIPA'][1:]]
-            elif row['BIPA'].startswith('('):
+            if row['BIPA'].startswith('('):  # Strip off the note.
                 sound = bipa[row['BIPA'][3:]]
             else:
                 sound = bipa[row['BIPA']]
 
-            if sound.type not in ['unknownsound', 'marker']:
+            if not isinstance(sound, (Marker, UnknownSound)):
                 row['SYMBOLS'] = sound.symbols
 
         # Collect modified info
         new_rows.append([row[h] for h in row])
 
-    header = [h for h in row]
+    header = list(row.keys())
 
     print('\t'.join(header))
     for row in sorted(
             new_rows, key=lambda x: (x[header.index('BIPA')], x[header.index('GRAPHEME')])):
         print('\t'.join(row))
-    table = [
-        ['mapped', mapped, mapped / len(new_rows), len(new_rows)],
-        ['premapped', premapped, premapped / len(new_rows), len(new_rows)],
-        ['skipped', skipped, skipped / len(new_rows), len(new_rows)],
-        ['unmapped', unmapped, unmapped / len(new_rows), len(new_rows)]
-    ]
-    for row in table:
-        args.log.info('{0[0]} {0[1]} items ({0[2]:.2f}) in {0[3]} rows'.format(
-            row))
+
+    report.printout(len(new_rows), args.log)

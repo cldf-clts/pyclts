@@ -407,8 +407,7 @@ nts	from voiced alveolar nasal to voiceless alveolar sibilant affricate cluster	
 p’ː	long voiceless bilabial ejective stop consonant	+		pʼː	http://phoible.org/parameters/A7B847AA2D5B3C649CC9CAC7D61F3D6A		0:-:-:-:+:+:-:-:-:-:-:-:-:-:+:-:-:-:0:0:0:-:0:0:0:0:0:0:0:-:-:-:+:-:+:-:-			2155	
 ɐː	long unrounded near-open central vowel			ɐː	http://phoible.org/parameters/6D24EE617FD4CBF6D3BA2BAA79EEE941		0:-:+:-:+:-:+:+:0:+:-:-:-:-:+:+:-:-:0:0:0:+:-:+:-:-:0:-:-:+:-:-:-:0:-:-:0			2155	
 <NA>	<NA>	+		pʲʰ	http://phoible.org/parameters/3B4E2188086496B9803EA76F0ADDBC08		0:-:-:-:-:+:-:-:-:-:-:-:-:-:+:-:-:-:0:0:0:+:+:-:+:+:0:0:0:-:-:+:-:-:-:-:-			2155	
-ǁ	voiceless lateral click consonant			kǁ	http://phoible.org/parameters/65096E7199FB5D6118AA4E120AA1E858		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:-:-:+:+:-:-:-:0:0:0:-:-:-:-:-:-:-:+			2155	
-ɒ̃	nasalized rounded open back vowel			ɒ̃	http://phoible.org/parameters/E4E4B517DAB38211A476158473D54981		0:-:+:-:-:-:+:+:0:+:-:-:+:-:+:+:-:-:0:0:0:+:-:+:-:+:0:-:-:+:-:-:-:0:-:-:0			2155	
+ɒ̃	nasalized rounded open back vowel			ɒ̃	http://phoible.org/parameters/E4E4B517DAB38211A476158473D54981		0:-:+:-:-:-:+:+:0:+:-:-:+:-:+:+:-:-:0:0:0:+:-:+:-:+:0:-:-:+:-:-:-:0:-:-:0			2155
 zʲ	palatalized voiced alveolar sibilant fricative consonant			zʲ	http://phoible.org/parameters/F065641E0402A3988BDA88C38E8EB34D		0:-:-:-:-:+:-:+:+:-:-:-:-:-:-:0:0:+:+:-:+:+:+:-:+:+:0:0:0:+:-:-:-:-:-:-:-			2155	
 tsʲ	palatalized voiceless alveolar sibilant affricate consonant			tsʲ	http://phoible.org/parameters/BD5DD0B4F35DA44F05B251A09476EADF		0:-:-:-:-:+:-:-:+:-:-:-:-:-:-:0:0:+:+:-:+:+:+:-:+:+:0:0:0:-:-:-:-:-:-:-:-			2155	
 ie̞	from unrounded close front to unrounded mid front diphthong	+		ie̞	http://phoible.org/parameters/5CFD17D860BE399275222AD5CA4357F1		0:-:+:-:-:-:+:+:0:+:-:-:-:-:-:0:0:-:0:0:0:+:+,-:-:+:-:+:-:-:+:-:-:-:0:-:-:0			2155	
@@ -546,8 +545,8 @@ eu	from unrounded close-mid front to rounded close back diphthong	+		eu	http://p
 o̤ː	long breathy rounded close-mid back vowel	+		o̤ː	http://phoible.org/parameters/FFA2D63FC14357632A2F058E18788722		0:-:+:-:+:-:+:+:0:+:-:-:-:-:+:+:-:-:0:0:0:+:-:-:-:+:+:-:-:+:-:+:-:0:-:-:0			2155	
 e̝	raised unrounded close-mid front vowel	+		e̝	http://phoible.org/parameters/6CDC690924FF3FB9EBEA1A4BF0122C67		0:-:+:-:-:-:+:+:0:+:-:-:-:-:-:0:0:-:0:0:0:+:-:-:+:-:+:-:-:+:-:-:-:0:-:-:0			2155	
 e̤ː	long breathy unrounded close-mid front vowel	+		e̤ː	http://phoible.org/parameters/9A3509C1FE89F812DE3D85AC8A5478D3		0:-:+:-:+:-:+:+:0:+:-:-:-:-:-:0:0:-:0:0:0:+:-:-:+:-:+:-:-:+:-:+:-:0:-:-:0			2155	
-ŋǁ	voiced lateral nasal-click consonant			ŋǁ	http://phoible.org/parameters/709DCF8413120688AD151FECAABC2BEA		0:-:-:-:-:+:-:-:-:-:-:-:+:-:-:0:0:+:+:-:-:+:+:-:-:-:0:0:0:+:-:-:-:-:-:-:+			2155	
-ǁʰ	aspirated voiceless lateral click consonant	+		kǁʰ	http://phoible.org/parameters/044ECEA9E8E69B74668FBDB2D2C8AB68		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:-:-:+:+:-:-:-:0:0:0:-:-:+:-:-:-:-:+			2155	
+ŋǁ	voiced alveolar nasal-click consonant			ŋǁ	http://phoible.org/parameters/709DCF8413120688AD151FECAABC2BEA		0:-:-:-:-:+:-:-:-:-:-:-:+:-:-:0:0:+:+:-:-:+:+:-:-:-:0:0:0:+:-:-:-:-:-:-:+			2155
+ǁʰ	aspirated voiceless alveolar click consonant	+		kǁʰ	http://phoible.org/parameters/044ECEA9E8E69B74668FBDB2D2C8AB68		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:-:-:+:+:-:-:-:0:0:0:-:-:+:-:-:-:-:+			2155
 ŋǀ	voiced dental nasal-click consonant			ŋǀ	http://phoible.org/parameters/2E8863075FAFE62BAE2BC8573FC083A3		0:-:-:-:-:+:-:-:-:-:-:-:+:-:-:0:0:+:+:+:-:+:+:-:-:-:0:0:0:+:-:-:-:-:-:-:+			2155	
 ɲʱ	breathy voiced palatal nasal consonant	+		ɲ̤	http://phoible.org/parameters/92F2B0835609D9237A79F9074E061BEB		0:-:-:-:-:+:+:-:0:-:-:-:+:-:-:0:0:+:-:+:-:+:+:-:+:-:0:0:0:+:-:+:-:-:-:-:-			2155	
 eˑ	mid-long unrounded close-mid front vowel			eˑ	http://phoible.org/parameters/EF73174DEB1FB7C52AC28939E2274A7A		0:-:+:+:+:-:+:+:0:+:-:-:-:-:-:0:0:-:0:0:0:+:-:-:+:-:+:-:-:+:-:-:-:0:-:-:0			2155	
@@ -620,7 +619,7 @@ ps	from voiceless bilabial stop to voiceless alveolar sibilant fricative cluster
 ɥ̃	nasalized voiced labio-palatal approximant consonant	+		ɥ̃	http://phoible.org/parameters/B4A57D7A95017B952D9FCAB6DDB0FB7C		0:-:-:-:-:-:+:+:0:+:-:-:+:-:+:+:-:-:0:0:0:+:+:-:+:-:+:0:0:+:-:-:-:-:-:-:-			2155	
 ɾʷ	labialized voiced alveolar tap consonant	+		ɾʷ	http://phoible.org/parameters/389988F091161A4E27B5A8764C187C23		0:-:-:-:-:+:+:+:0:+:+:-:-:-:+:+:0:+:+:-:-:-:0:0:0:0:0:0:0:+:-:-:-:-:-:-:-			2155	
 ǀ’	voiceless dental ejective click consonant	+		kǀʼ	http://phoible.org/parameters/C4BF47EF9EAF519D7D0F1B116497A950		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:+:-:+:+:-:-:-:0:0:0:-:-:-:+:-:+:-:+			2155	
-gǁ	voiced lateral click consonant			ɡǁ	http://phoible.org/parameters/42087FB8F05E0D496C88BD1DAF1DFAFB		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:-:-:+:+:-:-:-:0:0:0:+:-:-:-:-:-:-:+			2155	
+gǁ	voiced alveolar click consonant			ɡǁ	http://phoible.org/parameters/42087FB8F05E0D496C88BD1DAF1DFAFB		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:-:-:+:+:-:-:-:0:0:0:+:-:-:-:-:-:-:+			2155
 cç’	voiceless palatal ejective affricate consonant	+		cçʼ	http://phoible.org/parameters/84288A5D605CF98D0898A9616D91BBCC		0:-:-:-:-:+:-:-:+:-:-:-:-:-:-:0:0:+:-:+:-:+:+:-:+:-:0:0:0:-:-:-:+:-:+:-:-			2155	
 β̃	nasalized voiced bilabial fricative consonant	+		β̃	http://phoible.org/parameters/DB4ADEF4B06752C923EFABC2DE64EC68		0:-:-:-:-:+:-:+:+:-:-:-:+:-:+:-:-:-:0:0:0:-:0:0:0:0:0:0:0:+:-:-:-:-:-:-:-			2155	
 wʱ	breathy voiced labio-velar approximant consonant	+		w̤	http://phoible.org/parameters/E7D44037B3BAB7EEF6D9FBB37ED643D3		0:-:-:-:-:-:+:+:0:+:-:-:-:-:+:+:-:-:0:0:0:+:+:-:-:+:+:0:0:+:-:+:-:-:-:-:-			2155	
@@ -996,9 +995,9 @@ zʱ	breathy voiced alveolar sibilant fricative consonant	+		z̤	http://phoible.o
 kᶣ	labio-palatalized voiceless velar stop consonant	+		kᶣ	http://phoible.org/parameters/C8E2CFFBEAAE3F9FEDC3FA884ED72AD1		0:-:-:-:-:+:-:-:-:-:-:-:-:-:+:+:0:-:0:0:0:+:+:-:+:+:0:0:0:-:-:-:-:-:-:-:-			2155	
 mɓ	from voiced bilabial nasal to voiced bilabial implosive cluster	+		mɓ	http://phoible.org/parameters/5A57B19070C30C0F578829D1BE67A8E4		0:-:-:-:-:+:+,-:-:-:-:-:-:+,-:-:+:-:-:-:0:0:0:-:0:0:0:0:0:0:0:+:-:-:-:-:-:-,+:-			2155	
 dx	from voiced alveolar stop to voiceless velar fricative cluster	+		dx	http://phoible.org/parameters/D511C18B8C33176956AB6E5FA1977CD1		0:-:-:-:-:+:-:-,+:-,+:-:-:-:-:-:-:0:0:+,-:+:-:-:-,+:+:-:-:-:0:0:0:+,-:-:-:-:-:-:-:-			2155	
-ǁxʼ	from voiceless lateral click to voiceless velar ejective fricative cluster	+		kǁxʼ	http://phoible.org/parameters/14BB145889ED9EC987C696799E01E1EC		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:-:-:+:+:-:-:-:0:0:0:-:-:-:+:-:+:-:+			2155	
-gǁx	from voiced lateral click to voiceless velar fricative cluster	+		ɡǁx	http://phoible.org/parameters/01FB02570641C35EBBC9B8188EE88A8C		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:-:-:+:+:-:-:-:0:0:0:+:-:-:-:-:-:-:+			2155	
-ǁx	from voiceless lateral click to voiceless velar fricative cluster	+		kǁx	http://phoible.org/parameters/1FC7126B7567AA77B2C019B06C28E8EE		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:-:-:+:+:-:-:-:0:0:0:-:-:-:-:-:-:-:+			2155	
+ǁxʼ	from voiceless alveolar click to voiceless velar ejective fricative cluster	+		kǁxʼ	http://phoible.org/parameters/14BB145889ED9EC987C696799E01E1EC		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:-:-:+:+:-:-:-:0:0:0:-:-:-:+:-:+:-:+			2155
+gǁx	from voiced alveolar click to voiceless velar fricative cluster	+		ɡǁx	http://phoible.org/parameters/01FB02570641C35EBBC9B8188EE88A8C		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:-:-:+:+:-:-:-:0:0:0:+:-:-:-:-:-:-:+			2155
+ǁx	from voiceless alveolar click to voiceless velar fricative cluster	+		kǁx	http://phoible.org/parameters/1FC7126B7567AA77B2C019B06C28E8EE		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:-:-:+:+:-:-:-:0:0:0:-:-:-:-:-:-:-:+			2155
 ʘ	voiceless labial click consonant			kʘ	http://phoible.org/parameters/C19B683345CFDE009F5B6362C5762B42		0:-:-:-:-:+:-:-:-:-:-:-:-:-:+:-:-:-:0:0:0:+:+:-:-:-:0:0:0:-:-:-:-:-:-:-:+			2155	
 gǀx	from voiced dental click to voiceless velar fricative cluster	+		ɡǀx	http://phoible.org/parameters/84D847563140DB64F68B28EC5BCDBFCF		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:+:-:+:+:-:-:-:0:0:0:+:-:-:-:-:-:-:+			2155	
 ǀx	from voiceless dental click to voiceless velar fricative cluster	+		kǀx	http://phoible.org/parameters/08FE09233E12E9B44CBB92DBD7AC43C0		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:+:-:+:+:-:-:-:0:0:0:-:-:-:-:-:-:-:+			2155	
@@ -1773,9 +1772,9 @@ tʼkx’	from voiceless alveolar ejective stop to voiceless velar ejective affri
 <NA>	<NA>			qǂʰ	http://phoible.org/parameters/5DF781D6598F822669C1B808E562FC7E		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:-:+:-:+:-:-:-:+:0:0:0:-:-:+:-:-:-:-:+			2155	
 <NA>	<NA>			qǂʼ	http://phoible.org/parameters/FF6C2A1A6D357A4951DE6898D3291F9F		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:-:+:-:+:-:-:-:+:0:0:0:-:-:-:+:-:+:-:+			2155	
 gʘkx’	from voiced labial click to voiceless velar ejective affricate cluster	+		ɡʘkxʼ	http://phoible.org/parameters/9FB9B04D22D13C66FF528BD450D320EB		0:-:-:-:-:+:-:-:-:-:-:-:-:-:+:-:-:-:0:0:0:+:+:-:-:-:0:0:0:+:-:-:+:-:+:-:+			2155	
-gǁkx’	from voiced lateral click to voiceless velar ejective affricate cluster	+		ɡǁkxʼ	http://phoible.org/parameters/F20B38FB733DE8A2684FDEBA2F66980D		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:-:-:+:+:-:-:-:0:0:0:+:-:-:+:-:+:-:+			2155	
+gǁkx’	from voiced alveolar click to voiceless velar ejective affricate cluster	+		ɡǁkxʼ	http://phoible.org/parameters/F20B38FB733DE8A2684FDEBA2F66980D		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:-:-:+:+:-:-:-:0:0:0:+:-:-:+:-:+:-:+			2155
 t̪ʼkx’	from voiceless dental ejective stop to voiceless velar ejective affricate cluster	+		t̪ʼkxʼ	http://phoible.org/parameters/AFC473D1E60A87B5C7C5F2AD28E1D551		0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:-			2155	
-gǁqʰ	from voiced lateral click to aspirated voiceless uvular stop cluster	+		ɡǁqʰ	http://phoible.org/parameters/381265FF05F38B21C1179AB7AB933C45		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:-:-:+:+:-:-:-:0:0:0:+:-:+:-:-:-:-:+			2155	
+gǁqʰ	from voiced alveolar click to aspirated voiceless uvular stop cluster	+		ɡǁqʰ	http://phoible.org/parameters/381265FF05F38B21C1179AB7AB933C45		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:-:-:+:+:-:-:-:0:0:0:+:-:+:-:-:-:-:+			2155
 ʘ’	voiceless labial ejective click consonant	+		kʘʼ	http://phoible.org/parameters/0BE56512CDC5133CCA36FDCAD67202C6		0:-:-:-:-:+:-:-:-:-:-:-:-:-:+:-:-:-:0:0:0:+:+:-:-:-:0:0:0:-:-:-:+:-:+:-:+			2155	
 ǂ’	voiceless palatal ejective click consonant	+		kǂʼ	http://phoible.org/parameters/78FF70B570134C274B58DA11237A3EE2		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:-:+:-:+:+:-:-:-:0:0:0:-:-:-:+:-:+:-:+			2155	
 ʘʰ	aspirated voiceless labial click consonant	+		kʘʰ	http://phoible.org/parameters/09EDE8A77FEE22EEE5D267AE1713C17D		0:-:-:-:-:+:-:-:-:-:-:-:-:-:+:-:-:-:0:0:0:+:+:-:-:-:0:0:0:-:-:+:-:-:-:-:+			2155	
@@ -1814,7 +1813,7 @@ gǃxʼ	from voiced alveolar click to voiceless velar ejective fricative cluster	
 t’ʰ	aspirated voiceless alveolar ejective stop consonant	+		tʰʼ	http://phoible.org/parameters/303EC9AAB9D32C451540C6BB51A53AF9		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:-:-:-:0:0:0:0:0:0:0:-:-:-:+:-:+:-:-			2155	
 <NA>	<NA>			t̠ʃx	http://phoible.org/parameters/3A85D48D46ACD7B3ECA36D392B2DE5BC		0:-:-:-:-:+:-:-:+:-:-:-:-:-:-:0:0:+:-:+:+:-:0:0:0:0:0:0:0:-:-:-:-:-:-:-:-			2155	
 ǃ’ʰ	aspirated voiceless alveolar ejective click consonant	+		kǃʰʼ	http://phoible.org/parameters/22C2D045B233EC9998EE7A8092D75671		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:-:-:+:+:-:-:-:0:0:0:-:-:-:+:-:+:-:+			2155	
-gǁxʼ	from voiced lateral click to voiceless velar ejective fricative cluster	+		ɡǁxʼ	http://phoible.org/parameters/576002A02119FDFAE27C1DF7E9BABA7D		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:-:-:+:+:-:-:-:0:0:0:+:-:-:+:-:+:-:+			2155	
+gǁxʼ	from voiced alveolar click to voiceless velar ejective fricative cluster	+		ɡǁxʼ	http://phoible.org/parameters/576002A02119FDFAE27C1DF7E9BABA7D		0:-:-:-:-:+:-:-:-:-:-:-:-:-:-:0:0:+:+:-:-:+:+:-:-:-:0:0:0:+:-:-:+:-:+:-:+			2155
 pɸ	voiceless bilabial affricate consonant			pɸ	http://phoible.org/parameters/38BAEE2253F376B5956EC9FE52C26507		0:-:-:-:-:+:-:-:+:-:-:-:-:-:+:-:-:-:0:0:0:-:0:0:0:0:0:0:0:-:-:-:-:-:-:-:-			2155	
 nθ	from voiced alveolar nasal to voiceless dental fricative cluster	+		nθ	http://phoible.org/parameters/4061B7BA1015C28DFE16C384688DAD7E		0:-:-:-:-:+:+,-:-,+:+:-:-:-:+,-:-:-:0:0:+:+:-,+:-:-:0:0:0:0:0:0:0:+,-:-:-:-:-:-:-:-			2155	
 ⁵²³	contour from-high via-mid-low to-mid tone			˥˨˧	http://phoible.org/parameters/7FDF85C24BF708252CDB6A29CF162D66		+:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0			2155	
