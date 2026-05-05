@@ -7,7 +7,7 @@ from collections.abc import Generator
 
 from clldutils.apilib import API
 from cldfcatalog import Config
-from pybtex.database import parse_string
+from simplepybtex.database import parse_string
 
 from pyclts.datatypes import (
     TranscriptionData, TranscriptionSystem, SoundClasses, SOUNDCLASS_SYSTEMS)

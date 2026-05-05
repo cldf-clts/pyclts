@@ -13,6 +13,7 @@ from pyclts.models import (
 from pyclts.util import (
     read_data, SoundsType, NamesType, GraphemeMapType, DataType, nfd, norm, itertable, fieldnames)
 from .datatypes_util import TranscriptionBase, Diacritics, SymbolWithDiacritics
+from ._compat import get_annotations
 
 SoundsByFeatures = dict[frozenset, Sound]
 FeatureValueType = str
@@ -163,7 +164,7 @@ class TranscriptionSystem(TranscriptionBase):  # pylint: disable=R0902
                 except ValueError as e:  # pragma: no cover
                     raise ValueError(f"{floc} {e}") from e
 
-                for key in fieldnames(sound.__annotations__['features']):
+                for key in fieldnames(get_annotations(sound)['features']):
                     value = getattr(sound.features, key)
                     if value and value not in self._feature_values:
                         self._feature_values[value] = key

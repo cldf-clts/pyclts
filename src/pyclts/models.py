@@ -10,6 +10,7 @@ from clldutils.misc import nfilter
 
 from .util import norm, jaccard, EMPTY, fieldnames
 from .features import ConsonantFeatures, VowelFeatures, ToneFeatures, Features
+from ._compat import get_annotations
 
 if TYPE_CHECKING:
     from pyclts.datatypes import TranscriptionSystem
@@ -91,18 +92,18 @@ class Sound(Symbol):
     def from_kw(cls, **kw):
         """Instantiate a sound from a dict, partitioning feature data as appropriate."""
         fkw = {}
-        fnames = fieldnames(cls.__annotations__['features'])
+        fnames = fieldnames(get_annotations(cls, is_instance=False)['features'])
         for name in list(kw.keys()):
             if name in fnames:
                 fkw[name] = kw.pop(name)
-        kw['features'] = cls.__annotations__['features'](**fkw)
+        kw['features'] = get_annotations(cls, is_instance=False)['features'](**fkw)
         return cls(**kw)
 
     def asdict(self) -> dict[str, Any]:
         """dataclasses.asdict is very slow, so we provide a simplistic alternative."""
         res = {f: getattr(self, f) for f in fieldnames(self.__class__)}
         res.update(
-            {f: getattr(self.features, f) for f in fieldnames(self.__annotations__['features'])})
+            {f: getattr(self.features, f) for f in fieldnames(get_annotations(self)['features'])})
         return res
 
     def __eq__(self, other):
