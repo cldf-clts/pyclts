@@ -1,7 +1,12 @@
 # Changes
 
 
-## [4.0.0] - unreleased
+## unreleased
+
+Fixed bug where py3.14 compatibility code had unwanted print calls.
+
+
+## [4.0.0]
 
 - Drop py3.8 compat
 - Remove dependency on `attrs`
