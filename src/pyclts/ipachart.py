@@ -219,6 +219,7 @@ class PulmonicConsonants(Diagram):
             if cls:
                 if fill:
                     yield f"#{self.id} a.{cls} text, text svg|a.{cls} {{fill: {fill};}}"
+                    yield f"#{self.id} a.{cls} {{color: {fill};}}"
                 if outline:
                     yield f"#{self.id} a.{cls} {{outline: {outline};}}"
 

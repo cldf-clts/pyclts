@@ -25,6 +25,7 @@ figcaption {display: table-caption; caption-side: top; font-size: 120%;}
 #pulmonic-consonants a {color: black;}
 #pulmonic-consonants a {outline: solid 1px solid 1px white;}
 #pulmonic-consonants a.abc text, text svg|a.abc {fill: red;}
+#pulmonic-consonants a.abc {color: red;}
 #pulmonic-consonants a.abc {outline: solid 1px green;}
 #vowel-trapezoid {height: 300px; width: 100%; min-width: 800px;}
 #vowel-trapezoid .label {font-size: 150%;}

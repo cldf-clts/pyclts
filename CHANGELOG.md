@@ -3,7 +3,9 @@
 
 ## unreleased
 
-Fixed bug where py3.14 compatibility code had unwanted print calls.
+- Fixed bug where py3.14 compatibility code had unwanted print calls.
+- Fixed bug where the correct css code for the IPA consonant chart was not
+  added.
 
 
 ## [4.0.0]
